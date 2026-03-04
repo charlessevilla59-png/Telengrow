@@ -10,7 +10,6 @@ export const UserProgress = sequelize.define("UserProgress", {
     references: { model: User, key: 'id' }
   },
   totalGamesPlayed: { type: DataTypes.INTEGER, defaultValue: 0 },
-  totalQuizzesTaken: { type: DataTypes.INTEGER, defaultValue: 0 },
   totalJournalEntries: { type: DataTypes.INTEGER, defaultValue: 0 },
   totalPoints: { type: DataTypes.INTEGER, defaultValue: 0 },
   currentStreak: { type: DataTypes.INTEGER, defaultValue: 0 },
@@ -27,9 +26,6 @@ export const UserProgress = sequelize.define("UserProgress", {
   gridMemoryStats: { type: DataTypes.JSON, defaultValue: {} },
   stressBallStats: { type: DataTypes.JSON, defaultValue: {} },
   
-  // Quiz Stats stored as JSON
-  calmTriviaStats: { type: DataTypes.JSON, defaultValue: {} },
-  paperCardsStats: { type: DataTypes.JSON, defaultValue: {} },
   
   achievements: { type: DataTypes.JSON, defaultValue: [] }
 });

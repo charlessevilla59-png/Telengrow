@@ -22,6 +22,10 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
     */
+
+// Load environment variables FIRST
+import dotenv from 'dotenv';
+dotenv.config();
     
 import express from "express";
 import path from "path";
@@ -32,6 +36,7 @@ import fs from 'fs';
 import hbs from "hbs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import passport from "./config/passport.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session middleware MUST come before routes
 app.use(session({
-  secret: "xianfire-secret-key",
+  secret: process.env.SESSION_SECRET || "xianfire-secret-key-change-this-in-production",
   resave: false,
   saveUninitialized: false,
   cookie: { 
@@ -53,6 +58,11 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
 }));
+
+// Initialize Passport AFTER session middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(flash());
 app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -159,6 +169,51 @@ app.engine("xian", async (filePath, options, callback) => {
       return days[date.getDay()];
     });
 
+    // Helper for admin dashboard - format date with time
+    hbs.handlebars.registerHelper('formatDate', function(date) {
+      if (!date) return 'Never';
+      const d = new Date(date);
+      const now = new Date();
+      const diff = now - d;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return 'Just now';
+      if (minutes < 60) return `${minutes} min ago`;
+      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+      
+      return d.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    });
+
+    // Helper for comparing values (eq)
+    hbs.handlebars.registerHelper('eq', function(a, b) {
+      return a === b;
+    });
+
+    // Helper to get first character of string
+    hbs.handlebars.registerHelper('substring', function(str, start, end) {
+      if (!str) return '';
+      return str.substring(start, end).toUpperCase();
+    });
+
+    // Helper to check if user is online (active in last 5 minutes)
+    hbs.handlebars.registerHelper('isOnline', function(lastActive) {
+      if (!lastActive) return false;
+      const now = new Date();
+      const last = new Date(lastActive);
+      const diff = now - last;
+      const minutes = Math.floor(diff / 60000);
+      return minutes < 5; // Online if active in last 5 minutes
+    });
+
     const result = await new Promise((resolve, reject) => {
       hbs.__express(filePath, options, (err, html) => {
         if (err) return reject(err);
@@ -181,6 +236,48 @@ app.use((req, res, next) => {
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "xian");
+
+// Register Handlebars helpers
+hbs.registerHelper('formatDate', function(date) {
+  if (!date) return 'Never';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+});
+
+hbs.registerHelper('formatDuration', function(seconds) {
+  if (!seconds || seconds === 0) return '0s';
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
+});
+
+hbs.registerHelper('formatGameName', function(gameType) {
+  if (!gameType) return '';
+  return gameType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+});
+
+hbs.registerHelper('substring', function(str, start, end) {
+  if (!str) return '';
+  return str.substring(start, end).toUpperCase();
+});
+
+hbs.registerHelper('eq', function(a, b) {
+  return a === b;
+});
+
+hbs.registerHelper('isOnline', function(lastActive) {
+  if (!lastActive) return false;
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  return new Date(lastActive) > fiveMinutesAgo;
+});
+
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
 
 // ✅ FIXED: Register partials synchronously with proper error handling
 const partialsDir = path.resolve(__dirname, "views", "partials");

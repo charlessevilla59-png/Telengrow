@@ -11,7 +11,7 @@ import { User, UserProgress, Activity, sequelize } from "../models/index.js";
 
 await sequelize.sync();
 
-export const loginPage = (req, res) => res.render("login", { title: "Login" });
+export const loginPage = (req, res) => res.render("login", { title: "Login", email: '' });
 export const registerPage = (req, res) => res.render("register", { title: "Register" });
 export const forgotPasswordPage = (req, res) => res.render("forgotpassword", { title: "Forgot Password" });
 
@@ -25,16 +25,26 @@ export const dashboardPage = async (req, res) => {
     // Redirect based on role
     if (user.role === 'admin') {
       return res.redirect("/admin/dashboard");
+    } else if (user.role === 'counselor') {
+      return res.redirect("/counselor/dashboard");
     }
     
     const progress = await UserProgress.findOne({ where: { userId: req.session.userId } });
+    
+    // Get published reading materials (limit 6 for dashboard)
+    const { ReadingMaterial } = await import('../models/index.js');
+    const materials = await ReadingMaterial.findAll({
+      where: { isPublished: true },
+      order: [['createdAt', 'DESC']],
+      limit: 6
+    });
+    
     res.render("user/userdashboard", { 
       title: "Dashboard",
       user,
       progress: progress || { totalPoints: 0, level: 'beginner', currentStreak: 0 },
       todayActivities: 0,
-      recentActivities: [],
-      recentGames: []
+      materials
     });
   } catch (error) {
     console.error(error);
@@ -46,14 +56,49 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     
+    console.log('🔐 Login attempt:', email);
+    
     if (!email || !password) {
-      return res.status(400).render("login", { error_msg: "Email and password are required" });
+      return res.status(400).render("login", { 
+        title: "Login",
+        error_msg: "Email and password are required",
+        email: email || '' // Preserve email
+      });
     }
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
       console.log(`🔍 User not found: ${email}`);
-      return res.status(401).render("login", { error_msg: "Email or password is incorrect" });
+      return res.status(401).render("login", { 
+        title: "Login",
+        error_msg: "Email or password is incorrect",
+        email: email // Preserve email
+      });
+    }
+
+    // Check account status
+    if (user.accountStatus === 'pending') {
+      return res.status(403).render("login", { 
+        title: "Login",
+        error_msg: "Your account is pending admin approval. Please wait for approval before logging in.",
+        email: email // Preserve email
+      });
+    }
+
+    if (user.accountStatus === 'rejected') {
+      return res.status(403).render("login", { 
+        title: "Login",
+        error_msg: "Your account has been rejected. Please contact the administrator.",
+        email: email // Preserve email
+      });
+    }
+
+    if (user.accountStatus === 'suspended') {
+      return res.status(403).render("login", { 
+        title: "Login",
+        error_msg: "Your account has been suspended. Please contact the administrator.",
+        email: email // Preserve email
+      });
     }
 
     console.log(`🔍 User found: ${email}, comparing passwords...`);
@@ -62,17 +107,28 @@ export const loginUser = async (req, res) => {
     
     if (!match) {
       console.log(`❌ Password mismatch for user: ${email}`);
-      return res.status(401).render("login", { error_msg: "Email or password is incorrect" });
+      return res.status(401).render("login", { 
+        title: "Login",
+        error_msg: "Email or password is incorrect",
+        email: email // Preserve email
+      });
     }
 
+    console.log(`✅ Login successful for: ${email} (${user.role})`);
     req.session.userId = user.id;
     
     // Save session before redirecting
     req.session.save((err) => {
       if (err) {
-        console.error("Session save error:", err);
-        return res.status(500).render("login", { error_msg: "Session error occurred" });
+        console.error("❌ Session save error:", err);
+        return res.status(500).render("login", { 
+          title: "Login",
+          error_msg: "Session error occurred. Please try again.",
+          email: email // Preserve email
+        });
       }
+
+      console.log(`✅ Session saved for user: ${user.id}`);
 
       // Log activity
       Activity.create({
@@ -87,21 +143,30 @@ export const loginUser = async (req, res) => {
         .catch(err => console.error("Update lastActive error:", err));
 
       // Redirect based on role
+      console.log(`🚀 Redirecting ${user.role} to dashboard...`);
       if (user.role === 'admin') {
         res.redirect("/admin/dashboard");
+      } else if (user.role === 'counselor') {
+        res.redirect("/counselor/dashboard");
       } else {
         res.redirect("/user/dashboard");
       }
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).render("login", { error_msg: "An error occurred during login" });
+    console.error("❌ Login error:", error);
+    res.status(500).render("login", { 
+      title: "Login",
+      error_msg: "An error occurred during login. Please try again.",
+      email: req.body.email || '' // Preserve email
+    });
   }
 };
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword, isFaculty } = req.body;
+
+    console.log('📝 Registration attempt:', { name, email, isFaculty });
 
     if (!name || !email || !password || !confirmPassword) {
       return res.status(400).render("register", { error_msg: "All fields are required" });
@@ -122,39 +187,64 @@ export const registerUser = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed });
     
-    // Create user progress record with all fields
-    await UserProgress.create({ 
-      userId: user.id,
-      totalGamesPlayed: 0,
-      totalQuizzesTaken: 0,
-      totalJournalEntries: 0,
-      totalPoints: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      level: 'beginner',
-      breathingBubbleStats: {},
-      colorTapStats: {},
-      gridMemoryStats: {},
-      stressBallStats: {},
-      calmTriviaStats: {},
-      paperCardsStats: {},
-      achievements: []
+    // Determine role and status based on counselor checkbox
+    // Checkbox can send 'true', 'on', or be undefined
+    const isCounselor = isFaculty === 'true' || isFaculty === 'on' || isFaculty === true;
+    const role = isCounselor ? 'counselor' : 'user';
+    const accountStatus = isCounselor ? 'pending' : 'active';
+    
+    console.log('👤 Creating user with:', { role, accountStatus, isFaculty, isCounselor });
+    
+    const user = await User.create({ 
+      name, 
+      email, 
+      password: hashed,
+      role,
+      accountStatus
     });
+    
+    console.log('✅ User created:', { id: user.id, name: user.name, role: user.role, accountStatus: user.accountStatus });
+    
+    // Only create user progress for regular users (not counselor)
+    if (role === 'user') {
+      await UserProgress.create({ 
+        userId: user.id,
+        totalGamesPlayed: 0,
+        totalJournalEntries: 0,
+        totalPoints: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        level: 'beginner',
+        breathingBubbleStats: {},
+        colorTapStats: {},
+        gridMemoryStats: {},
+        stressBallStats: {},
+        achievements: []
+      });
+      console.log('📊 User progress created for regular user');
+    } else {
+      console.log('👨‍⚕️ Counselor user - no progress created');
+    }
 
     // Log activity
     await Activity.create({
       userId: user.id,
       type: 'registration',
-      description: `${name} registered`,
-      metadata: { ipAddress: req.ip }
+      description: `${name} registered as ${role}`,
+      metadata: { ipAddress: req.ip, role, accountStatus }
     });
 
-    // Redirect to login page with success message
-    res.render("login", { 
-      success_msg: "Account created successfully! Please log in with your credentials." 
-    });
+    // Different success messages based on role
+    if (role === 'counselor') {
+      res.render("login", { 
+        success_msg: "Counselor account created! Your account is pending admin approval. You will be able to login once approved." 
+      });
+    } else {
+      res.render("login", { 
+        success_msg: "Account created successfully! Please log in with your credentials." 
+      });
+    }
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).render("register", { error_msg: "An error occurred during registration" });
@@ -177,5 +267,70 @@ export const logoutUser = async (req, res) => {
   } catch (error) {
     console.error("Logout error:", error);
     res.redirect("/login");
+  }
+};
+
+// Handles profile update requests (name/email/password/profilePicture)
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, email, currentPassword, newPassword, confirmPassword, selectedAvatar } = req.body;
+    const user = await User.findByPk(req.session.userId);
+    if (!user) return res.redirect("/login");
+
+    let error_msg;
+
+    // if email changed, make sure it's not already taken by another account
+    if (email && email !== user.email) {
+      const existing = await User.findOne({ where: { email } });
+      if (existing && existing.id !== user.id) {
+        error_msg = "Email is already in use by another account.";
+      }
+    }
+
+    // handle password change logic
+    if (!error_msg && (newPassword || confirmPassword || currentPassword)) {
+      if (!currentPassword) {
+        error_msg = "You must enter your current password to change your password.";
+      } else if (newPassword !== confirmPassword) {
+        error_msg = "New password and confirmation do not match.";
+      } else {
+        const match = await bcrypt.compare(currentPassword, user.password);
+        if (!match) {
+          error_msg = "Current password is incorrect.";
+        } else if (newPassword && newPassword.length < 6) {
+          error_msg = "New password must be at least 6 characters long.";
+        } else if (newPassword) {
+          const hashed = await bcrypt.hash(newPassword, 10);
+          user.password = hashed;
+        }
+      }
+    }
+
+    if (!error_msg) {
+      // apply name/email updates
+      if (name) user.name = name;
+      if (email) user.email = email;
+      
+      // Handle profile picture upload
+      if (req.file) {
+        // File was uploaded
+        user.profilePicture = '/uploads/profiles/' + req.file.filename;
+      } else if (selectedAvatar) {
+        // Avatar emoji was selected
+        user.profilePicture = selectedAvatar;
+      }
+      
+      await user.save();
+    }
+
+    const success_msg = error_msg ? null : "Profile updated successfully.";
+    res.render("user/profile", { title: "My Profile", user, error_msg, success_msg });
+  } catch (err) {
+    console.error("Profile update error:", err);
+    res.status(500).render("user/profile", {
+      title: "My Profile",
+      user: req.user,
+      error_msg: "An error occurred while updating your profile."
+    });
   }
 };

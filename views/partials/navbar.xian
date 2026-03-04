@@ -1,136 +1,16 @@
-<!-- Navigation Bar with Animations -->
-<style>
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-8px);
-        }
-    }
-    
-    @keyframes glow {
-        0%, 100% {
-            text-shadow: 0 0 5px rgba(16, 185, 129, 0);
-        }
-        50% {
-            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
-        }
-    }
-    
-    @keyframes pulse-gentle {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.8;
-        }
-    }
-    
-    .nav-logo {
-        animation: slideDown 0.6s ease-out, float 3s ease-in-out infinite;
-    }
-    
-    .nav-link {
-        position: relative;
-        animation: slideDown 0.6s ease-out backwards;
-        transition: all 0.3s ease;
-    }
-    
-    .nav-link:hover {
-        color: #10b981;
-        transform: translateY(-2px);
-    }
-    
-    .nav-link::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px;
-        left: 0;
-        background: linear-gradient(90deg, #10b981, #06b6d4);
-        transition: width 0.3s ease;
-    }
-    
-    .nav-link:hover::after {
-        width: 100%;
-    }
-    
-    .nav-cta {
-        animation: slideDown 0.6s ease-out backwards;
-        transition: all 0.3s ease;
-    }
-    
-    .nav-cta:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
-    }
-    
-    .nav-container {
-        animation: slideDown 0.6s ease-out;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-</style>
-
-<nav class="relative bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 text-white shadow-xl nav-container">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-            <!-- Logo -->
-            <div class="flex items-center">
-                <a href="/" class="flex items-center space-x-2 nav-logo group">
-                    <div class="text-3xl transform group-hover:rotate-12 transition-transform duration-300">🌿</div>
-                    <span class="text-2xl font-light tracking-wide">Tell n Grow</span>
-                </a>
-            </div>
-            
-            {{#if user}}
-            <!-- User is logged in -->
-            <div class="hidden md:flex items-center space-x-1">
-                <a href="/dashboard" class="nav-link px-3 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10" style="animation-delay: 0.1s;">
-                    🏠 Dashboard
-                </a>
-                <a href="/games" class="nav-link px-3 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10" style="animation-delay: 0.2s;">
-                    🎮 Games
-                </a>
-                <a href="/quiz" class="nav-link px-3 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10" style="animation-delay: 0.3s;">
-                    🧘 Quiz
-                </a>
-                <a href="/journal" class="nav-link px-3 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10" style="animation-delay: 0.4s;">
-                    📝 Journal
-                </a>
-                <a href="/user/progress" class="nav-link px-3 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10" style="animation-delay: 0.5s;">
-                    📈 Progress
-                </a>
-            </div>
-
-            <div class="flex items-center space-x-3">
-                <a href="/logout" class="nav-cta bg-red-500 hover:bg-red-600 px-6 py-2 rounded-full font-semibold text-white shadow-lg transform transition-all duration-300 text-sm">
-                    Logout
-                </a>
-            </div>
-            {{else}}
-            <!-- User is not logged in -->
-            <div class="flex items-center space-x-4">
-                <a href="/login" class="nav-link px-4 py-2 text-sm font-medium rounded-lg hover:bg-white hover:bg-opacity-10 transition-all duration-300">
-                    Login
-                </a>
-                <a href="/register" class="nav-cta bg-white text-emerald-600 px-6 py-2 rounded-full font-semibold hover:bg-emerald-50 shadow-lg transform transition-all duration-300 text-sm">
-                    Sign Up Free
-                </a>
-            </div>
-            {{/if}}
-        </div>
+<nav class="bg-white shadow-md p-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      <!-- Hamburger Menu Button -->
+      <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
     </div>
+    <div class="text-gray-700">
+      <span class="font-medium">Welcome!</span>
+    </div>
+  </div>
 </nav>

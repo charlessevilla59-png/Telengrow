@@ -1,9 +1,0 @@
-<!-- Footer -->
-<footer class="bg-gray-800 text-white py-8 mt-12">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-gray-400">&copy; 2025 Tell n Grow - Your Mental Wellness Companion</p>
-        <p class="text-sm text-gray-500 mt-2">Built with XianFire Framework by Christian I. Cabrera</p>
-    </div>
-</footer>
-</body>
-</html>

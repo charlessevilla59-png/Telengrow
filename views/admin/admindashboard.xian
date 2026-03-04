@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Top Navigation -->
+  <nav class="bg-white border-b border-gray-200 shadow-sm p-4 sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <button onclick="toggleSidebar()" class="text-gray-600 hover:text-purple-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold text-purple-600">🔐 Admin Dashboard</h1>
+      </div>
+      <div class="space-x-4 flex items-center">
+        <span class="text-gray-700">👤 {{user.name}}</span>
+        <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <!-- Sidebar (Pushes content when open) -->
+    <aside id="adminSidebar" class="w-64 bg-white border-r border-gray-200 min-h-screen fixed top-16 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out z-40">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</h3>
+          <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <nav class="space-y-2">
+          <a href="#overview" onclick="scrollToSection('overview')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition">
+            <span class="text-xl">📊</span>
+            <span class="font-medium">Overview</span>
+          </a>
+          
+          <a href="#pending-counselors" onclick="scrollToSection('pending-counselors')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-yellow-50 text-gray-700 hover:text-yellow-600 transition">
+            <span class="text-xl">⏳</span>
+            <span class="font-medium">Pending Approvals</span>
+          </a>
+          
+          <a href="#users" onclick="scrollToSection('users')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition">
+            <span class="text-xl">👥</span>
+            <span class="font-medium">Regular Users</span>
+          </a>
+          
+          <a href="#counselors" onclick="scrollToSection('counselors')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition">
+            <span class="text-xl">👨‍⚕️</span>
+            <span class="font-medium">Counselors</span>
+          </a>
+          
+          <a href="#activity-timeline" onclick="scrollToSection('activity-timeline')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600 transition">
+            <span class="text-xl">📈</span>
+            <span class="font-medium">Activity Timeline</span>
+          </a>
+          
+          <div class="border-t border-gray-200 my-4"></div>
+          
+          <a href="/admin/analytics" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
+            <span class="text-xl">📊</span>
+            <span class="font-medium">Data Analytics</span>
+          </a>
+          
+          <a href="/admin/settings" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition">
+            <span class="text-xl">⚙️</span>
+            <span class="font-medium">Settings</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content (Adjusts when sidebar opens) -->
+    <main id="mainContent" class="w-full p-6 transition-all duration-300 ease-in-out">
+    <div id="overview" class="mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Welcome, Admin {{user.name}}! 👨‍💼</h2>
+      <p class="text-gray-600 mt-1">Comprehensive user activity monitoring and analytics</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-4xl mb-2">👥</div>
+        <div class="text-3xl font-bold">{{stats.totalUsers}}</div>
+        <div class="text-sm text-blue-100">Total Users</div>
+      </div>
+
+      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-4xl mb-2">🎮</div>
+        <div class="text-3xl font-bold">{{stats.totalGames}}</div>
+        <div class="text-sm text-purple-100">Games Played</div>
+      </div>
+
+      <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-4xl mb-2">📔</div>
+        <div class="text-3xl font-bold">{{stats.totalJournals}}</div>
+        <div class="text-sm text-pink-100">Journal Entries</div>
+      </div>
+
+      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-4xl mb-2">📚</div>
+        <div class="text-3xl font-bold">{{stats.totalReadingSessions}}</div>
+        <div class="text-sm text-orange-100">Reading Sessions</div>
+      </div>
+
+      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-4xl mb-2">✨</div>
+        <div class="text-3xl font-bold">{{stats.activeToday}}</div>
+        <div class="text-sm text-green-100">Active Today</div>
+      </div>
+    </div>
+
+    <!-- Pending Counselor Approvals -->
+    {{#if pendingCounselors.length}}
+    <div id="pending-counselors" class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 mb-8">
+      <h3 class="text-xl font-bold text-yellow-900 mb-4">⏳ Pending Counselor Approvals</h3>
+      <div class="space-y-3">
+        {{#each pendingCounselors}}
+        <div class="bg-white border-2 border-yellow-200 rounded-lg p-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-bold text-gray-900 text-lg">{{this.name}}</h4>
+              <p class="text-sm text-gray-600">{{this.email}}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="approveCounselor({{this.id}})" 
+                      class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm font-medium">
+                ✓ Approve
+              </button>
+              <button onclick="rejectCounselor({{this.id}})" 
+                      class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm font-medium">
+                ✗ Reject
+              </button>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+
+    <!-- Regular Users Activity Monitoring -->
+    <div id="users" class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-gray-900">👥 Regular Users Activity</h3>
+        <button onclick="toggleUserMonitoring()" id="toggleMonitoringBtn" 
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+          Hide User Activities ▲
+        </button>
+      </div>
+      
+      <div id="userMonitoringSection">
+      {{#each users}}
+      <div class="border-2 border-gray-200 rounded-xl p-6 mb-6 hover:border-purple-300 transition">
+        <!-- User Header -->
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+              {{substring this.name 0 1}}
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-gray-900">{{this.name}}</h4>
+              <p class="text-sm text-gray-600">{{this.email}}</p>
+              <div class="flex gap-3 mt-2 text-xs">
+                {{#if this.progress}}
+                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded">Level {{this.progress.level}}</span>
+                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">⭐ {{this.progress.totalPoints}} pts</span>
+                {{/if}}
+                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                  {{#if this.lastActive}}Last active: {{formatDate this.lastActive}}{{else}}Never{{/if}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <a href="/admin/users/{{this.id}}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm font-medium">
+            View Details →
+          </a>
+        </div>
+
+        <!-- Activity Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="bg-purple-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">🎮</div>
+            <div class="text-2xl font-bold text-purple-600">{{this.gameSessions.length}}</div>
+            <div class="text-xs text-gray-600">Games Played</div>
+            {{#if this.totalGameTime}}
+            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalGameTime}}</div>
+            {{/if}}
+          </div>
+          
+          <div class="bg-pink-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">📔</div>
+            <div class="text-2xl font-bold text-pink-600">{{this.journalEntries.length}}</div>
+            <div class="text-xs text-gray-600">Journal Entries</div>
+          </div>
+          
+          <div class="bg-orange-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">📚</div>
+            <div class="text-2xl font-bold text-orange-600">{{this.readingSessions.length}}</div>
+            <div class="text-xs text-gray-600">Reading Sessions</div>
+            {{#if this.totalReadingTime}}
+            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalReadingTime}}</div>
+            {{/if}}
+          </div>
+        </div>
+
+        <!-- Recent Activities Toggle -->
+        <button onclick="toggleUserActivities('user-{{this.id}}')" 
+                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-sm font-medium transition">
+          Show Detailed Activities ▼
+        </button>
+
+        <!-- Recent Activities (Hidden by default) -->
+        <div id="user-{{this.id}}" class="hidden mt-4 space-y-3">
+          
+          <!-- Recent Games -->
+          {{#if this.gameSessions.length}}
+          <div class="bg-purple-50 rounded-lg p-4">
+            <h5 class="font-bold text-purple-900 mb-3 flex items-center justify-between">
+              <span>🎮 Recent Games ({{this.gameSessions.length}})</span>
+              <span class="text-xs font-normal text-purple-700">Total: {{formatDuration this.totalGameTime}}</span>
+            </h5>
+            <div class="space-y-2">
+              {{#each this.gameSessions}}
+              <div class="bg-white rounded p-3 text-sm border-l-4 border-purple-400">
+                <div class="flex justify-between items-start mb-1">
+                  <div class="flex-1">
+                    <div class="font-semibold text-purple-700">{{formatGameName this.gameType}}</div>
+                    <div class="text-xs text-gray-600 mt-1 space-x-2">
+                      {{#if this.score}}
+                      <span class="inline-block bg-purple-100 px-2 py-0.5 rounded">Score: {{this.score}}</span>
+                      {{/if}}
+                      {{#if this.duration}}
+                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">⏱️ {{formatDuration this.duration}}</span>
+                      {{/if}}
+                      {{#if this.difficulty}}
+                      <span class="inline-block bg-yellow-100 px-2 py-0.5 rounded">{{this.difficulty}}</span>
+                      {{/if}}
+                      {{#if this.completed}}
+                      <span class="inline-block bg-green-100 px-2 py-0.5 rounded">✓ Completed</span>
+                      {{else}}
+                      <span class="inline-block bg-gray-100 px-2 py-0.5 rounded">Incomplete</span>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          {{else}}
+          <div class="bg-purple-50 rounded-lg p-4 text-center text-purple-600">
+            <div class="text-3xl mb-2">🎮</div>
+            <p class="text-sm">No games played yet</p>
+          </div>
+          {{/if}}
+
+          <!-- Recent Journals -->
+          {{#if this.journalEntries.length}}
+          <div class="bg-pink-50 rounded-lg p-4">
+            <h5 class="font-bold text-pink-900 mb-3 flex items-center justify-between">
+              <span>📔 Recent Journal Entries ({{this.journalEntries.length}})</span>
+            </h5>
+            <div class="space-y-2">
+              {{#each this.journalEntries}}
+              <div class="bg-white rounded p-3 text-sm border-l-4 border-pink-400">
+                <div class="flex justify-between items-start mb-1">
+                  <div class="flex-1">
+                    <div class="font-semibold text-pink-700">{{this.title}}</div>
+                    <div class="text-xs text-gray-600 mt-1 space-x-2">
+                      <span class="inline-block bg-pink-100 px-2 py-0.5 rounded">Mood: {{this.mood}}</span>
+                      {{#if this.wordCount}}
+                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">{{this.wordCount}} words</span>
+                      {{/if}}
+                      {{#if this.isPrivate}}
+                      <span class="inline-block bg-gray-100 px-2 py-0.5 rounded">🔒 Private</span>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          {{else}}
+          <div class="bg-pink-50 rounded-lg p-4 text-center text-pink-600">
+            <div class="text-3xl mb-2">📔</div>
+            <p class="text-sm">No journal entries yet</p>
+          </div>
+          {{/if}}
+
+          <!-- Recent Reading -->
+          {{#if this.readingSessions.length}}
+          <div class="bg-orange-50 rounded-lg p-4">
+            <h5 class="font-bold text-orange-900 mb-3 flex items-center justify-between">
+              <span>📚 Recent Reading Sessions ({{this.readingSessions.length}})</span>
+              <span class="text-xs font-normal text-orange-700">Total: {{formatDuration this.totalReadingTime}}</span>
+            </h5>
+            <div class="space-y-2">
+              {{#each this.readingSessions}}
+              <div class="bg-white rounded p-3 text-sm border-l-4 border-orange-400">
+                <div class="flex justify-between items-start mb-1">
+                  <div class="flex-1">
+                    <div class="font-semibold text-orange-700">{{this.material.title}}</div>
+                    <div class="text-xs text-gray-600 mt-1 space-x-2">
+                      <span class="inline-block bg-orange-100 px-2 py-0.5 rounded">{{this.material.fileType}}</span>
+                      {{#if this.duration}}
+                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">⏱️ {{formatDuration this.duration}}</span>
+                      {{/if}}
+                      {{#if this.completed}}
+                      <span class="inline-block bg-green-100 px-2 py-0.5 rounded">✓ Completed</span>
+                      {{/if}}
+                    </div>
+                  </div>
+                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          {{else}}
+          <div class="bg-orange-50 rounded-lg p-4 text-center text-orange-600">
+            <div class="text-3xl mb-2">📚</div>
+            <p class="text-sm">No reading sessions yet</p>
+          </div>
+          {{/if}}
+
+        </div>
+      </div>
+      {{else}}
+      <div class="text-center text-gray-500 py-12">
+        <div class="text-6xl mb-4">👥</div>
+        <p class="text-lg">No users yet</p>
+      </div>
+      {{/each}}
+    </div>
+    </div>
+
+    <!-- Counselors Activity Monitoring -->
+    <div id="counselors" class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-gray-900">👨‍⚕️ Counselors Activity</h3>
+        <button onclick="toggleCounselorMonitoring()" id="toggleCounselorBtn" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+          Hide Counselor Activities ▲
+        </button>
+      </div>
+      
+      <div id="counselorMonitoringSection">
+      {{#each counselors}}
+      <div class="border-2 border-blue-200 rounded-xl p-6 mb-6 hover:border-blue-400 transition">
+        <!-- Counselor Header -->
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+              {{substring this.name 0 1}}
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-gray-900">{{this.name}}</h4>
+              <p class="text-sm text-gray-600">{{this.email}}</p>
+              <div class="flex gap-3 mt-2 text-xs">
+                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">👨‍⚕️ Counselor</span>
+                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                  {{#if this.lastActive}}Last active: {{formatDate this.lastActive}}{{else}}Never{{/if}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <a href="/admin/users/{{this.id}}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">
+            View Details →
+          </a>
+        </div>
+
+        <!-- Activity Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="bg-blue-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">🎮</div>
+            <div class="text-2xl font-bold text-blue-600">{{this.gameSessions.length}}</div>
+            <div class="text-xs text-gray-600">Games Played</div>
+            {{#if this.totalGameTime}}
+            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalGameTime}}</div>
+            {{/if}}
+          </div>
+          
+          <div class="bg-cyan-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">📔</div>
+            <div class="text-2xl font-bold text-cyan-600">{{this.journalEntries.length}}</div>
+            <div class="text-xs text-gray-600">Journal Entries</div>
+          </div>
+          
+          <div class="bg-teal-50 rounded-lg p-4">
+            <div class="text-2xl mb-1">📚</div>
+            <div class="text-2xl font-bold text-teal-600">{{this.readingSessions.length}}</div>
+            <div class="text-xs text-gray-600">Reading Sessions</div>
+            {{#if this.totalReadingTime}}
+            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalReadingTime}}</div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="text-center text-gray-500 py-12">
+        <div class="text-6xl mb-4">👨‍⚕️</div>
+        <p class="text-lg">No counselors yet</p>
+      </div>
+      {{/each}}
+    </div>
+    </div>
+
+    <!-- System-Wide Activity Timeline -->
+    <div id="activity-timeline" class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">📊 System-Wide Activity Timeline</h3>
+      
+      <!-- Activity Tabs -->
+      <div class="flex gap-2 mb-6 border-b border-gray-200">
+        <button onclick="showActivityTab('all')" id="tab-all" class="activity-tab px-4 py-2 font-medium text-purple-600 border-b-2 border-purple-600">
+          All Activities
+        </button>
+        <button onclick="showActivityTab('games')" id="tab-games" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
+          🎮 Games
+        </button>
+        <button onclick="showActivityTab('journals')" id="tab-journals" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
+          📔 Journals
+        </button>
+        <button onclick="showActivityTab('reading')" id="tab-reading" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
+          📚 Reading
+        </button>
+      </div>
+
+      <!-- All Activities -->
+      <div id="activity-all" class="activity-content">
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          {{#each recentGameSessions}}
+          <div class="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">🎮</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} played {{formatGameName this.gameType}}</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    {{#if this.score}}Score: {{this.score}} • {{/if}}
+                    {{#if this.duration}}Duration: {{formatDuration this.duration}} • {{/if}}
+                    {{#if this.completed}}✓ Completed{{else}}Incomplete{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{/each}}
+          
+          {{#each recentJournals}}
+          <div class="bg-pink-50 rounded-lg p-4 border-l-4 border-pink-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">📔</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} wrote a journal entry</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    "{{this.title}}" • Mood: {{this.mood}}
+                    {{#if this.wordCount}} • {{this.wordCount}} words{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{/each}}
+          
+          {{#each recentReading}}
+          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">📚</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} read "{{this.material.title}}"</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    {{this.material.fileType}}
+                    {{#if this.duration}} • {{formatDuration this.duration}}{{/if}}
+                    {{#if this.completed}} • ✓ Completed{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <!-- Games Only -->
+      <div id="activity-games" class="activity-content hidden">
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          {{#each recentGameSessions}}
+          <div class="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">🎮</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} played {{formatGameName this.gameType}}</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    {{#if this.score}}Score: {{this.score}} • {{/if}}
+                    {{#if this.duration}}Duration: {{formatDuration this.duration}} • {{/if}}
+                    Difficulty: {{this.difficulty}} • 
+                    {{#if this.completed}}✓ Completed{{else}}Incomplete{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{else}}
+          <div class="text-center text-gray-500 py-8">
+            <div class="text-4xl mb-2">🎮</div>
+            <p>No game sessions yet</p>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <!-- Journals Only -->
+      <div id="activity-journals" class="activity-content hidden">
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          {{#each recentJournals}}
+          <div class="bg-pink-50 rounded-lg p-4 border-l-4 border-pink-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">📔</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} wrote a journal entry</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    "{{this.title}}" • Mood: {{this.mood}}
+                    {{#if this.wordCount}} • {{this.wordCount}} words{{/if}}
+                    {{#if this.isPrivate}} • 🔒 Private{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{else}}
+          <div class="text-center text-gray-500 py-8">
+            <div class="text-4xl mb-2">📔</div>
+            <p>No journal entries yet</p>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <!-- Reading Only -->
+      <div id="activity-reading" class="activity-content hidden">
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          {{#each recentReading}}
+          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-500">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div class="text-2xl">📚</div>
+                <div>
+                  <div class="font-semibold text-gray-900">{{this.User.name}} read "{{this.material.title}}"</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    {{this.material.fileType}}
+                    {{#if this.duration}} • {{formatDuration this.duration}}{{/if}}
+                    {{#if this.completed}} • ✓ Completed{{/if}}
+                  </div>
+                </div>
+              </div>
+              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+          {{else}}
+          <div class="text-center text-gray-500 py-8">
+            <div class="text-4xl mb-2">📚</div>
+            <p>No reading sessions yet</p>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </main>
+  </div>
+
+  <script>
+    // Toggle sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      if (sidebar.classList.contains('-translate-x-full')) {
+        // Show sidebar and push content
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        mainContent.classList.add('ml-64');
+      } else {
+        // Hide sidebar and restore content
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+        mainContent.classList.remove('ml-64');
+      }
+    }
+
+    // Smooth scroll to section
+    function scrollToSection(sectionId) {
+      event.preventDefault();
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Close sidebar after navigation on mobile
+        toggleSidebar();
+      }
+    }
+
+    // Toggle entire user monitoring section
+    function toggleUserMonitoring() {
+      const section = document.getElementById('userMonitoringSection');
+      const button = document.getElementById('toggleMonitoringBtn');
+      
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        button.textContent = 'Hide User Activities ▲';
+        button.classList.remove('bg-green-600', 'hover:bg-green-700');
+        button.classList.add('bg-purple-600', 'hover:bg-purple-700');
+      } else {
+        section.classList.add('hidden');
+        button.textContent = 'Show User Activities ▼';
+        button.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+        button.classList.add('bg-green-600', 'hover:bg-green-700');
+      }
+    }
+
+    // Toggle entire counselor monitoring section
+    function toggleCounselorMonitoring() {
+      const section = document.getElementById('counselorMonitoringSection');
+      const button = document.getElementById('toggleCounselorBtn');
+      
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        button.textContent = 'Hide Counselor Activities ▲';
+        button.classList.remove('bg-green-600', 'hover:bg-green-700');
+        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      } else {
+        section.classList.add('hidden');
+        button.textContent = 'Show Counselor Activities ▼';
+        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        button.classList.add('bg-green-600', 'hover:bg-green-700');
+      }
+    }
+
+    // Toggle user activities
+    function toggleUserActivities(userId) {
+      const element = document.getElementById(userId);
+      const button = event.target;
+      
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+        button.textContent = 'Hide Activities ▲';
+      } else {
+        element.classList.add('hidden');
+        button.textContent = 'Show Detailed Activities ▼';
+      }
+    }
+
+    // Activity tab switching
+    function showActivityTab(tabName) {
+      // Hide all activity contents
+      document.querySelectorAll('.activity-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      // Remove active state from all tabs
+      document.querySelectorAll('.activity-tab').forEach(tab => {
+        tab.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+        tab.classList.add('text-gray-600');
+      });
+      
+      // Show selected content
+      document.getElementById('activity-' + tabName).classList.remove('hidden');
+      
+      // Activate selected tab
+      const activeTab = document.getElementById('tab-' + tabName);
+      activeTab.classList.remove('text-gray-600');
+      activeTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+    }
+
+    // Counselor approval functions
+    async function approveCounselor(userId) {
+      if (!confirm('Approve this counselor account?')) return;
+      
+      try {
+        const response = await fetch(`/admin/counselor/approve/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          alert('✅ Counselor approved!');
+          location.reload();
+        } else {
+          alert('❌ Error approving counselor');
+        }
+      } catch (error) {
+        alert('❌ Failed to approve counselor');
+      }
+    }
+
+    async function rejectCounselor(userId) {
+      const reason = prompt('Reason for rejection (optional):');
+      if (reason === null) return;
+      
+      try {
+        const response = await fetch(`/admin/counselor/reject/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: reason || 'No reason provided' })
+        });
+        
+        if (response.ok) {
+          alert('✅ Counselor rejected');
+          location.reload();
+        } else {
+          alert('❌ Error rejecting counselor');
+        }
+      } catch (error) {
+        alert('❌ Failed to reject counselor');
+      }
+    }
+
+  </script>
+</body>
+</html>

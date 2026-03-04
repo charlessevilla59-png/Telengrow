@@ -26,7 +26,7 @@
     
 import { Sequelize } from "sequelize";
 
-export const sequelize = new Sequelize("Tellngrow", "root", "", {
+export const sequelize = new Sequelize("tellngrow", "root", "", {
   host: "localhost",
   dialect: "mysql"
 });

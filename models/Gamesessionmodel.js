@@ -9,7 +9,7 @@ export const GameSession = sequelize.define("GameSession", {
     references: { model: User, key: 'id' }
   },
   gameType: { 
-    type: DataTypes.ENUM('breathing-bubble', 'color-tap', 'grid-memory', 'stress-ball'),
+    type: DataTypes.ENUM('breathing-bubble', 'color-tap', 'grid-memory', 'stress-ball', 'gratitude-jar', 'affirmation-cards', 'zen-garden', 'puzzle-therapy'),
     allowNull: false 
   },
   startTime: { type: DataTypes.DATE },

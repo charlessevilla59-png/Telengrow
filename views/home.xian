@@ -1,261 +1,98 @@
-{{#*inline "title"}}Welcome to Tell n Grow{{/inline}}
-{{> header}}
-{{> navbar}}
-
-<style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
     @keyframes float {
-        0%, 100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-20px);
-        }
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
     }
-    
-    @keyframes pulse-circle {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(1.5);
-            opacity: 0;
-        }
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
     }
-    
-    @keyframes shimmer {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.7;
-        }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    .animated-gradient {
+      background-size: 200% 200%;
+      animation: gradient 15s ease infinite;
     }
-    
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    .hero-title {
-        animation: fadeInUp 0.8s ease-out;
-    }
-    
-    .hero-subtitle {
-        animation: fadeInUp 0.8s ease-out 0.2s backwards;
-    }
-    
-    .hero-cta {
-        animation: fadeInUp 0.8s ease-out 0.4s backwards;
-    }
-    
-    .feature-card {
-        animation: fadeInUp 0.6s ease-out backwards;
-        transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-10px);
-    }
-    
-    .feature-emoji {
-        animation: float 3s ease-in-out infinite;
-        display: inline-block;
-    }
-    
-    .stat-card {
-        animation: fadeInUp 0.6s ease-out backwards;
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: scale(1.05);
-    }
-    
-    .stat-number {
-        animation: shimmer 2s ease-in-out infinite;
-    }
-    
-    .floating-orb {
-        animation: float 6s ease-in-out infinite;
-    }
-    
-    .hero-section {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .pulse {
-        animation: pulse-circle 2s ease-out infinite;
-    }
-</style>
-
-<div class="min-h-screen bg-gradient-to-b from-blue-50 via-slate-50 to-emerald-50">
-    <!-- Hero Section with Calming Design -->
-    <section class="relative py-24 px-4 overflow-hidden hero-section">
-        <!-- Decorative animated elements -->
-        <div class="absolute top-10 right-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating-orb"></div>
-        <div class="absolute -bottom-8 left-10 w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating-orb" style="animation-delay: 2s;"></div>
+  </style>
+</head>
+<body class="min-h-screen animated-gradient bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600">
+  <!-- Decorative circles -->
+  <div class="absolute top-20 left-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-20 right-20 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
+  
+  <div class="min-h-screen flex items-center justify-center p-6 relative">
+    <div class="max-w-4xl w-full">
+      <!-- Main Card -->
+      <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 text-center">
         
-        <!-- Animated particles -->
-        <div class="absolute top-20 left-1/4 text-4xl animate-bounce" style="animation-duration: 3s;">✨</div>
-        <div class="absolute top-40 right-1/3 text-3xl animate-bounce" style="animation-duration: 4s; animation-delay: 1s;">🌿</div>
-        <div class="absolute bottom-20 left-1/3 text-3xl animate-bounce" style="animation-duration: 3.5s; animation-delay: 0.5s;">🍃</div>
-        
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <div class="mb-6">
-                <p class="hero-subtitle text-emerald-600 font-semibold text-lg tracking-widest uppercase mb-2">Mental Wellness Journey</p>
-                <h1 class="hero-title text-5xl md:text-6xl lg:text-7xl font-light text-slate-800 mb-4 leading-tight">
-                    Find Your <span class="text-emerald-500 font-semibold inline-block">Inner Peace</span>
-                </h1>
-            </div>
-            
-            <p class="hero-subtitle text-lg md:text-xl text-slate-600 mb-4 max-w-2xl mx-auto leading-relaxed font-light">
-                Take a moment for yourself. Tell n Grow guides you through calming games, mindful practices, and personal reflection to nurture your mental wellbeing.
-            </p>
-            
-            <p class="hero-subtitle text-base text-emerald-600 mb-12 max-w-2xl mx-auto font-medium">
-                ✨ Embrace tranquility • Build resilience • Grow mindfully
-            </p>
-            
-            <div class="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/register" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-10 py-4 rounded-full font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 inline-block">
-                    Start Your Journey
-                </a>
-                <a href="/login" class="border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 px-10 py-4 rounded-full font-semibold text-lg transition duration-300 hover:shadow-md inline-block">
-                    Sign In
-                </a>
-            </div>
+        <!-- Logo & Title -->
+        <div class="mb-8 float-animation overflow-visible">
+          <div class="inline-block bg-gradient-to-br from-emerald-400 to-teal-500 p-6 rounded-full mb-4 shadow-lg">
+            <span class="text-6xl">🌱</span>
+          </div>
+          <h1 class="text-6xl font-bold leading-relaxed bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-3">
+            Tellngrow
+          </h1>
+          <p class="text-2xl text-gray-600 font-light">Mental Wellness & Stress Relief</p>
         </div>
-    </section>
 
-    <!-- Features Section -->
-    <section class="py-24 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-20">
-                <h2 class="hero-title text-4xl md:text-5xl font-light text-slate-800 mb-4">Everything You Need</h2>
-                <p class="hero-subtitle text-lg text-slate-600 max-w-2xl mx-auto font-light">Simple, purposeful tools designed to help you manage stress and find balance</p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="group feature-card" style="animation-delay: 0.1s;">
-                    <div class="bg-white bg-opacity-60 backdrop-blur-sm p-10 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 border border-white border-opacity-20 h-full">
-                        <div class="feature-emoji text-7xl mb-6">🎮</div>
-                        <h3 class="text-2xl font-semibold text-slate-800 mb-3">Calming Games</h3>
-                        <p class="text-slate-600 font-light leading-relaxed">Engage with thoughtfully designed games that help you relax, focus, and relieve stress naturally.</p>
-                    </div>
-                </div>
-                
-                <!-- Feature 2 -->
-                <div class="group feature-card" style="animation-delay: 0.2s;">
-                    <div class="bg-white bg-opacity-60 backdrop-blur-sm p-10 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 border border-white border-opacity-20 h-full">
-                        <div class="feature-emoji text-7xl mb-6">🧘</div>
-                        <h3 class="text-2xl font-semibold text-slate-800 mb-3">Mindful Learning</h3>
-                        <p class="text-slate-600 font-light leading-relaxed">Deepen your wellness knowledge through gentle quizzes and coping strategy lessons at your own pace.</p>
-                    </div>
-                </div>
-                
-                <!-- Feature 3 -->
-                <div class="group feature-card" style="animation-delay: 0.3s;">
-                    <div class="bg-white bg-opacity-60 backdrop-blur-sm p-10 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 border border-white border-opacity-20 h-full">
-                        <div class="feature-emoji text-7xl mb-6">📔</div>
-                        <h3 class="text-2xl font-semibold text-slate-800 mb-3">Private Journal</h3>
-                        <p class="text-slate-600 font-light leading-relaxed">A safe space to express yourself freely and document your emotional growth with complete privacy.</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Description -->
+        <p class="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          Your journey to better mental health starts here. Discover games, exercises, and tools designed to help you relax, grow, and thrive.
+        </p>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl">
+            <div class="text-3xl mb-2">🎮</div>
+            <div class="text-sm font-semibold text-gray-700">Wellness Games</div>
+          </div>
+          <div class="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-xl">
+            <div class="text-3xl mb-2">🫧</div>
+            <div class="text-sm font-semibold text-gray-700">Breathing Exercises</div>
+          </div>
+          <div class="bg-gradient-to-br from-teal-50 to-emerald-50 p-4 rounded-xl">
+            <div class="text-3xl mb-2">📔</div>
+            <div class="text-sm font-semibold text-gray-700">Mood Journal</div>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl">
+            <div class="text-3xl mb-2">📚</div>
+            <div class="text-sm font-semibold text-gray-700">Reading Materials</div>
+          </div>
         </div>
-    </section>
 
-    <!-- Stats Section -->
-    <section class="py-24 px-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="hero-title text-4xl md:text-5xl font-light text-slate-800 mb-2">Our Community</h2>
-                <p class="hero-subtitle text-slate-600 font-light">Join people just like you on their wellness journey</p>
-            </div>
-            
-            <div class="grid md:grid-cols-4 gap-6">
-                <div class="stat-card bg-white bg-opacity-70 backdrop-blur-sm p-8 rounded-2xl text-center border border-white border-opacity-30" style="animation-delay: 0.1s;">
-                    <div class="stat-number text-5xl font-light text-emerald-600 mb-3">4</div>
-                    <div class="text-slate-700 font-medium">Soothing Games</div>
-                    <p class="text-sm text-slate-500 mt-1">Designed for calm</p>
-                </div>
-                
-                <div class="stat-card bg-white bg-opacity-70 backdrop-blur-sm p-8 rounded-2xl text-center border border-white border-opacity-30" style="animation-delay: 0.2s;">
-                    <div class="stat-number text-5xl font-light text-teal-600 mb-3">2</div>
-                    <div class="text-slate-700 font-medium">Learning Paths</div>
-                    <p class="text-sm text-slate-500 mt-1">For growth</p>
-                </div>
-                
-                <div class="stat-card bg-white bg-opacity-70 backdrop-blur-sm p-8 rounded-2xl text-center border border-white border-opacity-30" style="animation-delay: 0.3s;">
-                    <div class="stat-number text-5xl font-light text-blue-600 mb-3">∞</div>
-                    <div class="text-slate-700 font-medium">Journal Space</div>
-                    <p class="text-sm text-slate-500 mt-1">Limitless expression</p>
-                </div>
-                
-                <div class="stat-card bg-white bg-opacity-70 backdrop-blur-sm p-8 rounded-2xl text-center border border-white border-opacity-30" style="animation-delay: 0.4s;">
-                    <div class="stat-number text-5xl font-light text-emerald-600 mb-3">24/7</div>
-                    <div class="text-slate-700 font-medium">Always Here</div>
-                    <p class="text-sm text-slate-500 mt-1">When you need us</p>
-                </div>
-            </div>
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="/login" 
+             class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-emerald-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg">
+            Login
+          </a>
+          <a href="/register" 
+             class="w-full sm:w-auto bg-white text-emerald-600 border-2 border-emerald-500 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-50 transition-all transform hover:scale-105">
+            Register
+          </a>
         </div>
-    </section>
 
-    <!-- CTA Section -->
-    <section class="py-24 px-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 relative overflow-hidden">
-        <!-- Animated background elements -->
-        <div class="absolute top-5 right-10 text-5xl animate-bounce" style="animation-duration: 2s;">✨</div>
-        <div class="absolute bottom-10 left-10 text-4xl animate-bounce" style="animation-duration: 3s; animation-delay: 0.5s;">🌿</div>
-        <div class="absolute top-1/2 right-1/4 text-4xl animate-bounce" style="animation-duration: 2.5s; animation-delay: 1s;">💚</div>
-        
-        <div class="max-w-3xl mx-auto text-center relative z-10">
-            <h2 class="hero-title text-3xl md:text-4xl lg:text-5xl font-light text-white mb-6 leading-relaxed">
-                Your wellness journey starts with a single step
-            </h2>
-            <p class="hero-subtitle text-lg md:text-xl text-emerald-50 mb-10 font-light">
-                Create your account free and begin discovering the peace you deserve
-            </p>
-            <div class="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/register" class="inline-block bg-white text-emerald-600 hover:bg-emerald-50 px-12 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-1">
-                    Get Started Free
-                </a>
-                <a href="/login" class="inline-block border-2 border-white text-white hover:bg-white hover:bg-opacity-10 px-12 py-4 rounded-full font-semibold text-lg transition-all duration-300">
-                    Already a Member?
-                </a>
-            </div>
-        </div>
-    </section>
-</div>
+        <!-- Footer Text -->
+        <p class="mt-8 text-sm text-gray-500">
+          Join thousands on their wellness journey 🌿
+        </p>
+      </div>
 
-{{> footer}}
+      <!-- Bottom Info -->
+      <div class="text-center mt-6 text-white/80 text-sm">
+        <p>A safe space for your mental wellness</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
