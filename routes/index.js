@@ -81,7 +81,10 @@ router.get("/", (req, res) => {
 router.get("/login", authController.loginPage);
 router.post("/login", authController.loginUser);
 
-// Google OAuth Routes
+// Firebase Google Authentication Route
+router.post("/auth/firebase/google", authController.firebaseGoogleAuth);
+
+// Google OAuth Routes (Legacy - Passport.js)
 router.get("/auth/google", 
   passport.authenticate('google', { 
     scope: ['profile', 'email'] 

@@ -16,17 +16,22 @@ npm install
 - Import: `database/create_database.sql`
 - Import: `database/insert_sample_data.sql`
 
-### 3. Create Admin User
+### 3. Setup Firebase (for Google Sign-In)
+- Follow the guide: `FIREBASE_SETUP_TAGALOG.md` (Tagalog)
+- Or: `FIREBASE_SETUP.md` (English)
+- Copy `.env.example` to `.env` and add Firebase credentials
+
+### 4. Create Admin User
 ```cmd
 node SIMPLE_CREATE_ADMIN.js
 ```
 
-### 4. Run Server
+### 5. Run Server
 ```cmd
 npm run xian
 ```
 
-### 5. Open Browser
+### 6. Open Browser
 ```
 http://localhost:3000
 ```
@@ -35,13 +40,21 @@ http://localhost:3000
 
 ## 👤 Login Credentials
 
-### Admin Account:
+### Email/Password Login:
+
+#### Admin Account:
 - Email: `angelica@gmail.com`
 - Password: `pogi123`
 
 ### Test User:
 - Email: `marvin@gmail.com`
 - Password: `password123`
+
+### Google Sign-In:
+- Click "Sign in with Google" button on login page
+- Uses Firebase Authentication
+- Automatically creates account if first time
+- See `FIREBASE_SETUP_TAGALOG.md` for setup instructions
 
 ---
 

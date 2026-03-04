@@ -96,8 +96,8 @@
           </div>
         </div>
 
-        <!-- Google Sign-In Button -->
-        <a href="/auth/google" 
+        <!-- Google Sign-In Button (Firebase) -->
+        <button type="button" id="googleSignInBtn"
            class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition shadow-sm text-base">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -105,8 +105,9 @@
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          <span>Sign in with Google</span>
-        </a>
+          <span id="googleBtnText">Sign in with Google</span>
+          <span id="googleBtnLoading" class="hidden">Signing in...</span>
+        </button>
         
         <div class="mt-6 text-center text-gray-600 text-sm">
           Don't have an account? <a href="/register" class="text-purple-600 hover:underline font-semibold">Sign Up</a>
@@ -129,7 +130,26 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    // Firebase configuration - these will be injected from server
+    const firebaseConfig = {
+      apiKey: "{{firebaseApiKey}}",
+      authDomain: "{{firebaseAuthDomain}}",
+      projectId: "{{firebaseProjectId}}",
+      storageBucket: "{{firebaseStorageBucket}}",
+      messagingSenderId: "{{firebaseMessagingSenderId}}",
+      appId: "{{firebaseAppId}}"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
     // Handle form submission
     const form = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
@@ -146,8 +166,82 @@
       
       // Form will submit normally, don't prevent default
     });
+
+    // Handle Google Sign-In
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const googleBtnText = document.getElementById('googleBtnText');
+    const googleBtnLoading = document.getElementById('googleBtnLoading');
+
+    googleSignInBtn.addEventListener('click', async () => {
+      try {
+        // Show loading state
+        googleSignInBtn.disabled = true;
+        googleBtnText.classList.add('hidden');
+        googleBtnLoading.classList.remove('hidden');
+
+        console.log('🔵 Starting Firebase Google Sign-In...');
+
+        // Sign in with Google popup
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        console.log('✅ Firebase authentication successful:', user.email);
+
+        // Get the ID token
+        const idToken = await user.getIdToken();
+
+        console.log('🔑 Got Firebase ID token, sending to server...');
+
+        // Send the token to your backend
+        const response = await fetch('/auth/firebase/google', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            idToken: idToken,
+            email: user.email,
+            name: user.displayName,
+            photoURL: user.photoURL,
+            uid: user.uid
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log('✅ Server authentication successful, redirecting...');
+          window.location.href = data.redirectUrl || '/user/dashboard';
+        } else {
+          console.error('❌ Server authentication failed:', data.error);
+          alert(data.error || 'Authentication failed. Please try again.');
+          
+          // Reset button state
+          googleSignInBtn.disabled = false;
+          googleBtnText.classList.remove('hidden');
+          googleBtnLoading.classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('❌ Google Sign-In error:', error);
+        
+        let errorMessage = 'Failed to sign in with Google. Please try again.';
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+          errorMessage = 'Sign-in cancelled. Please try again.';
+        } else if (error.code === 'auth/popup-blocked') {
+          errorMessage = 'Pop-up blocked. Please allow pop-ups for this site.';
+        }
+        
+        alert(errorMessage);
+        
+        // Reset button state
+        googleSignInBtn.disabled = false;
+        googleBtnText.classList.remove('hidden');
+        googleBtnLoading.classList.add('hidden');
+      }
+    });
     
-    console.log('Login page ready');
+    console.log('Login page ready with Firebase');
   </script>
 </body>
 </html>

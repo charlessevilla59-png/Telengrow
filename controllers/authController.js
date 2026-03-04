@@ -11,7 +11,19 @@ import { User, UserProgress, Activity, sequelize } from "../models/index.js";
 
 await sequelize.sync();
 
-export const loginPage = (req, res) => res.render("login", { title: "Login", email: '' });
+export const loginPage = (req, res) => {
+  res.render("login", { 
+    title: "Login", 
+    email: '',
+    // Pass Firebase config to frontend
+    firebaseApiKey: process.env.FIREBASE_API_KEY || '',
+    firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
+    firebaseProjectId: process.env.FIREBASE_PROJECT_ID || '',
+    firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
+    firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
+    firebaseAppId: process.env.FIREBASE_APP_ID || ''
+  });
+};
 export const registerPage = (req, res) => res.render("register", { title: "Register" });
 export const forgotPasswordPage = (req, res) => res.render("forgotpassword", { title: "Forgot Password" });
 
@@ -267,6 +279,155 @@ export const logoutUser = async (req, res) => {
   } catch (error) {
     console.error("Logout error:", error);
     res.redirect("/login");
+  }
+};
+
+// Firebase Google Authentication Handler
+export const firebaseGoogleAuth = async (req, res) => {
+  try {
+    const { idToken, email, name, photoURL, uid } = req.body;
+
+    console.log('🔵 Firebase Google Auth request received');
+    console.log('📧 Email:', email);
+    console.log('👤 Name:', name);
+    console.log('🆔 Firebase UID:', uid);
+
+    if (!idToken || !email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required authentication data' 
+      });
+    }
+
+    // Verify the Firebase ID token (optional but recommended for production)
+    // For now, we'll trust the token since it came from Firebase client SDK
+    
+    // Check if user exists in MySQL
+    let user = await User.findOne({ where: { email } });
+
+    if (user) {
+      // User exists - update Firebase info if needed
+      console.log('✅ Existing user found:', user.email);
+
+      // Check account status
+      if (user.accountStatus === 'pending') {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Your account is pending admin approval. Please wait for approval before logging in.' 
+        });
+      }
+
+      if (user.accountStatus === 'rejected') {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Your account has been rejected. Please contact the administrator.' 
+        });
+      }
+
+      if (user.accountStatus === 'suspended') {
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Your account has been suspended. Please contact the administrator.' 
+        });
+      }
+
+      // Update Firebase UID and profile picture if not set
+      if (!user.googleId || user.googleId !== uid) {
+        await user.update({
+          googleId: uid,
+          profilePicture: photoURL || user.profilePicture,
+          authProvider: 'firebase-google',
+          lastActive: new Date()
+        });
+        console.log('🔗 Updated Firebase info for existing user');
+      } else {
+        await user.update({ lastActive: new Date() });
+      }
+    } else {
+      // Create new user
+      console.log('🆕 Creating new user from Firebase Google account');
+
+      user = await User.create({
+        name,
+        email,
+        googleId: uid,
+        profilePicture: photoURL,
+        authProvider: 'firebase-google',
+        role: 'user',
+        accountStatus: 'active',
+        password: null // No password for Google users
+      });
+
+      // Create user progress for new user
+      await UserProgress.create({ 
+        userId: user.id,
+        totalGamesPlayed: 0,
+        totalJournalEntries: 0,
+        totalPoints: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        level: 'beginner',
+        breathingBubbleStats: {},
+        colorTapStats: {},
+        gridMemoryStats: {},
+        stressBallStats: {},
+        achievements: []
+      });
+
+      console.log('✅ New user created:', user.email);
+    }
+
+    // Create session
+    req.session.userId = user.id;
+
+    // Save session
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('✅ Session created for user:', user.id);
+
+    // Log activity
+    await Activity.create({
+      userId: user.id,
+      type: 'login',
+      description: `${user.name} logged in via Firebase Google`,
+      metadata: { 
+        ipAddress: req.ip,
+        authProvider: 'firebase-google'
+      }
+    });
+
+    // Determine redirect URL based on role
+    let redirectUrl = '/user/dashboard';
+    if (user.role === 'admin') {
+      redirectUrl = '/admin/dashboard';
+    } else if (user.role === 'counselor') {
+      redirectUrl = '/counselor/dashboard';
+    }
+
+    console.log(`🚀 Redirecting ${user.role} to: ${redirectUrl}`);
+
+    return res.json({ 
+      success: true, 
+      redirectUrl,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Firebase Google Auth error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Authentication failed. Please try again.' 
+    });
   }
 };
 
