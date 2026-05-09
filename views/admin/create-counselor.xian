@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Counselor Account - Telengrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+    
+    .animate-fadeInDown { animation: fadeInDown 0.6s ease-out; }
+    .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
+    .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+    
+    .sidebar {
+      animation: slideInLeft 0.5s ease-out;
+      background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+      border-right: 1px solid rgba(0, 150, 136, 0.2);
+    }
+    
+    .sidebar-link {
+      transition: all 0.3s ease;
+      color: #2C3E50;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+      background-color: rgba(0, 150, 136, 0.15);
+      color: #009688;
+      padding-left: 1.5rem;
+      border-left: 4px solid #009688;
+      box-shadow: inset 0 0 15px rgba(0, 150, 136, 0.1);
+    }
+
+    .form-input {
+      background-color: #f0fdf4;
+      border-color: #c7f0d8;
+      color: #1f2937;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: #009688;
+      box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1);
+    }
+
+    .form-label {
+      color: #2C3E50;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-white via-green-50 to-yellow-50 min-h-screen text-gray-800">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen text-gray-900 shadow-2xl overflow-y-auto">
+    <!-- Logo -->
+    <div class="p-6 border-b border-slate-700 bg-gradient-to-r from-green-50 to-yellow-50">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
+      </div>
+      <p class="text-gray-600 text-xs font-semibold text-center">Mindoro State University</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mt-6">
+      <a href="/admin/dashboard" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link active block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">👥</span>
+        <span>Users</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📉</span>
+        <span>Analytics</span>
+      </a>
+    </nav>
+
+    <!-- User Profile -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-green-200 bg-gradient-to-r from-green-50 to-yellow-50">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-500 rounded-full flex items-center justify-center font-bold text-white text-lg shadow-lg">
+          {{substring user.name 0 1}}
+        </div>
+        <div>
+          <div class="font-bold text-sm text-gray-900">{{user.name}}</div>
+          <div class="text-xs text-gray-600 font-semibold">Admin</div>
+        </div>
+      </div>
+      <a href="/logout" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg font-bold text-center block transition shadow-lg">
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gradient-to-br from-white via-green-50 to-yellow-50">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-white to-green-50 border-b border-green-200 sticky top-0 z-40 shadow-xl">
+      <div class="px-8 py-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Create Counselor Account</h1>
+            <p class="text-gray-600 text-sm mt-1">Add a new counselor to the system</p>
+          </div>
+          <a href="/admin/users" class="bg-green-100 hover:bg-green-200 text-gray-900 px-6 py-2 rounded-lg font-semibold transition">
+            ← Back to Users
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="p-8">
+      {{#if error}}
+      <div class="bg-red-100 border border-red-300 text-red-800 px-6 py-4 rounded-lg mb-6 animate-fadeInUp">
+        <p class="font-bold mb-1">Error</p>
+        <p>{{error}}</p>
+      </div>
+      {{/if}}
+
+      <!-- Form Card -->
+      <div class="bg-white border border-green-200 rounded-2xl shadow-lg p-8 animate-fadeInUp max-w-2xl">
+        <form method="POST" action="/admin/create-counselor">
+          <!-- Name Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Full Name *</label>
+            <input 
+              type="text" 
+              name="name" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Enter full name"
+              required
+              minlength="2"
+            >
+          </div>
+
+          <!-- Email Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Email Address *</label>
+            <input 
+              type="email" 
+              name="email" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Enter email address"
+              required
+            >
+            <p class="text-xs text-slate-400 mt-1">The counselor will use this email to login</p>
+          </div>
+
+          <!-- Password Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Initial Password *</label>
+            <input 
+              type="password" 
+              name="password" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Enter initial password"
+              required
+              minlength="6"
+            >
+            <p class="text-xs text-slate-400 mt-1">Counselor should change this after first login</p>
+          </div>
+
+          <!-- Confirm Password Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Confirm Password *</label>
+            <input 
+              type="password" 
+              name="confirmPassword" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Confirm password"
+              required
+            >
+          </div>
+
+          <!-- Department/Specialty Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Department/Specialty</label>
+            <input 
+              type="text" 
+              name="specialty" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="e.g., Mental Health, Counseling, etc."
+            >
+          </div>
+
+          <!-- Contact Number Field -->
+          <div class="mb-6">
+            <label class="form-label block mb-2">Contact Number</label>
+            <input 
+              type="tel" 
+              name="contactNumber" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Enter contact number"
+            >
+          </div>
+
+          <!-- Notes Field -->
+          <div class="mb-8">
+            <label class="form-label block mb-2">Notes</label>
+            <textarea 
+              name="notes" 
+              class="form-input w-full px-4 py-3 border rounded-lg focus:outline-none"
+              placeholder="Add any additional notes about this counselor"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-4">
+            <button 
+              type="submit"
+              class="flex-1 bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg"
+            >
+              ✓ Create Counselor Account
+            </button>
+            <a href="/admin/users" class="flex-1 bg-green-100 hover:bg-green-200 text-gray-900 px-6 py-3 rounded-lg font-bold transition text-center">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Info Box -->
+      <div class="mt-8 bg-white border border-green-200 rounded-2xl p-6 max-w-2xl">
+        <h3 class="text-lg font-bold text-teal-600 mb-3">ℹ️ What happens after creation?</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>✓ The counselor account will be created with <strong>active</strong> status</li>
+          <li>✓ They can immediately login using the provided email and password</li>
+          <li>✓ They can start creating and managing learning materials</li>
+          <li>✓ You can view all counselor accounts in the Users management page</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const password = document.querySelector('input[name="password"]').value;
+      const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+      
+      if (password !== confirmPassword) {
+        e.preventDefault();
+        Swal.fire({
+          icon: 'error',
+          title: 'Passwords do not match',
+          text: 'Please make sure both password fields match'
+        });
+      }
+    });
+  </script>
+</body>
+</html>

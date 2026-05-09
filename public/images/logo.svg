@@ -1,0 +1,56 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .telengrow-text { font-family: Arial, sans-serif; font-weight: bold; }
+      .subtext { font-family: Arial, sans-serif; font-size: 12px; }
+    </style>
+  </defs>
+  
+  <!-- Outer circle border -->
+  <circle cx="200" cy="200" r="190" fill="none" stroke="#1a1a1a" stroke-width="8"/>
+  
+  <!-- Main background circle -->
+  <circle cx="200" cy="200" r="185" fill="#e8f4f8"/>
+  
+  <!-- Green curved landscape at bottom -->
+  <path d="M 50 250 Q 200 150 350 250 L 350 350 Q 200 320 50 350 Z" fill="#2ea44f"/>
+  <path d="M 30 280 Q 200 180 370 280 L 370 350 Q 200 340 30 350 Z" fill="#22c55e" opacity="0.8"/>
+  
+  <!-- Red figure (person) -->
+  <circle cx="220" cy="200" r="20" fill="#ff5f5f"/>
+  <path d="M 220 225 L 200 280 M 220 225 L 240 280" stroke="#ff5f5f" stroke-width="18" stroke-linecap="round"/>
+  <path d="M 220 232 L 190 250 M 220 232 L 250 250" stroke="#ff5f5f" stroke-width="16" stroke-linecap="round"/>
+  
+  <!-- Gold/yellow stars -->
+  <g fill="#ffd700">
+    <!-- Star 1 (top left) -->
+    <polygon points="120,100 125,115 141,115 129,125 134,140 120,130 106,140 111,125 99,115 115,115"/>
+    <!-- Star 2 (top) -->
+    <polygon points="200,70 205,85 221,85 209,95 214,110 200,100 186,110 191,95 179,85 195,85"/>
+    <!-- Star 3 (top right) -->
+    <polygon points="280,100 285,115 301,115 289,125 294,140 280,130 266,140 271,125 259,115 275,115"/>
+    <!-- Star 4 (right) -->
+    <polygon points="330,180 335,195 351,195 339,205 344,220 330,210 316,220 321,205 309,195 325,195"/>
+  </g>
+  
+  <!-- Organization text (curved top) -->
+  <defs>
+    <path id="topArc" d="M 80,200 A 120,120 0 0,1 320,200" fill="none"/>
+  </defs>
+  
+  <text class="telengrow-text" font-size="18" fill="#1a5f3f" letter-spacing="2">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+      GUIDANCE AND COUNSELING OFFICE
+    </textPath>
+  </text>
+  
+  <!-- Center bottom text -->
+  <text class="subtext" x="200" y="330" text-anchor="middle" fill="#1a5f3f" font-weight="bold" letter-spacing="1">
+    * MINSU *
+  </text>
+  
+  <!-- Telengrow branding (alternative positioning) -->
+  <text class="telengrow-text" x="200" y="370" text-anchor="middle" font-size="20" fill="#2ea44f">
+    Telengrow
+  </text>
+</svg>

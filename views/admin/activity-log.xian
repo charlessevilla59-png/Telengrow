@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Log - Telengrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #009688 #F1F8E9;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #F1F8E9;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #009688;
+      border-radius: 4px;
+    }
+    
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 150, 136, 0.2); } 50% { box-shadow: 0 0 30px rgba(0, 150, 136, 0.3); } }
+    
+    .animate-fadeInDown { animation: fadeInDown 0.6s ease-out; }
+    .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
+    .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+    
+    .sidebar {
+      animation: slideInLeft 0.5s ease-out;
+      background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+      border-right: 1px solid rgba(0, 150, 136, 0.2);
+    }
+    
+    .sidebar-link {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #2C3E50;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+      background-color: rgba(0, 150, 136, 0.15);
+      color: #009688;
+      padding-left: 1.5rem;
+      border-left: 4px solid #009688;
+      box-shadow: inset 0 0 15px rgba(0, 150, 136, 0.1);
+    }
+    
+    .activity-item {
+      animation: fadeInUp 0.6s ease-out backwards;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.2);
+    }
+    
+    .activity-item:hover {
+      transform: translateX(8px);
+      border-color: rgba(0, 150, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 150, 136, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-white via-green-50 to-yellow-50 min-h-screen text-gray-800">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen text-white shadow-2xl overflow-y-auto">
+    <!-- Logo -->
+    <div class="p-6 border-b border-green-200">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
+      </div>
+      <p class="text-gray-600 text-xs font-semibold text-center">Mindoro State University</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mt-6">
+      <a href="/admin/dashboard" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">👥</span>
+        <span>Users</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📉</span>
+        <span>Analytics</span>
+      </a>
+
+    </nav>
+
+    <!-- User Profile -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-green-200 bg-gradient-to-r from-green-50 to-yellow-50">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-500 rounded-full flex items-center justify-center font-bold text-white text-lg shadow-lg">
+          {{substring user.name 0 1}}
+        </div>
+        <div>
+          <div class="font-bold text-sm text-gray-900">{{user.name}}</div>
+          <div class="text-xs text-gray-600 font-semibold">Admin</div>
+        </div>
+      </div>
+      <a href="/logout" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg font-bold text-center block transition shadow-lg">
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gradient-to-br from-white via-green-50 to-yellow-50">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-white to-green-50 border-b border-green-200 sticky top-0 z-40 shadow-xl">
+      <div class="px-8 py-4">
+        <div class="flex justify-between items-center">
+          <div class="animate-fadeInDown">
+            <h1 class="text-3xl font-bold text-gray-900">System Activity Log</h1>
+            <p class="text-gray-600 text-sm mt-1">Track all user activities and system events</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="p-8">
+      <!-- Filter Section -->
+      <div class="bg-white border border-teal-500 border-opacity-30 rounded-2xl p-6 mb-8 animate-fadeInUp shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="text-sm font-bold text-teal-600 block mb-2">Activity Type</label>
+            <select id="activityTypeFilter" class="w-full px-4 py-3 border border-green-300 bg-green-50 text-gray-900 rounded-lg focus:border-teal-600 outline-none transition hover:bg-green-100" onchange="filterActivities()">
+              <option value="">All Types</option>
+              <option value="game">🎮 Game</option>
+              <option value="journal">📔 Journal</option>
+              <option value="reading">📚 Reading</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-bold text-teal-600 block mb-2">User</label>
+            <input type="text" id="userFilter" placeholder="Search user..." 
+                   class="w-full px-4 py-3 border border-green-300 bg-green-50 text-gray-900 rounded-lg focus:border-teal-600 outline-none transition placeholder-gray-400"
+                   onkeyup="filterActivities()">
+          </div>
+          <div class="flex items-end">
+            <button onclick="location.reload()" class="w-full bg-gradient-to-r from-teal-600 to-teal-600 hover:from-teal-700 hover:to-teal-700 text-white px-4 py-3 rounded-lg font-bold transition shadow-lg">
+              Refresh
+            </button>
+          </div>
+          <div class="flex items-end">
+            <button onclick="exportData()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-3 rounded-lg font-bold transition shadow-lg">
+              Export CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Timeline -->
+      <div class="space-y-4">
+        {{#each recentActivities}}
+        <div class="activity-item rounded-2xl p-6" data-type="{{this.type}}" data-user="{{this.userName}}">
+          <div class="flex items-start gap-4">
+            <!-- Icon -->
+            <div class="text-4xl mt-1 flex-shrink-0">
+              {{#eq this.type 'game'}}🎮{{else}}{{#eq this.type 'journal'}}📔{{else}}📚{{/eq}}{{/eq}}
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-3 flex-wrap">
+                <h3 class="font-bold text-lg text-gray-900">
+                  {{#eq this.type 'game'}}
+                  {{this.userName}} played {{formatGameName this.details.gameType}}
+                  {{else}}{{#eq this.type 'journal'}}
+                  {{this.userName}} wrote a journal entry
+                  {{else}}
+                  {{this.userName}} read "{{this.details.materialTitle}}"
+                  {{/eq}}{{/eq}}
+                </h3>
+                <span class="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-lg font-semibold border border-teal-300">
+                  {{#eq this.type 'game'}}Game{{else}}{{#eq this.type 'journal'}}Journal{{else}}Reading{{/eq}}{{/eq}}
+                </span>
+              </div>
+
+              <!-- Activity Details -->
+              <div class="text-sm text-gray-700 mb-3 flex flex-wrap gap-2">
+                {{#eq this.type 'game'}}
+                  {{#if this.details.score}}<span class="inline-block bg-blue-900 text-blue-300 px-3 py-1 rounded border border-blue-700">Score: {{this.details.score}}</span>{{/if}}
+                  {{#if this.details.duration}}<span class="inline-block bg-purple-900 text-purple-300 px-3 py-1 rounded border border-purple-700">⏱️ {{formatDuration this.details.duration}}</span>{{/if}}
+                  {{#if this.details.difficulty}}<span class="inline-block bg-yellow-900 text-yellow-300 px-3 py-1 rounded border border-yellow-700">{{this.details.difficulty}}</span>{{/if}}
+                  {{#if this.details.completed}}<span class="inline-block bg-emerald-900 text-emerald-300 px-3 py-1 rounded border border-emerald-700">✓ Completed</span>{{/if}}
+                {{else}}{{#eq this.type 'journal'}}
+                  <span class="inline-block bg-purple-900 text-purple-300 px-3 py-1 rounded border border-purple-700">"{{this.details.title}}"</span>
+                  {{#if this.details.mood}}<span class="inline-block bg-pink-900 text-pink-300 px-3 py-1 rounded border border-pink-700">Mood: {{this.details.mood}}</span>{{/if}}
+                  {{#if this.details.wordCount}}<span class="inline-block bg-blue-900 text-blue-300 px-3 py-1 rounded border border-blue-700">{{this.details.wordCount}} words</span>{{/if}}
+                {{else}}
+                  {{#if this.details.duration}}<span class="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded border border-orange-300">⏱️ {{formatDuration this.details.duration}}</span>{{/if}}
+                  {{#if this.details.completed}}<span class="inline-block bg-teal-100 text-teal-800 px-3 py-1 rounded border border-teal-300">✓ Completed</span>{{/if}}
+                {{/eq}}{{/eq}}
+              </div>
+
+              <!-- User Info and Timestamp -->
+              <div class="flex items-center justify-between text-xs text-gray-600 flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <span>👤 {{this.userEmail}}</span>
+                  <span>•</span>
+                  <span>⭐ {{this.userPoints}} points</span>
+                </div>
+                <span>{{formatDate this.timestamp}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{else}}
+        <div class="bg-green-50 border border-dashed border-green-300 rounded-2xl p-12 text-center">
+          <div class="text-5xl mb-3">📊</div>
+          <p class="text-gray-600 text-lg">No activities found</p>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filterActivities() {
+      const activityType = document.getElementById('activityTypeFilter').value;
+      const userFilter = document.getElementById('userFilter').value.toLowerCase();
+      
+      const items = document.querySelectorAll('.activity-item');
+      items.forEach(item => {
+        const type = item.getAttribute('data-type');
+        const user = item.getAttribute('data-user').toLowerCase();
+        
+        const typeMatch = !activityType || type === activityType;
+        const userMatch = !userFilter || user.includes(userFilter);
+        
+        item.style.display = (typeMatch && userMatch) ? 'block' : 'none';
+      });
+    }
+
+    function exportData() {
+      alert('📊 Export feature coming soon!');
+    }
+  </script>
+</body>
+</html>

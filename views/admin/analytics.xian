@@ -3,61 +3,598 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow Admin</title>
+  <title>Analytics - Telengrow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes float-animation {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .animate-fadeInDown {
+      animation: fadeInDown 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .animate-slideInLeft {
+      animation: slideInLeft 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #009688 #F5F5F5;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #F5F5F5;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #009688, #00796B);
+      border-radius: 4px;
+    }
+
+    .sidebar {
+      animation: slideInLeft 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+      border-right: 1px solid rgba(0, 150, 136, 0.15);
+    }
+
+    .sidebar-link {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #2C3E50;
+      border-left: 4px solid transparent;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+      background: rgba(0, 150, 136, 0.12);
+      color: #009688;
+      border-left-color: #009688;
+      font-weight: 600;
+      transform: translateX(4px);
+      box-shadow: inset 0 0 15px rgba(0, 150, 136, 0.08);
+    }
+
+    .metric-card {
+      animation: fadeInUp 0.6s ease-out backwards;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #009688, #00796B);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .metric-card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+    .metric-card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .metric-card:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+    .metric-card:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0, 150, 136, 0.12);
+      border-color: #009688;
+    }
+
+    .metric-card:hover::before {
+      opacity: 1;
+    }
+
+    .chart-container {
+      animation: fadeInUp 0.7s ease-out backwards;
+      position: relative;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-container:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+    .chart-container:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .chart-container:hover {
+      box-shadow: 0 20px 50px rgba(0, 150, 136, 0.1);
+      border-color: #009688;
+      transform: translateY(-4px);
+    }
+
+    .table-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .table-card:hover {
+      box-shadow: 0 20px 50px rgba(0, 150, 136, 0.1);
+      border-color: #009688;
+    }
+
+    table tbody tr {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: transparent;
+    }
+
+    table tbody tr:hover {
+      background: rgba(0, 150, 136, 0.05);
+      transform: scale(1.01);
+      transform-origin: center left;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <nav class="bg-white border-b border-gray-200 shadow-sm p-4 sticky top-0 z-50">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-6">
-        <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">← Back to Dashboard</a>
-        <h1 class="text-2xl font-bold text-blue-600">📊 Data Analytics</h1>
+<body class="bg-gradient-to-br from-white via-green-50 to-green-100 min-h-screen text-gray-800">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen text-gray-800 shadow-2xl overflow-y-auto">
+    <!-- Logo -->
+    <div class="p-6 border-b border-green-200">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
       </div>
-      <div class="space-x-4 flex items-center">
-        <span class="text-gray-700">👤 {{user.name}}</span>
-        <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container mx-auto p-6">
-    <div class="mb-8">
-      <h2 class="text-3xl font-bold text-gray-900">System Analytics & Reports</h2>
-      <p class="text-gray-600 mt-1">Comprehensive data insights and statistics</p>
+      <p class="text-gray-600 text-xs font-semibold text-center">Mindoro State University</p>
     </div>
 
-    <!-- Coming Soon Message -->
-    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
-      <div class="text-8xl mb-6">📊</div>
-      <h3 class="text-3xl font-bold text-gray-900 mb-4">Data Analytics</h3>
-      <p class="text-xl text-gray-600 mb-8">Advanced analytics and reporting features coming soon!</p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
-        <div class="bg-blue-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">📈</div>
-          <h4 class="font-bold text-gray-900 mb-2">Usage Trends</h4>
-          <p class="text-sm text-gray-600">Track user engagement over time with detailed charts and graphs</p>
+    <!-- Navigation -->
+    <nav class="mt-6">
+      <a href="/admin/dashboard" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">👥</span>
+        <span>Users</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link active block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold flex items-center gap-3">
+        <span class="text-xl">📉</span>
+        <span>Analytics</span>
+      </a>
+
+    </nav>
+
+    <!-- User Profile -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-green-200 bg-gradient-to-r from-green-50 to-green-100">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center font-bold text-white text-lg shadow-lg">
+          {{substring user.name 0 1}}
         </div>
-        
-        <div class="bg-purple-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">🎯</div>
-          <h4 class="font-bold text-gray-900 mb-2">Performance Metrics</h4>
-          <p class="text-sm text-gray-600">Analyze game scores, completion rates, and user progress</p>
+        <div>
+          <div class="font-bold text-sm text-gray-800">{{user.name}}</div>
+          <div class="text-xs text-gray-600 font-semibold">Admin</div>
         </div>
-        
-        <div class="bg-green-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">📊</div>
-          <h4 class="font-bold text-gray-900 mb-2">Custom Reports</h4>
-          <p class="text-sm text-gray-600">Generate detailed reports for specific time periods and metrics</p>
+      </div>
+      <a href="/logout" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg font-bold text-center block transition shadow-lg">
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gradient-to-br from-white via-green-50 to-yellow-50">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-white to-green-50 border-b border-green-200 sticky top-0 z-40">
+      <div class="px-8 py-6">
+        <div class="flex justify-between items-center">
+          <div class="animate-fadeInDown">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Analytics & Reports</h1>
+            <p class="text-gray-600 text-sm mt-2">System performance and user engagement metrics in real-time</p>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-gray-600 font-medium">Last Updated</div>
+            <div class="text-2xl font-bold text-gray-800">Just now</div>
+            <div class="text-xs text-teal-600 font-semibold mt-1">📊 Live Data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="p-8">
+      <!-- Key Metrics -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-8">
+          <h2 class="text-2xl font-bold text-gray-100">📊 Key Performance Indicators</h2>
+          <span class="text-xs bg-emerald-900 text-emerald-200 px-3 py-1 rounded-full font-semibold border border-emerald-700">Real-time</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <!-- Average Game Score -->
+          <div class="metric-card">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-5xl">🎮</div>
+              <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Games</span>
+            </div>
+            <div class="text-4xl font-bold text-blue-400 mb-2">{{avgGameScore}}</div>
+            <div class="text-slate-300 font-semibold">Avg Game Score</div>
+            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 72%"></div>
+            </div>
+          </div>
+
+          <!-- Average Game Duration -->
+          <div class="metric-card">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-5xl">⏱️</div>
+              <span class="text-xs bg-purple-100 text-purple-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Duration</span>
+            </div>
+            <div class="text-4xl font-bold text-purple-400 mb-2">{{avgGameDuration}}</div>
+            <div class="text-slate-300 font-semibold">Avg Session Time</div>
+            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 68%"></div>
+            </div>
+          </div>
+
+          <!-- Game Completion Rate -->
+          <div class="metric-card">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-5xl">✓</div>
+              <span class="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Completion</span>
+            </div>
+            <div class="text-4xl font-bold text-green-400 mb-2">{{completionRate}}%</div>
+            <div class="text-slate-300 font-semibold">Completion Rate</div>
+            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style="width: {{completionRate}}%"></div>
+            </div>
+          </div>
+
+          <!-- User Engagement -->
+          <div class="metric-card">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-5xl">👥</div>
+              <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Engagement</span>
+            </div>
+            <div class="text-4xl font-bold text-orange-400 mb-2">{{engagementRate}}%</div>
+            <div class="text-slate-300 font-semibold">User Engagement</div>
+            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" style="width: {{engagementRate}}%"></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="mt-8">
-        <a href="/admin/dashboard" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium inline-block transition">
-          Return to Dashboard
-        </a>
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Games by Type -->
+        <div class="chart-container">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-100">🎮 Games by Type</h3>
+            <span class="text-xs bg-blue-900 text-blue-200 px-3 py-1 rounded-full font-semibold border border-blue-700">Analytics</span>
+          </div>
+          <div class="relative h-80 mb-6">
+            <canvas id="gameTypeChart"></canvas>
+          </div>
+          {{#if gameStats.length}}
+          <div class="border-t border-gray-200 pt-4 space-y-3">
+            {{#each gameStats}}
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">{{formatGameName this.gameType}}</span>
+              <div class="flex items-center gap-3">
+                <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 50%"></div>
+                </div>
+                <span class="font-bold text-gray-100 text-sm min-w-max">{{this.count}} games</span>
+              </div>
+            </div>
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+
+        <!-- Activities by Type -->
+        <div class="chart-container">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-100">📈 Activities by Type</h3>
+            <span class="text-xs bg-purple-900 text-purple-200 px-3 py-1 rounded-full font-semibold border border-purple-700">Overview</span>
+          </div>
+          <div class="relative h-80 mb-6">
+            <canvas id="activityTypeChart"></canvas>
+          </div>
+          <div class="border-t border-gray-200 pt-4 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">🎮 Games</span>
+              <div class="flex items-center gap-3">
+                <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 65%"></div>
+                </div>
+                <span class="font-bold text-gray-100 text-sm min-w-max">{{activityStats.games}} sessions</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">📔 Journals</span>
+              <div class="flex items-center gap-3">
+                <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 52%"></div>
+                </div>
+                <span class="font-bold text-gray-100 text-sm min-w-max">{{activityStats.journals}} entries</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600 font-medium">📚 Reading</span>
+              <div class="flex items-center gap-3">
+                <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" style="width: 48%"></div>
+                </div>
+                <span class="font-bold text-gray-100 text-sm min-w-max">{{activityStats.reading}} sessions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Statistics Table -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900">🎮 Game Performance Statistics</h2>
+          <span class="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">Detailed</span>
+        </div>
+        <div class="table-card overflow-hidden shadow-lg">
+          {{#if gameStats.length}}
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-900 border-b border-slate-700">
+                <tr>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Game Type</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Total Plays</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Total Duration</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Avg Duration</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Completion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each gameStats}}
+                <tr class="border-b border-slate-700 transition hover:bg-slate-700 hover:bg-opacity-20">
+                  <td class="px-6 py-4">
+                    <span class="font-bold text-gray-100">{{formatGameName this.gameType}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="font-bold text-blue-400 bg-blue-900 bg-opacity-30 px-3 py-1 rounded-full border border-blue-700">{{this.count}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="font-bold text-purple-400 bg-purple-900 bg-opacity-30 px-3 py-1 rounded-full border border-purple-700">{{formatDuration this.totalDuration}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="font-bold text-orange-400 bg-orange-900 bg-opacity-30 px-3 py-1 rounded-full border border-orange-700">{{#if this.avgDuration}}{{formatDuration this.avgDuration}}{{else}}-{{/if}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    {{#if this.completionRate}}
+                    <div class="flex items-center gap-3">
+                      <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style="width: {{this.completionRate}}%"></div>
+                      </div>
+                      <span class="text-sm font-bold text-gray-100">{{this.completionRate}}%</span>
+                    </div>
+                    {{else}}
+                    <span class="text-slate-400 font-medium">-</span>
+                    {{/if}}
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{else}}
+          <div class="text-center py-12">
+            <div class="text-5xl mb-3">📊</div>
+            <p class="text-slate-400 text-lg">No game data available</p>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- User Engagement List -->
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-8">
+          <h2 class="text-2xl font-bold text-gray-100">👥 Top Engaged Users</h2>
+          <span class="text-xs bg-emerald-900 text-emerald-200 px-3 py-1 rounded-full font-semibold border border-emerald-700">Leaderboard</span>
+        </div>
+        <div class="table-card overflow-hidden shadow-lg">
+          {{#if topUsers.length}}
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-900 border-b border-slate-700">
+                <tr>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">User</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Games</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Journals</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Reading</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Total Points</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each topUsers}}
+                <tr class="border-b border-slate-700 transition hover:bg-slate-700 hover:bg-opacity-20">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                        {{substring this.name 0 1}}
+                      </div>
+                      <div>
+                        <div class="font-bold text-gray-100">{{this.name}}</div>
+                        <div class="text-xs text-slate-400">{{this.email}}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="bg-blue-900 bg-opacity-30 text-blue-300 px-3 py-1 rounded-lg font-bold border border-blue-700">{{this.gameCount}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="bg-purple-900 bg-opacity-30 text-purple-300 px-3 py-1 rounded-lg font-bold border border-purple-700">{{this.journalCount}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="bg-orange-900 bg-opacity-30 text-orange-300 px-3 py-1 rounded-lg font-bold border border-orange-700">{{this.readingCount}}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="font-bold text-lg">
+                      <span class="text-amber-400">⭐</span>
+                      <span class="text-emerald-400">{{this.totalPoints}}</span>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="bg-emerald-900 bg-opacity-30 text-emerald-200 px-3 py-1 rounded-lg font-bold border border-emerald-700">{{this.level}}</span>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{else}}
+          <div class="text-center py-16">
+            <div class="text-6xl mb-4">👥</div>
+            <p class="text-slate-300 text-lg font-medium">No user data available yet</p>
+            <p class="text-slate-400 text-sm mt-2">Users will appear here as they engage with the platform</p>
+          </div>
+          {{/if}}
+        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    // Games by Type Chart
+    {{#if gameStats.length}}
+    const gameTypeCtx = document.getElementById('gameTypeChart').getContext('2d');
+    new Chart(gameTypeCtx, {
+      type: 'doughnut',
+      data: {
+        labels: [{{#each gameStats}}'{{formatGameName this.gameType}}'{{#unless @last}},{{/unless}}{{/each}}],
+        datasets: [{
+          data: [{{#each gameStats}}{{this.count}}{{#unless @last}},{{/unless}}{{/each}}],
+          backgroundColor: [
+            '#3b82f6',
+            '#8b5cf6',
+            '#ec4899',
+            '#f59e0b',
+            '#10b981',
+            '#06b6d4',
+          ],
+          borderColor: '#fff',
+          borderWidth: 3,
+          boxShadow: '0 20px 50px rgba(22, 163, 74, 0.15)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { size: 12, weight: 'bold' },
+              padding: 20,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+    {{/if}}
+
+    // Activities by Type Chart
+    const activityTypeCtx = document.getElementById('activityTypeChart').getContext('2d');
+    new Chart(activityTypeCtx, {
+      type: 'pie',
+      data: {
+        labels: ['🎮 Games', '📔 Journals', '📚 Reading'],
+        datasets: [{
+          data: [{{activityStats.games}}, {{activityStats.journals}}, {{activityStats.reading}}],
+          backgroundColor: [
+            '#3b82f6',
+            '#8b5cf6',
+            '#f59e0b'
+          ],
+          borderColor: '#fff',
+          borderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { size: 12, weight: 'bold' },
+              padding: 20,
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

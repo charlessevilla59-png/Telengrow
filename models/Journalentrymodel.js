@@ -17,6 +17,9 @@ export const JournalEntry = sequelize.define("JournalEntry", {
   tags: { type: DataTypes.JSON }, // Array of strings
   isPrivate: { type: DataTypes.BOOLEAN, defaultValue: true },
   wordCount: { type: DataTypes.INTEGER, defaultValue: 0 }
+}, {
+  tableName: 'journal_entries',
+  timestamps: true
 });
 
 JournalEntry.belongsTo(User, { foreignKey: 'userId' });

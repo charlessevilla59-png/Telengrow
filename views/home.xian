@@ -3,96 +3,965 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
+  <title>{{title}} - Tellngrow - Guidance & Counseling Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-20px); }
     }
-    .float-animation {
-      animation: float 3s ease-in-out infinite;
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(22, 163, 74, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(22, 163, 74, 0.5); }
     }
-    @keyframes gradient {
+
+    @keyframes glowIntense {
+      0%, 100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), 0 0 60px rgba(5, 150, 105, 0.2); }
+      50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), 0 0 80px rgba(5, 150, 105, 0.3); }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    .animated-gradient {
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .float-animation {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .animate-slide-down {
+      animation: slideInDown 0.8s ease-out;
+    }
+
+    .animate-slide-up {
+      animation: slideInUp 0.8s ease-out;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .glow-effect {
+      animation: glow 3s ease-in-out infinite;
+    }
+
+    .glow-intense {
+      animation: glowIntense 3s ease-in-out infinite;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-light {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+    }
+
+    .gradient-animated {
+      background: linear-gradient(-45deg, #10b981, #059669, #047857, #06b6d4);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    /* Glass morphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .glass-green {
+      background: rgba(16, 185, 129, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* Feature card enhancements */
+    .feature-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 253, 244, 0.7));
+      border: 2px solid rgba(16, 185, 129, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 50px rgba(16, 185, 129, 0.3);
+      border-color: rgba(16, 185, 129, 0.5);
+      background: linear-gradient(135deg, rgba(240, 253, 244, 1), rgba(236, 253, 245, 1));
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card:hover::after {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 32px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.15) rotate(5deg);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Button enhancements */
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
       background-size: 200% 200%;
-      animation: gradient 15s ease infinite;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+      background-position: 200% center;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 2px solid #10b981;
+      color: #10b981;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+      border-color: #059669;
+      color: #059669;
+    }
+
+    /* Stat box enhancement */
+    .stat-box {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.08) 100%);
+      border: 2px solid rgba(16, 185, 129, 0.25);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-4px);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .stat-box:hover::before {
+      opacity: 1;
+    }
+
+    /* Navigation link animation */
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #10b981, #059669);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Section spacing */
+    .bg-gradient-premium {
+      background: linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(240,253,244,0.60) 50%, rgba(240,253,244,0.65) 100%),
+                  url('/images/image.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .bg-gradient-hero {
+      background: linear-gradient(135deg, #065f46 0%, #047857 25%, #059669 50%, #10b981 75%, #059669 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+    }
+
+    /* Decorative gradients */
+    .decoration-gradient {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      position: relative;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #10b981, #059669);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #059669, #047857);
+    }
+
+    /* Enhanced shadows and glows */
+    .shadow-glow-green {
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.1);
+    }
+
+    .shadow-glow-green-intense {
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3), 0 0 30px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Background with image and overlay */
+    body {
+      background-image: 
+        linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.08) 50%, rgba(4, 120, 87, 0.1) 100%),
+        url('/images/image.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-color: white;
+    }
+    
+    /* Sections with semi-transparent backgrounds */
+    .section-container {
+      background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.7) 100%);
     }
   </style>
 </head>
-<body class="min-h-screen animated-gradient bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600">
-  <!-- Decorative circles -->
-  <div class="absolute top-20 left-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
-  <div class="absolute bottom-20 right-20 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
-  
-  <div class="min-h-screen flex items-center justify-center p-6 relative">
-    <div class="max-w-4xl w-full">
-      <!-- Main Card -->
-      <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 text-center">
-        
-        <!-- Logo & Title -->
-        <div class="mb-8 float-animation overflow-visible">
-          <div class="inline-block bg-gradient-to-br from-emerald-400 to-teal-500 p-6 rounded-full mb-4 shadow-lg">
-            <span class="text-6xl">🌱</span>
-          </div>
-          <h1 class="text-6xl font-bold leading-relaxed bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-3">
-            Tellngrow
-          </h1>
-          <p class="text-2xl text-gray-600 font-light">Mental Wellness & Stress Relief</p>
+<body class="bg-white">
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white backdrop-blur-xl border-b border-gray-200 shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <!-- Logo with Seal -->
+      <div class="flex items-center gap-3">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='%23166534' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='45' fill='%231f6b3f' opacity='0.1'/%3E%3Ctext x='50' y='45' text-anchor='middle' font-size='24' font-weight='bold' fill='%231f6b3f' font-family='Arial'%3EGCO%3C/text%3E%3Ctext x='50' y='70' text-anchor='middle' font-size='8' fill='%231f6b3f' font-family='Arial' font-weight='bold'%3EMINSU%3C/text%3E%3C/svg%3E" alt="Guidance & Counseling Office" class="w-10 h-10">
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">Tellngrow</h1>
+          <p class="text-xs text-gray-600">Guidance & Counseling Office</p>
         </div>
-
-        <!-- Description -->
-        <p class="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Your journey to better mental health starts here. Discover games, exercises, and tools designed to help you relax, grow, and thrive.
-        </p>
-
-        <!-- Features Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl">
-            <div class="text-3xl mb-2">🎮</div>
-            <div class="text-sm font-semibold text-gray-700">Wellness Games</div>
-          </div>
-          <div class="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-xl">
-            <div class="text-3xl mb-2">🫧</div>
-            <div class="text-sm font-semibold text-gray-700">Breathing Exercises</div>
-          </div>
-          <div class="bg-gradient-to-br from-teal-50 to-emerald-50 p-4 rounded-xl">
-            <div class="text-3xl mb-2">📔</div>
-            <div class="text-sm font-semibold text-gray-700">Mood Journal</div>
-          </div>
-          <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl">
-            <div class="text-3xl mb-2">📚</div>
-            <div class="text-sm font-semibold text-gray-700">Reading Materials</div>
-          </div>
-        </div>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a href="/login" 
-             class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-emerald-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg">
-            Login
-          </a>
-          <a href="/register" 
-             class="w-full sm:w-auto bg-white text-emerald-600 border-2 border-emerald-500 px-10 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-50 transition-all transform hover:scale-105">
-            Register
-          </a>
-        </div>
-
-        <!-- Footer Text -->
-        <p class="mt-8 text-sm text-gray-500">
-          Join thousands on their wellness journey 🌿
-        </p>
       </div>
 
-      <!-- Bottom Info -->
-      <div class="text-center mt-6 text-white/80 text-sm">
-        <p>A safe space for your mental wellness</p>
+      <!-- Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="nav-link text-gray-700 hover:text-green-700 font-medium text-sm transition">Features</a>
+        <a href="#how-it-works" class="nav-link text-gray-700 hover:text-green-700 font-medium text-sm transition">How It Works</a>
+        <a href="#about" class="nav-link text-gray-700 hover:text-green-700 font-medium text-sm transition">About</a>
+      </div>
+
+      <!-- Auth buttons -->
+      <div class="flex items-center gap-3">
+        <a href="/login" class="text-gray-700 hover:text-green-700 font-semibold transition text-sm">Login</a>
+        <a href="/register" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-green-700 to-emerald-700 hover:shadow-lg transition">
+          Get Started
+        </a>
       </div>
     </div>
-  </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-gradient-hero text-white pt-20 pb-32">
+    <!-- Decorative gradient overlays -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div class="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-emerald-300 to-transparent opacity-10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-tl from-green-300 to-transparent opacity-10 rounded-full blur-3xl"></div>
+      <div class="absolute top-1/2 right-1/4 w-80 h-80 bg-gradient-to-bl from-cyan-300 to-transparent opacity-5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Left Content -->
+        <div class="animate-fade-in">
+          <!-- Badge -->
+          <div class="inline-flex items-center bg-white/15 border border-white/30 rounded-full px-4 py-2 mb-6 backdrop-blur-md shadow-lg hover:bg-white/20 transition-all">
+            <span class="text-sm font-semibold bg-gradient-to-r from-emerald-200 to-cyan-200 bg-clip-text text-transparent">GCO CERTIFIED • PRE-VERIFIED</span>
+          </div>
+
+          <!-- Main Heading -->
+          <h1 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
+            The Professional Mental Health Platform Built for <span class="bg-gradient-to-r from-emerald-200 via-green-100 to-cyan-200 bg-clip-text text-transparent">Counselors & Students</span>
+          </h1>
+
+          <!-- Subheading -->
+          <p class="text-lg text-white/95 mb-8 leading-relaxed drop-shadow-md">
+            Empowering mental health guidance, protecting student wellness, and streamlining counseling services—all in one secure, professional platform.
+          </p>
+
+          <!-- Features List -->
+          <div class="grid grid-cols-2 gap-4 mb-10">
+            <div class="flex items-start gap-3 bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 hover:bg-white/15 transition-all">
+              <span class="text-emerald-200 font-bold text-xl">✓</span>
+              <div>
+                <p class="font-semibold">Professional Tools</p>
+                <p class="text-sm text-white/75">Counselor-grade features</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 hover:bg-white/15 transition-all">
+              <span class="text-emerald-200 font-bold text-xl">✓</span>
+              <div>
+                <p class="font-semibold">Student Wellness</p>
+                <p class="text-sm text-white/75">Mental health tracking</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 hover:bg-white/15 transition-all">
+              <span class="text-emerald-200 font-bold text-xl">✓</span>
+              <div>
+                <p class="font-semibold">Secure & Private</p>
+                <p class="text-sm text-white/75">Enterprise encryption</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 hover:bg-white/15 transition-all">
+              <span class="text-emerald-200 font-bold text-xl">✓</span>
+              <div>
+                <p class="font-semibold">Real-Time Analytics</p>
+                <p class="text-sm text-white/75">Track progress instantly</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-8">
+            <a href="/register" class="bg-gradient-to-r from-emerald-300 to-cyan-300 text-green-900 px-8 py-4 rounded-lg font-bold text-lg hover:from-emerald-200 hover:to-cyan-200 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105">
+              Create Account
+            </a>
+            <a href="/login" class="border-2 border-white/40 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/20 transition-all backdrop-blur-sm hover:border-white/70">
+              Login
+            </a>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="text-sm text-white/80 drop-shadow-md">
+            No credit card required • 30-day free trial • Mindoro State University
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section - Modern Card Design -->
+  <section id="features" class="py-28 bg-gradient-premium relative">
+    <!-- Decorative gradients -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div class="absolute top-20 right-20 w-72 h-72 bg-gradient-to-bl from-emerald-200 to-transparent opacity-10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-tr from-green-200 to-transparent opacity-10 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 relative">
+      <!-- Section Header -->
+      <div class="text-center mb-20">
+        <div class="inline-flex items-center bg-green-100 border-2 border-green-400 rounded-full px-4 py-2 mb-4 shadow-md">
+          <span class="text-sm font-semibold text-green-700">🚀 CORE FEATURES</span>
+        </div>
+        <h2 class="text-5xl font-bold text-gray-900 mb-6">
+          Everything You Need for <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-cyan-600">Professional Counseling</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Designed by educators and counselors for real-world mental health support
+        </p>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Feature Card 1 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">🎮</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Therapeutic Games</h3>
+          <p class="text-gray-600 mb-6">Evidence-based interactive games designed to improve focus, emotional regulation, and stress management for students.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Clinically validated</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Progress tracking</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Personalized content</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature Card 2 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">📚</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Expert Materials</h3>
+          <p class="text-gray-600 mb-6">Comprehensive reading materials and professional articles curated by licensed counselors and health experts.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Licensed review</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">CBT-based content</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Regularly updated</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature Card 3 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">📔</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Secure Journaling</h3>
+          <p class="text-gray-600 mb-6">Private encrypted journal space for students to safely document emotions, thoughts, and personal growth journey.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">End-to-end encrypted</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Privacy guaranteed</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Analytics included</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature Card 4 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">📊</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Mood Tracking</h3>
+          <p class="text-gray-600 mb-6">Real-time mood analytics and emotional health metrics with detailed insights for both counselors and students.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Real-time insights</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Trend analysis</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Export reports</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature Card 5 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-red-100 to-pink-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">💬</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Messaging System</h3>
+          <p class="text-gray-600 mb-6">Secure messaging between counselors and students for quick consultations and follow-up guidance.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Real-time notifications</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Message history</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">HIPAA compliant</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature Card 6 -->
+        <div class="feature-card rounded-2xl p-8 shadow-lg hover:shadow-2xl">
+          <div class="w-14 h-14 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-md">
+            <span class="text-3xl">🎓</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">Progress Reports</h3>
+          <p class="text-gray-600 mb-6">Comprehensive progress reports and assessment tools for counselors to monitor student wellness development.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Detailed analytics</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Customizable reports</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></span>
+              <span class="text-sm text-gray-700">Data-driven insights</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section - System Information -->
+  <section id="about" class="py-28 bg-gradient-to-r from-emerald-50 via-green-50 to-cyan-50 relative">
+    <!-- Decorative gradients -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div class="absolute top-32 left-20 w-96 h-96 bg-gradient-to-br from-emerald-200 to-transparent opacity-5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-10 right-20 w-96 h-96 bg-gradient-to-tl from-cyan-200 to-transparent opacity-5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 relative">
+      <!-- Section Header -->
+      <div class="text-center mb-20">
+        <div class="inline-flex items-center bg-green-100 border-2 border-green-400 rounded-full px-4 py-2 mb-4 shadow-md">
+          <span class="text-sm font-semibold text-green-700">ℹ️ ABOUT TELLNGROW</span>
+        </div>
+        <h2 class="text-5xl font-bold text-gray-900 mb-6">
+          Transforming Student <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-cyan-600">Mental Wellness</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Tellngrow is a comprehensive digital platform developed by the Guidance and Counseling Office (GCO) to provide professional mental health support, therapeutic interventions, and wellness resources to students and educational institutions.
+        </p>
+      </div>
+
+      <!-- About Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+        <!-- Left Side -->
+        <div>
+          <h3 class="text-3xl font-bold text-gray-900 mb-6">Our Mission</h3>
+          <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+            We are dedicated to making professional mental health support accessible, affordable, and user-friendly for every student. By combining clinical expertise with modern technology, Tellngrow empowers both counselors and students to achieve better mental health outcomes.
+          </p>
+          
+          <div class="space-y-4">
+            <div class="flex gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all shadow-md">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md">
+                  <span class="text-xl">🎯</span>
+                </div>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-900">Evidence-Based</h4>
+                <p class="text-gray-600">All features grounded in psychological research and clinical best practices</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all shadow-md">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md">
+                  <span class="text-xl">🔒</span>
+                </div>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-900">Privacy Protected</h4>
+                <p class="text-gray-600">Enterprise-grade security with full HIPAA compliance and data encryption</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all shadow-md">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md">
+                  <span class="text-xl">👥</span>
+                </div>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-900">Counselor-Designed</h4>
+                <p class="text-gray-600">Built by licensed mental health professionals for real counseling needs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side - Statistics -->
+        <div class="grid grid-cols-2 gap-6">
+          <div class="stat-box rounded-2xl p-8 text-center hover:shadow-2xl transition-shadow bg-white">
+            <div class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">8+</div>
+            <p class="text-gray-700 font-semibold">Therapeutic Games</p>
+            <p class="text-sm text-gray-500">Clinically validated</p>
+          </div>
+
+          <div class="stat-box rounded-2xl p-8 text-center hover:shadow-2xl transition-shadow bg-white">
+            <div class="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-2">50+</div>
+            <p class="text-gray-700 font-semibold">Expert Materials</p>
+            <p class="text-sm text-gray-500">Licensed reviewed</p>
+          </div>
+
+          <div class="stat-box rounded-2xl p-8 text-center hover:shadow-2xl transition-shadow bg-white">
+            <div class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">100%</div>
+            <p class="text-gray-700 font-semibold">HIPAA Secure</p>
+            <p class="text-sm text-gray-500">Enterprise encryption</p>
+          </div>
+
+          <div class="stat-box rounded-2xl p-8 text-center hover:shadow-2xl transition-shadow bg-white">
+            <div class="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-2">24/7</div>
+            <p class="text-gray-700 font-semibold">Available Support</p>
+            <p class="text-sm text-gray-500">Always accessible</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Why Choose Tellngrow -->
+      <div class="bg-gradient-to-br from-white to-emerald-50 rounded-2xl p-12 shadow-lg border-2 border-emerald-200">
+        <h3 class="text-3xl font-bold text-gray-900 mb-8 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Why Students Choose Tellngrow</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">🌟</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Non-Judgmental Space</h4>
+              <p class="text-gray-600 text-sm">A safe, private environment to explore your feelings without stigma</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">⚡</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Immediate Access</h4>
+              <p class="text-gray-600 text-sm">Get support anytime you need it—even outside of office hours</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">💡</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Practical Tools</h4>
+              <p class="text-gray-600 text-sm">Actionable strategies you can use immediately to improve wellness</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">📈</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Track Progress</h4>
+              <p class="text-gray-600 text-sm">Visualize your mental health journey with data-driven insights</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">🤝</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Professional Support</h4>
+              <p class="text-gray-600 text-sm">Direct access to counselors and mental health professionals</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-lg hover:bg-white/60 transition-all">
+            <div class="flex-shrink-0 text-3xl">🎮</div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Engaging Experience</h4>
+              <p class="text-gray-600 text-sm">Learn through interactive games and activities, not lectures</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-28 bg-gradient-to-b from-white via-emerald-50 to-white relative">
+    <!-- Decorative gradients -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div class="absolute top-32 right-32 w-80 h-80 bg-gradient-to-bl from-green-200 to-transparent opacity-10 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 relative">
+      <!-- Section Header -->
+      <div class="text-center mb-20">
+        <div class="inline-flex items-center bg-green-100 border-2 border-green-400 rounded-full px-4 py-2 mb-4 shadow-md">
+          <span class="text-sm font-semibold text-green-700">📋 GETTING STARTED</span>
+        </div>
+        <h2 class="text-5xl font-bold text-gray-900 mb-6">
+          Simple Steps to <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-cyan-600">Better Wellness</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Get started with Tellngrow in just a few easy steps
+        </p>
+      </div>
+
+      <!-- Process Steps -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="relative">
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200 hover:shadow-lg hover:border-green-400 transition-all shadow-md">
+            <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg glow-effect">
+              1
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Sign Up</h3>
+            <p class="text-gray-600">Create your account with just an email and password. Quick, easy, and secure.</p>
+          </div>
+          <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transform -translate-y-1/2 shadow-lg"></div>
+        </div>
+
+        <div class="relative">
+          <div class="bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-2xl p-8 border-2 border-emerald-200 hover:shadow-lg hover:border-emerald-400 transition-all shadow-md">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-600 to-cyan-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg glow-effect">
+              2
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Complete Profile</h3>
+            <p class="text-gray-600">Tell us about yourself so we can personalize your experience and track progress.</p>
+          </div>
+          <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-8 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full transform -translate-y-1/2 shadow-lg"></div>
+        </div>
+
+        <div class="relative">
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200 hover:shadow-lg hover:border-green-400 transition-all shadow-md">
+            <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg glow-effect">
+              3
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Explore Tools</h3>
+            <p class="text-gray-600">Browse games, materials, journaling tools, and other wellness resources available to you.</p>
+          </div>
+          <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transform -translate-y-1/2 shadow-lg"></div>
+        </div>
+
+        <div>
+          <div class="bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-2xl p-8 border-2 border-emerald-200 hover:shadow-lg hover:border-emerald-400 transition-all shadow-md">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-600 to-cyan-700 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg glow-effect">
+              4
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Start Your Journey</h3>
+            <p class="text-gray-600">Begin your wellness journey and track your progress with detailed analytics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="py-24 bg-gradient-to-r from-green-700 via-emerald-700 to-green-700 relative overflow-hidden">
+    <!-- Decorative gradient overlays -->
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div class="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-emerald-400 to-transparent opacity-10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-tl from-cyan-400 to-transparent opacity-10 rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-6 text-center relative">
+      <h2 class="text-5xl font-bold text-white mb-6 drop-shadow-lg">
+        Ready to Transform Your Wellness?
+      </h2>
+      <p class="text-xl text-white/95 mb-12 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+        Join students and counselors who are already experiencing positive mental health outcomes with Tellngrow. Start your free 30-day trial today.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/register" class="bg-gradient-to-r from-emerald-300 to-cyan-300 text-emerald-900 px-10 py-4 rounded-lg font-bold text-lg hover:from-emerald-200 hover:to-cyan-200 transition-all transform hover:scale-105 shadow-lg hover:shadow-2xl">
+          Create Account
+        </a>
+        <a href="/login" class="border-2 border-white/60 text-white px-10 py-4 rounded-lg font-bold text-lg hover:border-white backdrop-blur-sm hover:bg-white/15 transition-all">
+          Login
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-300 py-16 border-t border-green-800/30">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+        <!-- Brand Column -->
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%2310b981' opacity='0.2' stroke='%2310b981' stroke-width='2'/%3E%3Ctext x='50' y='45' text-anchor='middle' font-size='20' font-weight='bold' fill='%2310b981' font-family='Arial'%3EGCO%3C/text%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='7' fill='%2310b981' font-family='Arial' font-weight='bold'%3ETELNGROW%3C/text%3E%3C/svg%3E" alt="Tellngrow" class="w-8 h-8">
+            <h3 class="text-white font-bold text-lg">Tellngrow</h3>
+          </div>
+          <p class="text-sm text-gray-400">Professional mental health support platform for educational institutions.</p>
+        </div>
+
+        <!-- Platform Column -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Platform</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="#features" class="text-gray-400 hover:text-green-400 transition">Features</a></li>
+            <li><a href="#how-it-works" class="text-gray-400 hover:text-green-400 transition">How It Works</a></li>
+            <li><a href="#about" class="text-gray-400 hover:text-green-400 transition">About</a></li>
+            <li><a href="/register" class="text-gray-400 hover:text-green-400 transition">Get Started</a></li>
+          </ul>
+        </div>
+
+        <!-- Company Column -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Company</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Careers</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal Column -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Legal</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition">Privacy Policy</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition">Terms of Service</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition">HIPAA Compliance</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition">Security</a></li>
+          </ul>
+        </div>
+
+        <!-- Support Column -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Support</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="mailto:support@tellngrow.com" class="text-gray-400 hover:text-emerald-400 transition">support@tellngrow.com</a></li>
+            <li class="text-xs text-gray-500 pt-2">Mindoro State University</li>
+            <li class="text-xs text-gray-500">Guidance & Counseling Office</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-green-800/20 pt-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+          <p>&copy; 2025 Tellngrow. All rights reserved. Designed for student wellness. 🌱</p>
+          <div class="flex gap-6">
+            <a href="#" class="text-gray-400 hover:text-green-400 transition">Twitter</a>
+            <a href="#" class="text-gray-400 hover:text-emerald-400 transition">Facebook</a>
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -11,6 +11,13 @@ import { User } from "../models/index.js";
 export const isAuthenticated = async (req, res, next) => {
   try {
     if (!req.session.userId) {
+      // If it's an AJAX/JSON request, return JSON error instead of redirect
+      if (req.headers['content-type']?.includes('application/json') || req.xhr) {
+        return res.status(401).json({ 
+          success: false, 
+          error: "You must be logged in to perform this action" 
+        });
+      }
       return res.redirect("/login");
     }
     
@@ -18,6 +25,13 @@ export const isAuthenticated = async (req, res, next) => {
     
     if (!user) {
       req.session.destroy();
+      // If it's an AJAX/JSON request, return JSON error instead of redirect
+      if (req.headers['content-type']?.includes('application/json') || req.xhr) {
+        return res.status(401).json({ 
+          success: false, 
+          error: "Session expired. Please log in again." 
+        });
+      }
       return res.redirect("/login");
     }
     
@@ -25,6 +39,13 @@ export const isAuthenticated = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);
+    // If it's an AJAX/JSON request, return JSON error instead of redirect
+    if (req.headers['content-type']?.includes('application/json') || req.xhr) {
+      return res.status(500).json({ 
+        success: false, 
+        error: "Authentication error" 
+      });
+    }
     res.redirect("/login");
   }
 };

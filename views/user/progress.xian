@@ -5,30 +5,551 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    .stat-card {
+      animation: slideIn 0.5s ease-out backwards;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    .tab-button {
+      transition: all 0.3s ease;
+    }
+    
+    .tab-button.active {
+      border-bottom: 3px solid #10b981;
+      color: #10b981;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
   {{> sidebar}}
   
-  <nav class="bg-white shadow-md p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+  <!-- Navigation -->
+  <nav class="bg-white border-b-2 border-green-100 shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <button onclick="openSidebar()" class="text-gray-700 hover:text-green-600 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <h1 class="text-2xl font-bold text-green-600">📊 My Progress</h1>
+        </div>
       </div>
     </div>
   </nav>
 
-  <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">📊 My Progress</h1>
-    
-    <div class="bg-white rounded-xl shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">Progress Tracking</h2>
-      <p class="text-gray-600">Progress tracking coming soon...</p>
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <div class="mb-4">
+      <a href="/user/dashboard" class="inline-flex items-center text-green-600 hover:text-green-700 transition">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span class="font-medium">Back to Dashboard</span>
+      </a>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center py-8">
+      <div class="inline-block">
+        <div class="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+      </div>
+      <p class="text-gray-600 mt-4">Loading your progress...</p>
+    </div>
+
+    <!-- Content Container (Hidden until loaded) -->
+    <div id="contentContainer" style="display: none;">
+      <!-- Overview Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Level Card -->
+        <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-600 text-sm font-semibold">LEVEL</p>
+              <h3 class="text-3xl font-bold text-gray-900 mt-2" id="levelName">—</h3>
+              <p class="text-sm text-gray-500 mt-1" id="levelDescription">Loading...</p>
+            </div>
+            <div class="text-4xl" id="levelIcon">🌱</div>
+          </div>
+          <div class="mt-4 bg-gray-200 rounded-full h-2">
+            <div id="levelProgress" class="bg-purple-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2" id="levelProgressText">0/500 points</p>
+        </div>
+
+        <!-- Total Points Card -->
+        <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition">
+          <p class="text-gray-600 text-sm font-semibold">TOTAL POINTS</p>
+          <h3 class="text-4xl font-bold text-blue-600 mt-2" id="totalPoints">0</h3>
+          <div class="flex items-center mt-4 text-yellow-500">
+            <span class="text-2xl">⭐</span>
+            <span class="text-sm font-semibold ml-2" id="pointsRank">Beginner Rank</span>
+          </div>
+        </div>
+
+        <!-- Streak Card -->
+        <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500 hover:shadow-xl transition">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-600 text-sm font-semibold">CURRENT STREAK</p>
+              <h3 class="text-4xl font-bold text-red-600 mt-2" id="currentStreak">0</h3>
+              <p class="text-xs text-gray-500 mt-1">days</p>
+            </div>
+            <div class="text-4xl">🔥</div>
+          </div>
+          <p class="text-xs text-gray-600 mt-4" id="longestStreakText">Longest: 0 days</p>
+        </div>
+
+        <!-- Activities Card -->
+        <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 hover:shadow-xl transition">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-gray-600 text-xs font-semibold">GAMES PLAYED</p>
+              <h3 class="text-3xl font-bold text-green-600 mt-2" id="gamesPlayed">0</h3>
+            </div>
+            <div>
+              <p class="text-gray-600 text-xs font-semibold">JOURNAL ENTRIES</p>
+              <h3 class="text-3xl font-bold text-green-600 mt-2" id="journalEntries">0</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Daily Activity Chart -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">📈 Weekly Activity</h3>
+          <canvas id="dailyActivityChart" height="80"></canvas>
+        </div>
+
+        <!-- Mood Trend Chart -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">😊 Mood Trend</h3>
+          <canvas id="moodTrendChart" height="80"></canvas>
+        </div>
+      </div>
+
+      <!-- Game Statistics -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">🎮 Game Performance</h3>
+        <div id="gameStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Game stats will be populated here -->
+        </div>
+      </div>
+
+      <!-- Achievements Section -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">🏆 Achievements</h3>
+        <div id="achievementsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <!-- Achievements will be populated here -->
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">📅 Recent Activity</h3>
+        <div id="recentActivityList" class="space-y-3">
+          <!-- Recent activities will be populated here -->
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">💡 Recommendations</h3>
+        <div id="recommendationsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Recommendations will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" style="display: none;" class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+      <p class="text-red-600 font-semibold">Unable to load progress data. Please try again later.</p>
     </div>
   </div>
+
+  <script>
+    let dailyActivityChart, moodTrendChart;
+
+    async function loadProgressData() {
+      try {
+        console.log('🔄 Loading progress data...');
+        const response = await fetch('/api/user/progress/dashboard');
+        
+        console.log('📡 Response status:', response.status);
+        const result = await response.json();
+        
+        console.log('📥 Response data:', result);
+
+        if (!response.ok) {
+          throw new Error(result.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        if (!result.success) {
+          throw new Error(result.error || 'API returned success: false');
+        }
+
+        const { data } = result;
+        
+        console.log('✅ Data received, displaying...');
+        displayOverviewStats(data.overview);
+        displayGameStats(data.statistics.gameStats);
+        displayRecentActivity(data.statistics.recentActivities);
+        displayCharts(data.charts);
+        displayAchievements(data);
+        displayRecommendations(data.recommendations);
+
+        // Show content, hide loading
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('contentContainer').style.display = 'block';
+      } catch (error) {
+        console.error('❌ Error loading progress:', error);
+        console.error('Stack:', error.stack);
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        const errorEl = document.getElementById('errorMessage').querySelector('p');
+        errorEl.innerHTML = `Unable to load progress data: ${error.message}<br><small style="color: #999;">Check browser console for details</small>`;
+      }
+    }
+
+    function displayOverviewStats(overview) {
+      const levelIcon = overview.levelDetails.icon;
+      const levelName = overview.levelDetails.name;
+      const levelDescription = overview.levelDetails.description;
+
+      document.getElementById('levelIcon').textContent = levelIcon;
+      document.getElementById('levelName').textContent = levelName;
+      document.getElementById('levelDescription').textContent = levelDescription;
+      document.getElementById('levelProgress').style.width = overview.progressToNextLevel.percentage + '%';
+      document.getElementById('levelProgressText').textContent = 
+        `${overview.totalPoints}/${overview.progressToNextLevel.target === Infinity ? '∞' : overview.progressToNextLevel.target} points`;
+
+      document.getElementById('totalPoints').textContent = overview.totalPoints.toLocaleString();
+      document.getElementById('pointsRank').textContent = `${levelName} Rank`;
+      document.getElementById('currentStreak').textContent = overview.currentStreak;
+      document.getElementById('longestStreakText').textContent = `Longest: ${overview.longestStreak} days`;
+      document.getElementById('gamesPlayed').textContent = overview.totalGamesPlayed;
+      document.getElementById('journalEntries').textContent = overview.totalJournalEntries;
+    }
+
+    function displayGameStats(gameStats) {
+      const container = document.getElementById('gameStats');
+      container.innerHTML = '';
+
+      const formatGameName = (name) => {
+        return name
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase())
+          .trim();
+      };
+
+      Object.entries(gameStats).forEach(([key, stats]) => {
+        const card = document.createElement('div');
+        card.className = 'bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border-l-4 border-blue-500';
+        card.innerHTML = `
+          <h4 class="font-bold text-gray-900 text-sm">${formatGameName(key)}</h4>
+          <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+            <div>
+              <p class="text-gray-600">Times Played</p>
+              <p class="font-bold text-blue-600">${stats.timesPlayed}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Best Score</p>
+              <p class="font-bold text-blue-600">${stats.bestScore}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Avg Score</p>
+              <p class="font-bold text-blue-600">${stats.averageScore.toFixed(0)}</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Points</p>
+              <p class="font-bold text-blue-600">${stats.totalPoints}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      if (Object.keys(gameStats).length === 0) {
+        container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-6">No games played yet. Start playing to see your stats!</p>';
+      }
+    }
+
+    function displayRecentActivity(activities) {
+      const container = document.getElementById('recentActivityList');
+      container.innerHTML = '';
+
+      if (activities.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-6">No activities yet. Start playing games or journaling!</p>';
+        return;
+      }
+
+      activities.forEach(activity => {
+        const date = new Date(activity.createdAt);
+        const timeAgo = getTimeAgo(date);
+        const icon = getActivityIcon(activity.type, activity.subType);
+
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition';
+        item.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <span class="text-2xl">${icon}</span>
+            <div>
+              <p class="font-semibold text-gray-900">${activity.description || formatActivityType(activity.type, activity.subType)}</p>
+              <p class="text-xs text-gray-500">${timeAgo}</p>
+            </div>
+          </div>
+          ${activity.metadata?.points ? `<span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">+${activity.metadata.points} pts</span>` : ''}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function displayCharts(charts) {
+      // Daily Activity Chart
+      const dailyCtx = document.getElementById('dailyActivityChart').getContext('2d');
+      if (dailyActivityChart) dailyActivityChart.destroy();
+
+      dailyActivityChart = new Chart(dailyCtx, {
+        type: 'bar',
+        data: {
+          labels: charts.dailyActivity.map(d => {
+            const date = new Date(d.date);
+            return date.toLocaleDateString('en-US', { weekday: 'short' });
+          }),
+          datasets: [{
+            label: 'Activities',
+            data: charts.dailyActivity.map(d => d.count),
+            backgroundColor: '#10b981',
+            borderColor: '#059669',
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: '#059669'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+
+      // Mood Trend Chart
+      const moodCtx = document.getElementById('moodTrendChart').getContext('2d');
+      if (moodTrendChart) moodTrendChart.destroy();
+
+      const moodColors = {
+        'happy': '#22c55e',
+        'neutral': '#8b5cf6',
+        'surprised': '#f59e0b',
+        'sad': '#06b6d4',
+        'fearful': '#ef4444',
+        'angry': '#dc2626',
+        'disgusted': '#f97316',
+        'anxious': '#f43f5e'
+      };
+
+      const moodValues = {
+        'happy': 5,
+        'neutral': 3,
+        'surprised': 3,
+        'sad': 2,
+        'fearful': 2,
+        'angry': 1,
+        'disgusted': 1,
+        'anxious': 2
+      };
+
+      const moodEmojis = {
+        'happy': '😄',
+        'neutral': '😐',
+        'surprised': '😮',
+        'sad': '😢',
+        'fearful': '😨',
+        'angry': '😠',
+        'disgusted': '🤢',
+        'anxious': '😰'
+      };
+
+      moodTrendChart = new Chart(moodCtx, {
+        type: 'line',
+        data: {
+          labels: charts.moodTrend.slice(-7).map(m => new Date(m.date).toLocaleDateString('en-US', { weekday: 'short' })),
+          datasets: [{
+            label: 'Mood Score',
+            data: charts.moodTrend.slice(-7).map(m => moodValues[m.mood] || 3),
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 6,
+            pointBackgroundColor: charts.moodTrend.slice(-7).map(m => moodColors[m.mood] || '#8b5cf6'),
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            hoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 5,
+              ticks: { stepSize: 1, callback: (v) => [moodEmojis['angry'], moodEmojis['sad'], moodEmojis['neutral'], moodEmojis['surprised'], moodEmojis['happy']][v] || '' }
+            }
+          }
+        }
+      });
+    }
+
+    async function displayAchievements(data) {
+      try {
+        const response = await fetch('/api/user/achievements');
+        const result = await response.json();
+
+        if (!response.ok) throw new Error('Failed to load achievements');
+
+        const container = document.getElementById('achievementsContainer');
+        container.innerHTML = '';
+
+        result.achievements.forEach(achievement => {
+          const badge = document.createElement('div');
+          badge.className = 'text-center p-4 rounded-lg bg-gray-50 hover:bg-yellow-50 transition border-2 border-gray-200 hover:border-yellow-400';
+          badge.innerHTML = `
+            <div class="text-4xl mb-2">${achievement.icon}</div>
+            <h4 class="font-bold text-sm text-gray-900">${achievement.name}</h4>
+            <p class="text-xs text-gray-600 mt-1">${achievement.description}</p>
+            ${achievement.date ? `<p class="text-xs text-gray-500 mt-2">${new Date(achievement.date).toLocaleDateString()}</p>` : ''}
+          `;
+          container.appendChild(badge);
+        });
+
+        if (result.achievements.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-6">Keep playing to unlock achievements!</p>';
+        }
+      } catch (error) {
+        console.error('Error loading achievements:', error);
+      }
+    }
+
+    function displayRecommendations(data) {
+      const container = document.getElementById('recommendationsContainer');
+      container.innerHTML = '';
+
+      data.recommendations.forEach(rec => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg p-4 border-2 border-green-200 hover:border-green-400 transition';
+        card.innerHTML = `
+          <h4 class="font-bold text-gray-900 mb-2">${rec.title}</h4>
+          <p class="text-sm text-gray-600 mb-3">${rec.description}</p>
+          <a href="${rec.link}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">
+            ${rec.action}
+          </a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getActivityIcon(type, subType) {
+      const icons = {
+        'game': '🎮',
+        'journal': '📝',
+        'mood': '😊',
+        'achievement': '🏆',
+        'login': '👤'
+      };
+      return icons[type] || '✨';
+    }
+
+    function formatActivityType(type, subType) {
+      if (subType) {
+        return subType.replace(/([A-Z])/g, ' $1').trim();
+      }
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+      if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+      if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+      return date.toLocaleDateString();
+    }
+
+    // Open/Close Sidebar
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    document.getElementById('overlay')?.addEventListener('click', closeSidebar);
+
+    // Auto-open sidebar when cursor moves to left edge
+    let sidebarOpenTimeout;
+    document.addEventListener('mousemove', function(e) {
+      // If cursor is within 30px from left edge, open sidebar
+      if (e.clientX < 30) {
+        if (!sidebarOpenTimeout) {
+          sidebarOpenTimeout = setTimeout(() => {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('open')) {
+              openSidebar();
+            }
+          }, 300); // 300ms delay to prevent accidental triggers
+        }
+      } else {
+        // Clear timeout if cursor moves away
+        if (sidebarOpenTimeout) {
+          clearTimeout(sidebarOpenTimeout);
+          sidebarOpenTimeout = null;
+        }
+      }
+    });
+
+    // Load progress data on page load
+    document.addEventListener('DOMContentLoaded', loadProgressData);
+  </script>
 </body>
 </html>

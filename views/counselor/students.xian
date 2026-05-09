@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .overlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .student-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(22, 163, 74, 0.1);
+      border-color: #6ee7b7;
+    }
+
+    .profile-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #d1f2eb;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: #ecfdf5;
+      color: #16a34a;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #d1fae5;
+    }
+
+    .filter-chip:hover {
+      background: #d1fae5;
+      border-color: #a7f3d0;
+    }
+
+    .filter-chip.active {
+      background: #16a34a;
+      color: white;
+      border-color: #16a34a;
+    }
+
+    .search-input {
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+
+    .btn-primary {
+      background: #16a34a;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #15803d;
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #ecfdf5;
+      color: #16a34a;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      color: #d1d5db;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  {{> sidebar}}
+  
+  <nav class="bg-white shadow-md p-4 border-b-2 border-green-100">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-green-600 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold text-green-600">🌱 Tellngrow</h1>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-6">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">👥 Students Information</h1>
+      </div>
+      <p class="text-gray-600">View and manage student information and profiles</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8 border-l-4 border-green-500">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <!-- Search by Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name</label>
+          <input 
+            type="text" 
+            id="searchName" 
+            class="search-input w-full"
+            placeholder="Enter student name..."
+            onkeyup="filterStudents()"
+          />
+        </div>
+
+        <!-- Filter by Course -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Course</label>
+          <select 
+            id="filterCourse"
+            class="search-input w-full"
+            onchange="filterStudents()"
+          >
+            <option value="">All Courses</option>
+            <option value="CPE">CPE (Computer Engineering)</option>
+            <option value="IT">IT (Information Technology)</option>
+            <option value="BSFI">BSFI (Business Administration - Finance)</option>
+            <option value="BSENTREP">BSENTREP (Business Administration - Entrepreneurship)</option>
+            <option value="BEED">BEED (Bachelor of Elementary Education)</option>
+            <option value="EDUC">EDUC (Bachelor of Secondary Education)</option>
+            <option value="CRIM">CRIM (Criminology)</option>
+            <option value="TOURISM">TOURISM (Tourism)</option>
+            <option value="HM">HM (Hospitality Management)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t">
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{totalStudents}}</p>
+          <p class="text-sm text-gray-600">Total Students</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{uniqueCourses}}</p>
+          <p class="text-sm text-gray-600">Courses</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{averageYear}}</p>
+          <p class="text-sm text-gray-600">Avg Year Level</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Table -->
+    {{#if students}}
+      <div class="bg-white rounded-lg shadow overflow-hidden border-t-4 border-green-500">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gradient-to-r from-green-50 to-green-100 border-b-2 border-green-200">
+              <tr>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Student</th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Course</th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Year</th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Action</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody" class="divide-y">
+              {{#each students}}
+              <tr class="hover:bg-green-50 transition student-row" data-name="{{this.name}}" data-course="{{this.course}}">
+                <td class="px-6 py-4">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-green-200 bg-white flex items-center justify-center flex-shrink-0">
+                      {{#if this.profilePicture}}
+                        {{#if (eq (substring this.profilePicture 0 1) "/")}}
+                          <img src="{{this.profilePicture}}" alt="{{this.name}}" class="w-full h-full object-cover" />
+                        {{else}}
+                          <span class="text-2xl">{{this.profilePicture}}</span>
+                        {{/if}}
+                      {{else}}
+                        <span class="text-2xl text-gray-400">👤</span>
+                      {{/if}}
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">{{this.name}}</p>
+                      <p class="text-xs text-gray-500">{{this.section}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{this.email}}</td>
+                <td class="px-6 py-4">
+                  <span class="badge">{{this.course}}</span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{this.year}}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{this.contactNumber}}</td>
+                <td class="px-6 py-4 text-center">
+                  <a href="/counselor/students/{{this.id}}" class="btn-primary">
+                    View Profile
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination Info -->
+      <div class="mt-4 text-center text-sm text-gray-600">
+        Showing <span id="visibleCount">{{students.length}}</span> of <span id="totalCount">{{totalStudents}}</span> students
+      </div>
+    {{else}}
+      <div class="bg-white rounded-lg shadow p-12 border-t-4 border-green-500">
+        <div class="empty-state">
+          <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM18 20a6 6 0 11-12 0 6 6 0 0112 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">No Students Found</h3>
+          <p class="text-gray-600">There are no students to display yet.</p>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('show');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
+    }
+
+    function filterStudents() {
+      const searchName = document.getElementById('searchName').value.toLowerCase();
+      const filterCourse = document.getElementById('filterCourse').value;
+      const rows = document.querySelectorAll('.student-row');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const course = row.getAttribute('data-course');
+
+        const matchesName = name.includes(searchName);
+        const matchesCourse = filterCourse === '' || course === filterCourse;
+
+        if (matchesName && matchesCourse) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      // Update visible count
+      const visibleCountEl = document.getElementById('visibleCount');
+      const totalCountEl = document.getElementById('totalCount');
+      if (visibleCountEl) {
+        visibleCountEl.textContent = visibleCount;
+      }
+      if (totalCountEl) {
+        totalCountEl.textContent = '{{totalStudents}}';
+      }
+    }
+
+    // Close sidebar when clicking overlay
+    document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking a link
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (!link.target || link.target === '') {
+          setTimeout(closeSidebar, 100);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

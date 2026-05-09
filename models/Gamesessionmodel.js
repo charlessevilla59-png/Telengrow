@@ -30,6 +30,9 @@ export const GameSession = sequelize.define("GameSession", {
   consistency: { type: DataTypes.FLOAT },
   mistakes: { type: DataTypes.INTEGER, defaultValue: 0 },
   completed: { type: DataTypes.BOOLEAN, defaultValue: false }
+}, {
+  tableName: 'game_sessions',
+  timestamps: true
 });
 
 GameSession.belongsTo(User, { foreignKey: 'userId' });

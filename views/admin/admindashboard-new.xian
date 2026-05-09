@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Telengrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+    
+    .animate-fadeInDown { animation: fadeInDown 0.6s ease-out; }
+    .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
+    .animate-slideInLeft { animation: slideInLeft 0.5s ease-out; }
+    
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #16a34a #f0fdf4;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f0fdf4;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #16a34a;
+      border-radius: 4px;
+    }
+    
+    .sidebar {
+      animation: slideInLeft 0.5s ease-out;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+    }
+    
+    .sidebar-link {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #6b7280;
+      border-left: 3px solid transparent;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+      background-color: #f3faf7;
+      color: #16a34a;
+      border-left-color: #16a34a;
+      font-weight: 600;
+    }
+    
+    .stat-card {
+      animation: fadeInUp 0.6s ease-out backwards;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    .stat-card:nth-child(5) { animation-delay: 0.5s; }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+      border-color: #16a34a;
+    }
+    
+    .progress-bar {
+      background: linear-gradient(90deg, #16a34a 0%, #10b981 100%);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card:hover {
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.1);
+      border-color: #16a34a;
+    }
+    
+    .navbar-clean {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen text-gray-900 shadow-lg overflow-y-auto">
+    <!-- Logo -->
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold text-green-600">Telengrow</h1>
+      </div>
+      <p class="text-green-700 text-xs font-semibold text-center">Admin Panel</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mt-6">
+      <a href="/admin/HOME" class="sidebar-link active block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Users</span>
+      </a>
+      <a href="/admin/reports" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Reports</span>
+      </a>
+      <a href="/admin/activity-log" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Activity Log</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Analytics</span>
+      </a>
+      <a href="/admin/settings" class="sidebar-link block px-4 py-3 mx-3 rounded-lg mb-2 font-semibold">
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <!-- User Profile -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+          {{substring user.name 0 1}}
+        </div>
+        <div>
+          <div class="font-bold text-sm text-gray-900">{{user.name}}</div>
+          <div class="text-xs text-gray-600 font-semibold">Administrator</div>
+        </div>
+      </div>
+      <a href="/logout" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-center block transition">
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="navbar-clean sticky top-0 z-40">
+      <div class="px-8 py-6">
+        <div class="flex justify-between items-center">
+          <div class="animate-fadeInDown">
+            <h1 class="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-600 text-base mt-2">Monitor system activity and platform metrics</p>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-gray-500 font-medium">Welcome back,</div>
+            <div class="text-2xl font-bold text-gray-900">{{user.name}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="p-8">
+      <!-- Key Statistics -->
+      <div class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Platform Overview</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <!-- Total Users -->
+          <div class="stat-card rounded-xl p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 text-xs font-semibold uppercase tracking-wide">Total Users</p>
+              <p class="text-3xl font-bold text-gray-900 mt-3">{{stats.totalUsers}}</p>
+            </div>
+            <div class="text-gray-500 text-xs font-medium">Registered members</div>
+            <div class="progress-bar mt-4" style="width: 85%;"></div>
+          </div>
+
+          <!-- Games Played -->
+          <div class="stat-card rounded-xl p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 text-xs font-semibold uppercase tracking-wide">Games Played</p>
+              <p class="text-3xl font-bold text-gray-900 mt-3">{{stats.totalGames}}</p>
+            </div>
+            <div class="text-gray-500 text-xs font-medium">Total sessions</div>
+            <div class="progress-bar mt-4" style="width: 75%;"></div>
+          </div>
+
+          <!-- Journal Entries -->
+          <div class="stat-card rounded-xl p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 text-xs font-semibold uppercase tracking-wide">Journal Entries</p>
+              <p class="text-3xl font-bold text-gray-900 mt-3">{{stats.totalJournals}}</p>
+            </div>
+            <div class="text-gray-500 text-xs font-medium">User reflections</div>
+            <div class="progress-bar mt-4" style="width: 62%;"></div>
+          </div>
+
+          <!-- Reading Sessions -->
+          <div class="stat-card rounded-xl p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 text-xs font-semibold uppercase tracking-wide">Reading Sessions</p>
+              <p class="text-3xl font-bold text-gray-900 mt-3">{{stats.totalReadingSessions}}</p>
+            </div>
+            <div class="text-gray-500 text-xs font-medium">Content consumed</div>
+            <div class="progress-bar mt-4" style="width: 58%;"></div>
+          </div>
+
+          <!-- Active Users Today -->
+          <div class="stat-card rounded-xl p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 text-xs font-semibold uppercase tracking-wide">Active Today</p>
+              <p class="text-3xl font-bold text-gray-900 mt-3">{{stats.activeToday}}</p>
+            </div>
+            <div class="text-gray-500 text-xs font-medium">Online right now</div>
+            <div class="progress-bar mt-4" style="width: 45%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- User Growth Chart -->
+        <div class="card rounded-xl p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">User Growth Trend</h3>
+          <div class="chart-container">
+            <canvas id="userGrowthChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Activity Distribution Chart -->
+        <div class="card rounded-xl p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Activity Distribution</h3>
+          <div class="chart-container">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Daily Activity Chart -->
+        <div class="card rounded-xl p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Daily Activity (Last 7 Days)</h3>
+          <div class="chart-container">
+            <canvas id="dailyActivityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Engagement Chart -->
+        <div class="card rounded-xl p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Engagement Rate</h3>
+          <div class="chart-container">
+            <canvas id="engagementChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Approvals Section -->
+      {{#if pendingCounselors}}
+      <div class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Pending Approvals ({{pendingCounselors.length}})</h2>
+        <div class="space-y-4">
+          {{#each pendingCounselors}}
+          <div class="card rounded-xl p-6 border-l-4 border-amber-500">
+            <div class="flex justify-between items-start gap-4">
+              <!-- Counselor Info -->
+              <div class="flex-1">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="w-14 h-14 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+                    {{substring this.name 0 1}}
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-900 text-lg">{{this.name}}</h3>
+                    <p class="text-sm text-gray-600">{{this.email}}</p>
+                    <div class="flex gap-2 mt-2">
+                      <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded font-semibold">Pending Review</span>
+                      <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Counselor</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {{#if this.bio}}
+                <div class="bg-gray-50 rounded-lg p-3 mt-4">
+                  <p class="text-xs text-gray-500 font-semibold mb-1">Professional Bio</p>
+                  <p class="text-sm text-gray-700">{{this.bio}}</p>
+                </div>
+                {{/if}}
+              </div>
+
+              <!-- Actions -->
+              <div class="flex flex-col gap-2">
+                <button onclick="approveCounselor({{this.id}})" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-semibold transition whitespace-nowrap">
+                  Approve
+                </button>
+                <button onclick="rejectCounselor({{this.id}})" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 font-semibold transition whitespace-nowrap">
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      <!-- Recent Users -->
+      <div class="mb-12">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Recent Users</h2>
+          <a href="/admin/users" class="text-green-600 hover:text-green-700 font-semibold">View All</a>
+        </div>
+        
+        {{#if users}}
+        <div class="grid grid-cols-1 gap-4">
+          {{#each users}}
+          {{#lt @index 6}}
+          <div class="card rounded-xl p-6">
+            <div class="flex justify-between items-start gap-4">
+              <!-- User Info -->
+              <div class="flex-1">
+                <div class="flex items-start gap-4 mb-4">
+                  <div class="w-12 h-12 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+                    {{substring this.name 0 1}}
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-bold text-gray-900 text-lg">{{this.name}}</h3>
+                    <p class="text-sm text-gray-600">{{this.email}}</p>
+                    <div class="flex gap-2 mt-2">
+                      {{#if this.progress}}
+                      <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-semibold">Level {{this.progress.level}}</span>
+                      <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">{{this.progress.totalPoints}} pts</span>
+                      {{/if}}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Activity Stats -->
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                  <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <div class="font-bold text-gray-900 text-lg">{{this.gameCount}}</div>
+                    <div class="text-xs text-gray-600 font-medium">Games</div>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <div class="font-bold text-gray-900 text-lg">{{this.journalCount}}</div>
+                    <div class="text-xs text-gray-600 font-medium">Journals</div>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <div class="font-bold text-gray-900 text-lg">{{this.readingCount}}</div>
+                    <div class="text-xs text-gray-600 font-medium">Reading</div>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                    <div class="font-bold text-gray-900 text-lg">{{this.totalActivities}}</div>
+                    <div class="text-xs text-gray-600 font-medium">Total</div>
+                  </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <p class="text-xs font-semibold text-gray-600">Activity Progress</p>
+                    <p class="text-xs font-bold text-gray-700">{{this.totalActivities}}/50</p>
+                  </div>
+                  <div class="progress-bar" style="width: 65%;"></div>
+                </div>
+              </div>
+
+              <!-- Action -->
+              <a href="/admin/users/{{this.id}}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold text-sm transition text-center whitespace-nowrap h-fit">
+                View Details
+              </a>
+            </div>
+          </div>
+          {{/lt}}
+          {{/each}}
+        </div>
+        {{else}}
+        <div class="bg-white border border-dashed border-gray-300 rounded-xl p-12 text-center">
+          <p class="text-gray-600 text-lg font-medium">No users yet</p>
+          <p class="text-gray-500 text-sm mt-2">Users will appear here as they register</p>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 text-center">
+        <p class="text-gray-600 text-sm">Last updated: Just now</p>
+        <p class="text-gray-500 text-xs mt-2">Dashboard automatically refreshes in real-time</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Chart configuration
+    const chartColor = {
+      primary: 'rgb(22, 163, 74)',
+      secondary: 'rgba(22, 163, 74, 0.1)',
+      text: 'rgb(31, 41, 55)'
+    };
+
+    // User Growth Chart
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userGrowthCtx, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
+        datasets: [{
+          label: 'New Users',
+          data: [12, 19, 15, 25, 22, 30, 28],
+          borderColor: chartColor.primary,
+          backgroundColor: chartColor.secondary,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: chartColor.primary,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: chartColor.text }
+          },
+          x: {
+            ticks: { color: chartColor.text }
+          }
+        }
+      }
+    });
+
+    // Activity Distribution Chart
+    const activityCtx = document.getElementById('activityChart').getContext('2d');
+    new Chart(activityCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Games', 'Journals', 'Reading', 'Other'],
+        datasets: [{
+          data: [{{stats.totalGames}}, {{stats.totalJournals}}, {{stats.totalReadingSessions}}, 150],
+          backgroundColor: [
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(168, 85, 247)',
+            'rgb(241, 146, 46)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: chartColor.text, usePointStyle: true }
+          }
+        }
+      }
+    });
+
+    // Daily Activity Chart
+    const dailyCtx = document.getElementById('dailyActivityChart').getContext('2d');
+    new Chart(dailyCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Activities',
+          data: [65, 72, 68, 85, 92, 78, 81],
+          backgroundColor: chartColor.primary,
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: chartColor.text } },
+          x: { ticks: { color: chartColor.text } }
+        }
+      }
+    });
+
+    // Engagement Chart
+    const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Games', 'Journals', 'Reading', 'Progress', 'Community', 'Engagement'],
+        datasets: [{
+          label: 'Engagement Rate',
+          data: [75, 68, 82, 71, 65, 78],
+          borderColor: chartColor.primary,
+          backgroundColor: chartColor.secondary,
+          borderWidth: 2,
+          pointBackgroundColor: chartColor.primary,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            ticks: { color: chartColor.text },
+            grid: { color: 'rgba(0, 0, 0, 0.1)' }
+          }
+        }
+      }
+    });
+
+    // Approval functions
+    async function approveCounselor(id) {
+      if (!confirm('Approve this counselor?')) return;
+      
+      try {
+        const response = await fetch(`/admin/counselor/approve/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          alert('Counselor approved successfully!');
+          location.reload();
+        } else {
+          alert('Error approving counselor');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to approve counselor');
+      }
+    }
+
+    async function rejectCounselor(id) {
+      if (!confirm('Reject this counselor?')) return;
+      
+      try {
+        const response = await fetch(`/admin/counselor/reject/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          alert('Counselor rejected!');
+          location.reload();
+        } else {
+          alert('Error rejecting counselor');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to reject counselor');
+      }
+    }
+  </script>
+</body>
+</html>

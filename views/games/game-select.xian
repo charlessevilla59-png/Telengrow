@@ -5,133 +5,442 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Enhanced Animations */
+    @keyframes fadeInDown { 
+      from { opacity: 0; transform: translateY(-30px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes fadeInUp { 
+      from { opacity: 0; transform: translateY(30px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn { 
+      from { opacity: 0; transform: scale(0.9); } 
+      to { opacity: 1; transform: scale(1); } 
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    /* Animation Classes */
+    .animate-fade-in-down { animation: fadeInDown 0.7s ease-out forwards; }
+    .animate-fade-in-up { animation: fadeInUp 0.7s ease-out forwards; }
+    .animate-slide-in-left { animation: slideInLeft 0.7s ease-out forwards; }
+    .animate-scale-in { animation: scaleIn 0.6s ease-out forwards; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+    /* Game Card Styling */
+    .game-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #f0fdf4 100%);
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Shimmer Effect */
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+      transition: left 0.6s ease;
+    }
+
+    /* Glow Effect on Hover */
+    .game-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(22, 163, 74, 0.1), transparent 80%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 16px;
+    }
+
+    .game-card:hover::before { left: 100%; }
+    .game-card:hover::after { opacity: 1; }
+
+    .game-card:hover {
+      transform: translateY(-16px) scale(1.03);
+      box-shadow: 0 25px 50px rgba(22, 163, 74, 0.2), 
+                  0 0 40px rgba(22, 163, 74, 0.1);
+      border-color: #16a34a;
+      background: linear-gradient(135deg, #ffffff 0%, #f3fff3 50%, #ecfdf5 100%);
+    }
+
+    /* Icon Styling */
+    .game-icon {
+      display: inline-block;
+      font-size: 3.5rem;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+    }
+
+    .game-card:hover .game-icon {
+      transform: scale(1.25) rotate(-5deg);
+      filter: drop-shadow(0 8px 16px rgba(22, 163, 74, 0.2));
+    }
+
+    /* Difficulty Badge */
+    .difficulty-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .difficulty-badge.beginner {
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    .difficulty-badge.intermediate {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .difficulty-badge.advanced {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .difficulty-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .game-card:hover .difficulty-badge::before { left: 100%; }
+
+    /* Duration Info */
+    .duration-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* Navbar Styling */
+    .navbar-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #f3fff3 100%);
+      border-bottom: 3px solid #16a34a;
+      box-shadow: 0 10px 30px rgba(22, 163, 74, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header Section */
+    .header-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header-title {
+      background: linear-gradient(135deg, #059669 0%, #16a34a 50%, #4ade80 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header-subtitle {
+      color: #64748b;
+      animation: fadeInDown 0.8s ease-out 0.1s backwards;
+    }
+
+    /* Stagger Animation */
+    .animate-stagger-1 { animation-delay: 0.1s; }
+    .animate-stagger-2 { animation-delay: 0.2s; }
+    .animate-stagger-3 { animation-delay: 0.3s; }
+    .animate-stagger-4 { animation-delay: 0.4s; }
+    .animate-stagger-5 { animation-delay: 0.5s; }
+    .animate-stagger-6 { animation-delay: 0.6s; }
+    .animate-stagger-7 { animation-delay: 0.7s; }
+    .animate-stagger-8 { animation-delay: 0.8s; }
+
+    /* Smooth Transitions */
+    * {
+      transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .no-transition { transition: none !important; }
+
+    /* Opacity classes for animations */
+    [style*="animation-delay"] {
+      opacity: 0;
+      animation: fadeInUp 0.7s ease-out forwards;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-green-50 via-white to-emerald-50 min-h-screen">
   {{> sidebar}}
   
   <!-- Navigation -->
-  <nav class="bg-white shadow-md p-4">
+  <nav class="navbar-gradient sticky top-0 z-30 p-4">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-green-600 focus:outline-none transition p-2 rounded-lg hover:bg-green-50">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">🌱 Tellngrow</h1>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <div class="container mx-auto p-6">
+  <div class="container mx-auto p-6 md:p-8">
     <!-- Back Button -->
-    <div class="mb-4">
-      <a href="/user/dashboard" class="inline-flex items-center text-purple-600 hover:text-purple-700 transition">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="mb-8 animate-slide-in-left">
+      <a href="/user/dashboard" class="inline-flex items-center text-green-600 hover:text-green-700 transition font-semibold group hover:gap-3">
+        <svg class="w-5 h-5 group-hover:-translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        <span class="font-medium">Back to Dashboard</span>
+        <span>Back to Dashboard</span>
       </a>
     </div>
 
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">🎮 Game Selection</h1>
-      <p class="text-gray-600">Choose a game to relax and relieve stress</p>
+    <!-- Header Section -->
+    <div class="text-center mb-16">
+      <div class="flex items-center justify-center mb-4 animate-scale-in">
+        <div class="text-6xl animate-float">🎮</div>
+      </div>
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 header-title">
+        Therapeutic Games
+      </h1>
+      <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto header-subtitle">
+        Discover our science-backed collection of interactive games designed to support your mental wellness journey
+      </p>
+      <div class="flex items-center justify-center gap-8 mt-8 flex-wrap">
+        <div class="animate-fade-in-up" style="animation-delay: 0.3s;">
+          <div class="text-green-600 font-bold text-lg">8 Games</div>
+          <div class="text-gray-500 text-sm">Therapeutic Experiences</div>
+        </div>
+        <div class="w-px h-8 bg-gray-300"></div>
+        <div class="animate-fade-in-up" style="animation-delay: 0.4s;">
+          <div class="text-green-600 font-bold text-lg">2-15 Minutes</div>
+          <div class="text-gray-500 text-sm">Per Session</div>
+        </div>
+        <div class="w-px h-8 bg-gray-300"></div>
+        <div class="animate-fade-in-up" style="animation-delay: 0.5s;">
+          <div class="text-green-600 font-bold text-lg">All Levels</div>
+          <div class="text-gray-500 text-sm">Beginner to Advanced</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Game Cards -->
+    <!-- Game Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
       
       <!-- Breathing Bubble -->
-      <a href="/games/breathing-bubble" class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🫧</div>
-        <h2 class="text-2xl font-bold mb-2">Breathing Bubble</h2>
-        <p class="text-purple-100 text-sm mb-4">Follow the bubble to practice deep breathing exercises</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 5-10 minutes</div>
-          <div>🎯 Easy</div>
+      <a href="/games/breathing-bubble" class="game-card group animate-fade-in-up animate-stagger-1">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">💨</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Breathing Bubble</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Follow the bubble with guided breathing exercises for instant calm</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>5-10 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge beginner">🎯 Beginner</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Color Tap -->
-      <a href="/games/color-tap" class="bg-gradient-to-br from-pink-500 to-red-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🎨</div>
-        <h2 class="text-2xl font-bold mb-2">Color Tap</h2>
-        <p class="text-pink-100 text-sm mb-4">Match colors quickly to improve focus</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 3-5 minutes</div>
-          <div>🎯 Medium</div>
+      <a href="/games/color-tap" class="game-card group animate-fade-in-up animate-stagger-2">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🎨</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Color Tap</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Quick focus game to improve mental clarity and concentration</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>3-5 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge intermediate">🎯 Intermediate</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Grid Memory -->
-      <a href="/games/grid-memory" class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🧩</div>
-        <h2 class="text-2xl font-bold mb-2">Grid Memory</h2>
-        <p class="text-blue-100 text-sm mb-4">Remember patterns to enhance memory</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 5-8 minutes</div>
-          <div>🎯 Medium-Hard</div>
+      <a href="/games/grid-memory" class="game-card group animate-fade-in-up animate-stagger-3">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🧩</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Grid Memory</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Pattern recognition game to enhance cognitive memory skills</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>5-8 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge intermediate">🎯 Intermediate</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Stress Ball -->
-      <a href="/games/stress-ball" class="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🎯</div>
-        <h2 class="text-2xl font-bold mb-2">Stress Ball</h2>
-        <p class="text-green-100 text-sm mb-4">Click to release stress instantly</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 2-5 minutes</div>
-          <div>🎯 Easy</div>
+      <a href="/games/stress-ball" class="game-card group animate-fade-in-up animate-stagger-4">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🎆</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Stress Ball</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Quick stress relief game with instant impact and visual feedback</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>2-5 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge beginner">🎯 Beginner</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Gratitude Jar -->
-      <a href="/games/gratitude-jar" class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🏺</div>
-        <h2 class="text-2xl font-bold mb-2">Gratitude Jar</h2>
-        <p class="text-yellow-100 text-sm mb-4">Fill your jar with gratitude</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 5-10 minutes</div>
-          <div>🎯 Easy</div>
+      <a href="/games/gratitude-jar" class="game-card group animate-fade-in-up animate-stagger-5">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🏺</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Gratitude Jar</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Cultivate gratitude and shift perspective with positive reflection</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>5-10 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge beginner">🎯 Beginner</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Affirmation Cards -->
-      <a href="/games/affirmation-cards" class="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🌟</div>
-        <h2 class="text-2xl font-bold mb-2">Affirmation Cards</h2>
-        <p class="text-purple-100 text-sm mb-4">Flip cards for positive affirmations</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 2-5 minutes</div>
-          <div>🎯 Easy</div>
+      <a href="/games/affirmation-cards" class="game-card group animate-fade-in-up animate-stagger-6">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🌟</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Affirmation Cards</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Daily positive affirmations to inspire growth and self-belief</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>2-5 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge beginner">🎯 Beginner</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Zen Garden -->
-      <a href="/games/zen-garden" class="bg-gradient-to-br from-amber-500 to-stone-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🪨</div>
-        <h2 class="text-2xl font-bold mb-2">Zen Garden</h2>
-        <p class="text-amber-100 text-sm mb-4">Rake sand and find inner peace</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 10-15 minutes</div>
-          <div>🎯 Easy</div>
+      <a href="/games/zen-garden" class="game-card group animate-fade-in-up animate-stagger-7">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🪨</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Zen Garden</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Meditative sand raking experience for deep relaxation and mindfulness</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>10-15 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge beginner">🎯 Beginner</span>
+            </div>
+          </div>
         </div>
       </a>
 
       <!-- Puzzle Therapy -->
-      <a href="/games/puzzle-therapy" class="bg-gradient-to-br from-teal-500 to-blue-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition transform hover:scale-105">
-        <div class="text-6xl mb-4">🧩</div>
-        <h2 class="text-2xl font-bold mb-2">Puzzle Therapy</h2>
-        <p class="text-teal-100 text-sm mb-4">Piece together calming images</p>
-        <div class="text-xs space-y-1">
-          <div>⏱️ 5-15 minutes</div>
-          <div>🎯 Easy-Hard</div>
+      <a href="/games/puzzle-therapy" class="game-card group animate-fade-in-up animate-stagger-8">
+        <div class="relative p-8 h-full flex flex-col">
+          <div class="mb-4">
+            <div class="game-icon">🎯</div>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition leading-tight">Puzzle Therapy</h2>
+          <p class="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">Relaxing puzzles that engage focus and encourage mindful engagement</p>
+          <div class="space-y-2">
+            <div class="duration-info">
+              <span>⏱️</span>
+              <span>5-15 minutes</span>
+            </div>
+            <div>
+              <span class="difficulty-badge advanced">🎯 All Levels</span>
+            </div>
+          </div>
         </div>
       </a>
 
+    </div>
+
+    <!-- Footer Section -->
+    <div class="mt-16 pt-12 border-t border-gray-200">
+      <div class="max-w-4xl mx-auto text-center animate-fade-in-up" style="animation-delay: 0.9s;">
+        <p class="text-gray-600 text-sm">
+          💡 <span class="font-semibold">Pro Tip:</span> Try different games to find what works best for you. Consistency is key to building a stronger mental wellness practice.
+        </p>
+      </div>
     </div>
   </div>
 </body>

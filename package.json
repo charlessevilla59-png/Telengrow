@@ -27,12 +27,14 @@
     "firebase-admin": "^13.7.0",
     "hbs": "^4.2.0",
     "inquirer": "^9.2.15",
+    "markdown-it": "^14.1.1",
     "multer": "^2.1.0",
     "mysql2": "^3.9.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.17.2",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.3",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.22",

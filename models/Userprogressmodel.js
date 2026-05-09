@@ -28,6 +28,9 @@ export const UserProgress = sequelize.define("UserProgress", {
   
   
   achievements: { type: DataTypes.JSON, defaultValue: [] }
+}, {
+  tableName: 'UserProgresses',
+  timestamps: true
 });
 
 UserProgress.belongsTo(User, { foreignKey: 'userId' });

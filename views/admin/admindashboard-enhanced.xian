@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Telengrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-fade-in-down {
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .animate-slide-in-left {
+      animation: slideInLeft 0.6s ease-out;
+    }
+
+    /* PLAIN STANDARD SIDEBAR - NO COLORS */
+    .sidebar {
+      animation: slideInLeft 0.6s ease-out;
+      background: #ffffff;
+      border-right: 1px solid #d1d5db;
+    }
+
+    .sidebar-header {
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .sidebar-link {
+      transition: all 0.3s ease;
+      color: #4b5563;
+      border-left: 3px solid transparent;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+      background-color: #f3f4f6;
+      border-left-color: #6b7280;
+      color: #1f2937;
+    }
+
+    .sidebar-link.active {
+      background-color: #f3f4f6;
+      border-left-color: #1f2937;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .sidebar-profile {
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    /* STAT CARDS - CLEAN DESIGN */
+    .stat-card {
+      animation: fadeInUp 0.6s ease-out backwards;
+      transition: all 0.3s ease;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-color: #d1d5db;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+    }
+
+    /* CARDS */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-color: #d1d5db;
+    }
+
+    /* NAVBAR */
+    .navbar-clean {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* CHART STYLES */
+    .chart-container {
+      position: relative;
+      height: 400px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background-color: #1f2937;
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* TABLE STYLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tbody td {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      color: #1f2937;
+    }
+
+    tbody tr:hover {
+      background-color: #f9fafb;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid #1f2937;
+    }
+
+    .btn-primary:hover {
+      background-color: #374151;
+      border-color: #374151;
+    }
+
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #1f2937;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background-color: #d1d5db;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen overflow-y-auto">
+    <!-- Logo -->
+    <div class="sidebar-header p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-xl font-bold text-gray-900">Telengrow</h1>
+      </div>
+      <p class="text-xs text-gray-500 font-medium text-center">Admin Dashboard</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mt-6 px-3 space-y-1">
+      <a href="/admin/dashboard" class="sidebar-link active block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span>HOME</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2z"></path>
+        </svg>
+        <span>Users</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+        </svg>
+        <span>Analytics</span>
+      </a>
+
+    </nav>
+
+    <!-- User Profile -->
+    <div class="sidebar-profile absolute bottom-0 left-0 right-0 p-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center font-bold text-gray-700">
+          {{substring user.name 0 1}}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-sm text-gray-900 truncate">{{user.name}}</div>
+          <div class="text-xs text-gray-500">Administrator</div>
+        </div>
+      </div>
+      <a href="/logout" class="btn-secondary w-full text-center py-2 text-sm">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gray-50">
+    <!-- Top Navigation -->
+    <nav class="navbar-clean sticky top-0 z-30">
+      <div class="container mx-auto flex justify-between items-center px-6 py-4">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="text-right">
+            <p class="text-sm font-semibold text-gray-900">{{user.name}}</p>
+            <p class="text-xs text-gray-500">Admin</p>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mx-auto p-6">
+      <!-- Welcome Header -->
+      <div class="mb-8 animate-fade-in-down">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Welcome Back, {{user.name}}</h1>
+        <p class="text-gray-600">Manage system activity, users, and track platform metrics</p>
+      </div>
+
+      <!-- Main Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+          <p class="stat-label">Total Users</p>
+          <p class="stat-value mt-2">{{stats.totalUsers}}</p>
+          <p class="text-sm text-gray-600 mt-2">Active accounts</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+          <p class="stat-label">Active Today</p>
+          <p class="stat-value mt-2">{{stats.activeToday}}</p>
+          <p class="text-sm text-gray-600 mt-2">Users online</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.3s;">
+          <p class="stat-label">Total Games</p>
+          <p class="stat-value mt-2">{{stats.totalGames}}</p>
+          <p class="text-sm text-gray-600 mt-2">Sessions played</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.4s;">
+          <p class="stat-label">Journal Entries</p>
+          <p class="stat-value mt-2">{{stats.totalJournals}}</p>
+          <p class="text-sm text-gray-600 mt-2">User content</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.5s;">
+          <p class="stat-label">Reading Sessions</p>
+          <p class="stat-value mt-2">{{stats.totalReadingSessions}}</p>
+          <p class="text-sm text-gray-600 mt-2">Materials read</p>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- User Activity Chart -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.1s;">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">User Activity Trend</h2>
+            <p class="text-sm text-gray-600 mt-1">Last 7 days</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="userActivityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Game Performance Chart -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.2s;">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">Game Performance</h2>
+            <p class="text-sm text-gray-600 mt-1">Session distribution</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="gameChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Device Distribution -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.3s;">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">Platform Distribution</h2>
+            <p class="text-sm text-gray-600 mt-1">User device types</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="platformChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Engagement Rate -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.4s;">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">Engagement Metrics</h2>
+            <p class="text-sm text-gray-600 mt-1">User interaction rates</p>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-900">Game Participation</span>
+                <span class="text-gray-600">{{stats.gameEngagement}}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: {{stats.gameEngagement}}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-900">Journal Activity</span>
+                <span class="text-gray-600">{{stats.journalEngagement}}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: {{stats.journalEngagement}}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-900">Reading Engagement</span>
+                <span class="text-gray-600">{{stats.readingEngagement}}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: {{stats.readingEngagement}}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-900">Overall Health</span>
+                <span class="text-gray-600">{{stats.systemHealth}}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: {{stats.systemHealth}}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Sections Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent Users -->
+        <div class="lg:col-span-2 card animate-fade-in-up" style="animation-delay: 0.5s;">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">Recent Users</h2>
+            <p class="text-sm text-gray-600 mt-1">Latest registered members</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each users}}
+                {{#lt @index 5}}
+                <tr>
+                  <td class="font-semibold">{{this.name}}</td>
+                  <td>{{this.email}}</td>
+                  <td><span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{{this.role}}</span></td>
+                  <td class="text-sm">{{formatDate this.createdAt}}</td>
+                  <td><a href="/admin/users/{{this.id}}" class="text-gray-600 hover:text-gray-900">View</a></td>
+                </tr>
+                {{/lt}}
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="space-y-6">
+          <!-- System Status -->
+          <div class="card p-6 animate-fade-in-up" style="animation-delay: 0.6s;">
+            <h3 class="font-bold text-gray-900 mb-4">System Status</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Server</span>
+                <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded">✓ Online</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Database</span>
+                <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded">✓ Connected</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">API</span>
+                <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded">✓ Responsive</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Storage</span>
+                <span class="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">65% Used</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="card p-6 animate-fade-in-up" style="animation-delay: 0.7s;">
+            <h3 class="font-bold text-gray-900 mb-4">Quick Links</h3>
+            <div class="space-y-2">
+              <a href="/admin/users" class="block text-sm text-gray-600 hover:text-gray-900 py-1">👥 View All Users</a>
+              <a href="/admin/analytics" class="block text-sm text-gray-600 hover:text-gray-900 py-1">📊 Full Analytics</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Chart configurations
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            font: { size: 12, weight: '600' },
+            color: '#6b7280',
+            padding: 15
+          }
+        },
+        filler: {
+          propagate: true
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', font: { size: 11 } }
+        },
+        y: {
+          grid: { color: '#f3f4f6', drawBorder: false },
+          ticks: { color: '#9ca3af', font: { size: 11 } }
+        }
+      }
+    };
+
+    // User Activity Chart
+    const userActivityCtx = document.getElementById('userActivityChart');
+    if (userActivityCtx) {
+      new Chart(userActivityCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Active Users',
+            data: [65, 75, 72, 85, 90, 78, 82],
+            borderColor: '#1f2937',
+            backgroundColor: 'rgba(31, 41, 55, 0.05)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#1f2937',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: chartOptions
+      });
+    }
+
+    // Game Performance Chart
+    const gameCtx = document.getElementById('gameChart');
+    if (gameCtx) {
+      new Chart(gameCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Breathing Bubble', 'Color Tap', 'Grid Memory', 'Others'],
+          datasets: [{
+            data: [30, 25, 25, 20],
+            backgroundColor: [
+              '#1f2937',
+              '#4b5563',
+              '#9ca3af',
+              '#d1d5db'
+            ],
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          ...chartOptions,
+          scales: {}
+        }
+      });
+    }
+
+    // Platform Distribution Chart
+    const platformCtx = document.getElementById('platformChart');
+    if (platformCtx) {
+      new Chart(platformCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Desktop', 'Mobile', 'Tablet', 'Other'],
+          datasets: [{
+            label: 'Users',
+            data: [45, 35, 15, 5],
+            backgroundColor: '#1f2937',
+            borderRadius: 4,
+            borderSkipped: false
+          }]
+        },
+        options: chartOptions
+      });
+    }
+
+    function formatDate(date) {
+      if (!date) return 'N/A';
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('✓ Admin Dashboard Enhanced Loaded');
+    });
+  </script>
+</body>
+</html>

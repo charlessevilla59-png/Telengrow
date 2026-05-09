@@ -27,6 +27,7 @@
 import { Sequelize } from "sequelize";
 import { sequelize } from "./models/db.js";
 import { User } from "./models/userModel.js";
+import "./models/index.js"; // Import all models to ensure they're synced
 import inquirer from "inquirer";
 
 // Server-level connection (no database selected)

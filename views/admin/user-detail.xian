@@ -14,6 +14,9 @@
         <h1 class="text-2xl font-bold text-gray-800">User Details</h1>
       </div>
       <div class="space-x-4 flex items-center">
+        <a href="/admin/users/{{targetUser.id}}/reports" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold text-sm">
+          📋 View Reports
+        </a>
         <span class="text-gray-700">👤 {{user.name}}</span>
         <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
       </div>
@@ -24,8 +27,17 @@
     <!-- User Profile Card -->
     <div class="bg-white border-2 border-gray-200 rounded-lg p-6 mb-6">
       <div class="flex items-start space-x-6">
-        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-4xl">
-          {{substring targetUser.name 0 1}}
+        <!-- Profile Picture -->
+        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-4xl overflow-hidden flex-shrink-0">
+          {{#if targetUser.profilePicture}}
+            {{#if (eq (substring targetUser.profilePicture 0 1) "/")}}
+              <img src="{{targetUser.profilePicture}}" alt="{{targetUser.name}}" class="w-full h-full object-cover">
+            {{else}}
+              <span class="text-4xl">{{targetUser.profilePicture}}</span>
+            {{/if}}
+          {{else}}
+            {{substring targetUser.name 0 1}}
+          {{/if}}
         </div>
         <div class="flex-1">
           <h2 class="text-3xl font-bold text-gray-900">{{targetUser.name}}</h2>

@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-gray-100 p-4">
+  <div class="max-w-2xl mx-auto h-screen flex flex-col">
+    <!-- Chat Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 rounded-t-lg shadow-lg flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img id="headerUserPic" src="/images/default-avatar.png" alt="User" class="w-12 h-12 rounded-full border-2 border-white">
+        <div>
+          <h1 id="headerUserName" class="text-xl font-bold">Select a conversation</h1>
+          <p id="headerUserStatus" class="text-sm text-blue-100">Online</p>
+        </div>
+      </div>
+      <a href="/messages" class="hover:bg-blue-600 px-3 py-2 rounded-lg transition">
+        Back to Conversations
+      </a>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="chatMessagesContainer" class="flex-1 overflow-y-auto bg-white p-6 space-y-4">
+      <div class="text-center py-8 text-gray-500">
+        <p>Loading chat interface...</p>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="bg-white border-t border-gray-300 p-4 rounded-b-lg shadow-lg">
+      <div class="flex gap-2">
+        <input type="text" id="chatMessageInput" placeholder="Type a message..." class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="chatSendBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // This view is meant to be used when navigating to /messages/:conversationId
+  // For now, it redirects to /conversations
+  window.location.href = '/conversations';
+</script>

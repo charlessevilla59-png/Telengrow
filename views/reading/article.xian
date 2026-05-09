@@ -5,138 +5,756 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Markdown Content Styling */
+    .article-content {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .article-content h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      border-bottom: 3px solid #15803d;
+      padding-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .article-content h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+      border-left: 4px solid #16a34a;
+      padding-left: 1rem;
+      line-height: 1.3;
+    }
+
+    .article-content h3 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid #22c55e;
+    }
+
+    .article-content h4,
+    .article-content h5,
+    .article-content h6 {
+      font-weight: 600;
+      color: #6b7280;
+      margin-top: 1.2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .article-content p {
+      font-size: 1.5rem;
+      line-height: 1.8;
+      margin-bottom: 1.2rem;
+      color: #374151;
+      text-align: justify;
+    }
+
+    .article-content strong {
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .article-content em {
+      font-style: italic;
+      color: #4b5563;
+    }
+
+    .article-content code {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      padding: 0.2rem 0.5rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.95rem;
+      color: #16a34a;
+    }
+
+    .article-content pre {
+      background-color: #1f2937;
+      color: #f3f4f6;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      line-height: 1.6;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .article-content pre code {
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      color: #f3f4f6;
+    }
+
+    .article-content ul {
+      list-style-type: disc;
+      margin-left: 2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .article-content ol {
+      list-style-type: decimal;
+      margin-left: 2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .article-content li {
+      margin-bottom: 0.6rem;
+      line-height: 1.7;
+      color: #374151;
+      font-size: 1.4rem;
+    }
+
+    .article-content ul li {
+      list-style-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2315803d'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+      margin-left: 1rem;
+    }
+
+    .article-content blockquote {
+      border-left: 4px solid #15803d;
+      background-color: #f0fdf4;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0.375rem;
+      font-style: italic;
+      color: #4b5563;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .article-content table th {
+      background-color: #15803d;
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid #22c55e;
+    }
+
+    .article-content table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      color: #374151;
+    }
+
+    .article-content table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .article-content table tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+
+    .article-content a {
+      color: #15803d;
+      text-decoration: underline;
+      transition: all 0.3s ease;
+    }
+
+    .article-content a:hover {
+      color: #22c55e;
+      font-weight: 500;
+    }
+
+    .article-content hr {
+      border: none;
+      border-top: 2px solid #e5e7eb;
+      margin: 2rem 0;
+    }
+
+    /* Tip/Info boxes */
+    .article-content blockquote.tip {
+      border-left-color: #0ea5e9;
+      background-color: #ecf8ff;
+      color: #0c4a6e;
+    }
+
+    /* Section containers */
+    .section-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid #15803d;
+    }
+
+    /* Highlighted boxes for important content */
+    .highlight-box {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      color: #92400e;
+    }
+
+    .article-content > *:first-child {
+      margin-top: 0;
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1f2937;
+        color: #f3f4f6;
+      }
+
+      .article-content h1,
+      .article-content h2,
+      .article-content h3,
+      .article-content p,
+      .article-content strong {
+        color: #f3f4f6;
+      }
+
+      .article-content blockquote {
+        background-color: #064e3b;
+        color: #dcfce7;
+        border-left-color: #22c55e;
+      }
+
+      .article-content table {
+        border-color: #4b5563;
+      }
+
+      .article-content table td {
+        border-bottom-color: #4b5563;
+        color: #e5e7eb;
+      }
+
+      .article-content table tr:nth-child(even) {
+        background-color: #111827;
+      }
+
+      .article-content code {
+        background-color: #1f2937;
+        border-color: #4b5563;
+      }
+
+      .comment-card {
+        background: #111827;
+        border-color: #4b5563;
+        color: #f3f4f6;
+      }
+
+      .bg-gradient-to-r {
+        background-color: #22c55e;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
   {{> sidebar}}
   
-  <nav class="bg-white shadow-md p-4">
+  <nav class="bg-white shadow-md p-4 sticky top-0 z-10">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-green-700 focus:outline-none">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+        <h1 class="text-4xl font-bold text-green-700">🌱 Tellngrow</h1>
       </div>
+      <div class="text-sm text-gray-500">📖 Reading</div>
     </div>
   </nav>
 
-  <div class="container mx-auto p-6 max-w-4xl">
+  <div class="container mx-auto p-6 max-w-5xl">
     <!-- Back Button -->
-    <a href="/reading" class="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6">
+    <a href="/reading" class="inline-flex items-center text-green-700 hover:text-green-800 mb-8 font-medium transition">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
       </svg>
-      Back to Reading Materials
+      ← Back to Reading Materials
     </a>
 
     <!-- Article Content -->
-    <article class="bg-white rounded-xl shadow-lg p-8">
-      <!-- Header -->
-      <div class="mb-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">Mental Health</span>
-          <span class="text-sm text-gray-500">5 min read</span>
-          <span class="text-sm text-gray-500">•</span>
-          <span class="text-sm text-gray-500">Updated: Feb 25, 2026</span>
+    <article class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- Header Section -->
+      <div class="bg-gradient-to-r from-green-600 to-green-700 p-12 text-white">
+        <div class="flex items-start justify-between mb-6">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-4 flex-wrap">
+              <span class="text-xs bg-white bg-opacity-30 text-white px-4 py-1.5 rounded-full font-semibold backdrop-blur-sm">
+                {{material.category}}
+              </span>
+              <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">⏱️ {{material.readingTime}} min read</span>
+              <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">👁️ {{material.views}} views</span>
+              {{#if material.counselor}}
+              <span class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">👨‍💼 {{material.counselor.name}}</span>
+              {{/if}}
+            </div>
+            <h1 class="text-6xl font-bold mb-4 leading-tight">{{material.title}}</h1>
+            <p class="text-2xl opacity-95">{{material.excerpt}}</p>
+          </div>
+            <div class="text-8xl ml-6 flex-shrink-0">📘</div>
         </div>
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Understanding Anxiety</h1>
-        <p class="text-xl text-gray-600">A comprehensive guide to recognizing and managing anxiety in daily life.</p>
       </div>
 
-      <!-- Featured Image -->
-      <div class="h-64 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg mb-8 flex items-center justify-center">
-        <span class="text-8xl">🧠</span>
-      </div>
+      <!-- Main Content -->
+      <div class="p-10 md:p-12">
+        <!-- Video Player for Video Files -->
+        {{#ifEquals material.fileType "video"}}
+        <div class="mb-8">
+          <!-- YouTube Video -->
+          {{#if material.videoUrl}}
+          <div class="relative w-full mb-6">
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+              <iframe 
+                src="{{material.videoUrl}}" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+                class="rounded-lg shadow-lg"
+              ></iframe>
+            </div>
+          </div>
+          {{else if material.filePath}}
+          <!-- Uploaded Video File -->
+          <div class="relative w-full mb-6 bg-black rounded-lg overflow-hidden shadow-lg">
+            <video 
+              controls 
+              style="width: 100%; height: auto; display: block;"
+              class="w-full"
+            >
+              <source src="{{material.filePath}}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          {{else}}
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-6">
+            <p class="text-sm text-red-800">
+              <span class="font-semibold">⚠️ Error:</span> Video source not available
+            </p>
+          </div>
+          {{/if}}
+          
+          {{#if material.videoDuration}}
+          <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">
+            <p class="text-sm text-blue-800">
+              <span class="font-semibold">⏱️ Video Duration:</span> <span id="duration-{{material.id}}">Loading...</span>
+            </p>
+          </div>
+          <script>
+            document.getElementById('duration-{{material.id}}').textContent = Math.round({{material.videoDuration}} / 60) + ' minutes';
+          </script>
+          {{/if}}
+        </div>
+        {{/ifEquals}}
 
-      <!-- Article Body -->
-      <div class="prose prose-lg max-w-none">
-        <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">What is Anxiety?</h2>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Anxiety is a natural response to stress and can be beneficial in some situations. It can alert us to dangers and help us prepare and pay attention. However, anxiety disorders differ from normal feelings of nervousness or anxiousness and involve excessive fear or anxiety.
-        </p>
+        <!-- PDF Viewer for PDF Files -->
+        {{#ifEquals material.fileType "pdf"}}
+        <div class="mb-8">
+          <div class="bg-gray-100 rounded-lg p-6 flex flex-col items-center justify-center min-h-96">
+            {{#if material.filePath}}
+              <iframe src="{{material.filePath}}" width="100%" height="700px" class="rounded-lg shadow-lg"></iframe>
+              <div class="mt-6 flex gap-4 flex-wrap justify-center">
+                <a href="{{material.filePath}}" download class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2">
+                  ⬇️ Download PDF
+                </a>
+                <a href="{{material.filePath}}" target="_blank" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2">
+                  🔗 Open in New Tab
+                </a>
+              </div>
+            {{else}}
+              <p class="text-gray-500 text-lg">PDF file not available</p>
+            {{/if}}
+          </div>
+        </div>
+        {{/ifEquals}}
 
-        <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Common Symptoms</h2>
-        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-          <li>Feeling nervous, restless, or tense</li>
-          <li>Having a sense of impending danger, panic, or doom</li>
-          <li>Increased heart rate</li>
-          <li>Rapid breathing (hyperventilation)</li>
-          <li>Sweating and trembling</li>
-          <li>Feeling weak or tired</li>
-          <li>Trouble concentrating or thinking about anything other than the present worry</li>
-          <li>Having trouble sleeping</li>
-        </ul>
+        <!-- Featured Image (for articles only) -->
+        {{#ifEquals material.fileType "article"}}
+        <div class="h-80 bg-gradient-to-br from-green-300 via-green-400 to-emerald-300 rounded-xl mb-12 flex items-center justify-center shadow-lg">
+          <svg class="w-32 h-32 text-white opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        {{/ifEquals}}
 
-        <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Coping Strategies</h2>
-        
-        <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">1. Deep Breathing Exercises</h3>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Practice deep breathing techniques to calm your nervous system. Try the 4-7-8 technique: breathe in for 4 counts, hold for 7 counts, and exhale for 8 counts.
-        </p>
-
-        <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">2. Regular Exercise</h3>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Physical activity can help reduce anxiety symptoms. Aim for at least 30 minutes of moderate exercise most days of the week.
-        </p>
-
-        <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">3. Mindfulness and Meditation</h3>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Practicing mindfulness can help you stay grounded in the present moment and reduce anxious thoughts about the future.
-        </p>
-
-        <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">4. Limit Caffeine and Alcohol</h3>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Both substances can trigger or worsen anxiety. Consider reducing your intake or eliminating them entirely.
-        </p>
-
-        <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">5. Get Enough Sleep</h3>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          Lack of sleep can exacerbate anxiety symptoms. Aim for 7-9 hours of quality sleep each night.
-        </p>
-
-        <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">When to Seek Professional Help</h2>
-        <p class="text-gray-700 leading-relaxed mb-4">
-          If anxiety is interfering with your daily life, relationships, or work, it's important to seek help from a mental health professional. They can provide:
-        </p>
-        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-          <li>Cognitive Behavioral Therapy (CBT)</li>
-          <li>Medication management if needed</li>
-          <li>Personalized coping strategies</li>
-          <li>Support and guidance</li>
-        </ul>
-
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">
-          <p class="text-blue-900 font-semibold mb-2">💡 Remember:</p>
-          <p class="text-blue-800">
-            Anxiety is treatable, and with the right support and strategies, you can manage your symptoms and improve your quality of life. You're not alone in this journey.
-          </p>
+        <!-- Article Body with Markdown Styling -->
+        <div class="article-content prose-xl">
+          {{{material.htmlContent}}}
         </div>
 
-        <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Additional Resources</h2>
-        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-          <li>National Alliance on Mental Illness (NAMI): 1-800-950-NAMI</li>
-          <li>Anxiety and Depression Association of America (ADAA)</li>
-          <li>Crisis Text Line: Text HOME to 741741</li>
-        </ul>
-      </div>
+        <!-- Footer Section -->
+        <div class="mt-12 pt-8 border-t-2 border-gray-200">
+          <p class="text-sm text-gray-500 mb-2">📅 Last updated: <span class="font-medium">{{formatDate material.updatedAt}}</span></p>
+        </div>
 
-      <!-- Related Articles -->
-      <div class="mt-12 pt-8 border-t border-gray-200">
-        <h3 class="text-2xl font-bold text-gray-800 mb-6">Related Articles</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <a href="/reading/mindfulness-meditation" class="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <h4 class="font-semibold text-gray-800 mb-2">🧘 Mindfulness Meditation</h4>
-            <p class="text-sm text-gray-600">Discover the benefits of mindfulness practice</p>
+        <!-- Related Materials -->
+        <div class="mt-12 pt-8 border-t-2 border-gray-200">
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">More Resources</h3>
+          <p class="text-gray-600 mb-6">Check out other materials in the {{material.category}} category:</p>
+          <a href="/reading#{{material.category}}" class="inline-block bg-green-100 text-green-700 px-8 py-3 rounded-lg hover:bg-green-200 transition font-medium text-lg">
+            Explore {{material.category}} →
           </a>
-          <a href="/reading/managing-depression" class="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <h4 class="font-semibold text-gray-800 mb-2">💭 Managing Depression</h4>
-            <p class="text-sm text-gray-600">Understanding and coping with depression</p>
           </a>
+        </div>
+
+        <!-- Reactions Section -->
+        <div class="mt-12 pt-8 border-t-2 border-gray-200">
+          <h3 class="text-xl font-bold text-gray-800 mb-6">How helpful was this article?</h3>
+          <div class="flex gap-3 flex-wrap">
+            <button onclick="addReaction({{material.id}}, 'helpful')" class="flex items-center gap-2 px-6 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition font-semibold reaction-btn" data-reaction="helpful">
+              👍 Helpful <span class="reaction-count">0</span>
+            </button>
+            <button onclick="addReaction({{material.id}}, 'love')" class="flex items-center gap-2 px-6 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition font-semibold reaction-btn" data-reaction="love">
+              ❤️ Love <span class="reaction-count">0</span>
+            </button>
+            <button onclick="addReaction({{material.id}}, 'insightful')" class="flex items-center gap-2 px-6 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition font-semibold reaction-btn" data-reaction="insightful">
+              💡 Insightful <span class="reaction-count">0</span>
+            </button>
+            <button onclick="addReaction({{material.id}}, 'wish-more')" class="flex items-center gap-2 px-6 py-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition font-semibold reaction-btn" data-reaction="wish-more">
+              ⭐ Wish More <span class="reaction-count">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="mt-12 pt-8 border-t-2 border-gray-200">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">💬 Comments & Discussion</h2>
+          
+          <!-- Add Comment Form -->
+          <div class="bg-gradient-to-r from-green-50 to-green-50 rounded-xl p-6 mb-8 border border-green-200">
+            <h3 class="font-semibold text-gray-800 mb-4">Share Your Thoughts</h3>
+            <form onsubmit="submitComment(event, {{material.id}})" class="space-y-4">
+              <textarea 
+                id="comment-input"
+                placeholder="What do you think about this article? Share your insights..."
+                class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none text-lg" 
+                rows="4"
+                required
+              ></textarea>
+              <div class="flex justify-end gap-3">
+                <button type="button" onclick="resetComment()" class="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium">
+                  Cancel
+                </button>
+                <button type="submit" class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:shadow-lg transition font-semibold text-lg">
+                  Post Comment
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Comments List -->
+          <div id="comments-list" class="space-y-6">
+            <div class="text-center py-8 text-gray-500">
+              <p class="text-lg mb-2">📝 No comments yet</p>
+              <p class="text-sm">Be the first to share your thoughts about this article!</p>
+            </div>
+          </div>
         </div>
       </div>
     </article>
   </div>
+
+  <style>
+    .comment-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .comment-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .comment-avatar {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .comment-content {
+      color: #374151;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+
+    .reaction-btn {
+      transition: all 0.2s ease;
+    }
+
+    .reaction-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .comment-time {
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .comment-action-btn {
+      font-size: 0.875rem;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      transition: all 0.2s ease;
+    }
+
+    .comment-action-btn:hover {
+      background: #f3f4f6;
+      color: #9333ea;
+    }
+  </style>
+
+  <script>
+    // Material ID
+    const materialId = {{material.id}};
+
+    // Reaction type to emoji mapping
+    const reactionEmojis = {
+      'helpful': '👍',
+      'love': '❤️',
+      'insightful': '💡',
+      'wish-more': '⭐'
+    };
+
+    // Initialize comments on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadComments();
+      loadReactions();
+    });
+
+    // Load all comments for this material
+    function loadComments() {
+      fetch(`/api/reading/${materialId}/comments`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.comments && data.comments.length > 0) {
+            displayComments(data.comments);
+          }
+        })
+        .catch(err => console.error('Error loading comments:', err));
+    }
+
+    // Display comments on page
+    function displayComments(comments) {
+      const commentsList = document.getElementById('comments-list');
+      commentsList.innerHTML = '';
+
+      if (!comments || comments.length === 0) {
+        commentsList.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <p class="text-lg mb-2">📝 No comments yet</p>
+            <p class="text-sm">Be the first to share your thoughts about this article!</p>
+          </div>
+        `;
+        return;
+      }
+
+      comments.forEach(comment => {
+        const reactions = comment.reactions || [];
+        const reactionCount = reactions.length;
+        
+        const commentHTML = `
+          <div class="comment-card">
+            <div class="flex gap-4">
+              <div class="comment-avatar">${comment.user.name.charAt(0).toUpperCase()}</div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">${escapeHtml(comment.user.name)}</h4>
+                    <p class="comment-time">${formatTime(comment.createdAt)}</p>
+                  </div>
+                </div>
+                <p class="comment-content mt-2">${escapeHtml(comment.content)}</p>
+                <div class="comment-actions">
+                  <button onclick="toggleCommentLike(${comment.id})" class="comment-action-btn">
+                    👍 Like ${reactionCount > 0 ? `(${reactionCount})` : ''}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        commentsList.innerHTML += commentHTML;
+      });
+    }
+
+    // Submit new comment
+    function submitComment(event, materialId) {
+      event.preventDefault();
+      const commentInput = document.getElementById('comment-input');
+      const text = commentInput.value.trim();
+
+      if (!text) {
+        alert('Please write a comment');
+        return;
+      }
+
+      fetch(`/api/reading/${materialId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.comment) {
+            commentInput.value = '';
+            loadComments();
+            alert('✅ Comment posted successfully!');
+          } else {
+            alert('❌ ' + (data.error || 'Failed to post comment'));
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error posting comment');
+        });
+    }
+
+    // Toggle like on comment
+    function toggleCommentLike(commentId) {
+      fetch(`/api/comments/${commentId}/react`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emoji: '👍' })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.reaction || data.success) {
+            loadComments();
+          }
+        })
+        .catch(err => console.error('Error:', err));
+    }
+
+    // Add reaction to article
+    function addReaction(materialId, reactionType) {
+      const emoji = reactionEmojis[reactionType];
+      
+      fetch(`/api/reading/${materialId}/react`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emoji })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.reaction || data.success) {
+            loadReactions();
+          }
+        })
+        .catch(err => console.error('Error:', err));
+    }
+
+    // Load and display reactions
+    function loadReactions() {
+      fetch(`/api/reading/${materialId}/reactions`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.summary) {
+            const summary = data.summary;
+            document.querySelectorAll('[data-reaction]').forEach(btn => {
+              const reactionType = btn.getAttribute('data-reaction');
+              const emoji = reactionEmojis[reactionType];
+              const count = summary[emoji] ? summary[emoji].count : 0;
+              btn.querySelector('.reaction-count').textContent = count;
+            });
+          }
+        })
+        .catch(err => console.error('Error loading reactions:', err));
+    }
+
+    // Reset comment form
+    function resetComment() {
+      document.getElementById('comment-input').value = '';
+    }
+
+    // Format time for display
+    function formatTime(timestamp) {
+      const now = new Date();
+      const commentTime = new Date(timestamp);
+      const diff = Math.floor((now - commentTime) / 1000);
+
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      
+      return commentTime.toLocaleDateString();
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function saveMaterial(materialId) {
+      fetch(`/reading/save/${materialId}`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ Material saved to your library!');
+          } else {
+            alert(data.message || '❌ Failed to save material');
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error saving material');
+        });
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
 </body>
 </html>

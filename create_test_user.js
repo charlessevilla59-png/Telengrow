@@ -10,9 +10,9 @@ async function createTestUser() {
   try {
     await sequelize.sync();
     
-    const email = 'toy@gmail.com';
-    const password = 'test123';
-    const name = 'Toy User';
+    const email = 'charles@gmail.com';
+    const password = 'pogi123';
+    const name = 'Charles Kevin';
     
     // Check if user exists
     const existing = await User.findOne({ where: { email } });

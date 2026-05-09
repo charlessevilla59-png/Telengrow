@@ -3,93 +3,420 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
+  <title>Reading Materials - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      background-attachment: fixed;
+    }
+    
+    .navbar {
+      background-color: white;
+      border-bottom: 2px solid #e0e0e0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 0 !important;
+    }
+    
+    .navbar .container {
+      padding: 12px 20px;
+    }
+    
+    .navbar h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.3px;
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .header {
+      background: white;
+      padding: 32px 0;
+      margin-bottom: 32px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .header p {
+      font-size: 15px;
+      color: #666;
+      margin: 0;
+      font-weight: 400;
+    }
+    
+    .materials-table {
+      background-color: white;
+      border-collapse: collapse;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .materials-table thead {
+      background: linear-gradient(135deg, #f8f9fb 0%, #f0f3f7 100%);
+      border-bottom: 2px solid #e5e9f0;
+    }
+    
+    .materials-table th {
+      padding: 16px 18px;
+      text-align: left;
+      font-weight: 700;
+      color: #2c3e50;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .materials-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid #f0f2f5;
+      color: #555;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    
+    .materials-table tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    .materials-table tbody tr:hover {
+      background-color: #f8fafb;
+      box-shadow: inset 0 0 0 1px #e8eef5;
+    }
+    
+    .material-title {
+      color: #2c3e50;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      font-size: 14px;
+    }
+    
+    .material-title:hover {
+      color: #16a34a;
+    }
+    
+    .category-badge {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #2e7d32;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      border: 1px solid #a5d6a7;
+    }
+    
+    .action-link {
+      color: #16a34a;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+    
+    .action-link:hover {
+      color: #15803d;
+      text-decoration: underline;
+    }
+    
+    .back-link {
+      color: #16a34a;
+      text-decoration: none;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: inline-block;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    
+    .back-link:hover {
+      color: #15803d;
+    }
+    
+    .stats-bar {
+      background-color: white;
+      padding: 24px;
+      margin-bottom: 28px;
+      border-radius: 8px;
+      display: flex;
+      gap: 40px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border-left: 4px solid #16a34a;
+    }
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #16a34a;
+      letter-spacing: -0.5px;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    
+    .empty-state {
+      background-color: white;
+      padding: 60px 40px;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-state h2 {
+      font-size: 22px;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+    
+    .empty-state p {
+      color: #999;
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    /* Rating Styles */
+    .rating-stars {
+      transition: all 0.2s ease;
+    }
+
+    .rating-stars .star {
+      cursor: pointer;
+      color: #ddd;
+      transition: all 0.1s ease;
+      display: inline-block;
+    }
+
+    .rating-stars .star:hover,
+    .rating-stars .star.hover {
+      color: #fbbf24;
+      transform: scale(1.2);
+    }
+
+    .rating-stars .star.active {
+      color: #fbbf24;
+    }
+
+    .rating-stars:hover {
+      filter: brightness(1.1);
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen">
   {{> sidebar}}
   
-  <nav class="bg-white shadow-md p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+  <!-- Navigation -->
+  <nav class="navbar sticky top-0 z-30">
+    <div class="container flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <button onclick="openSidebar()" class="text-gray-600 hover:text-gray-900 p-2 hover:bg-gray-100 rounded transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <a href="/user/dashboard" class="text-gray-600 hover:text-gray-800 flex items-center space-x-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-          <span>Back to Dashboard</span>
-        </a>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+        <h1>Reading Materials</h1>
       </div>
     </div>
   </nav>
 
-  <div class="container mx-auto p-6">
+  <!-- Main Content -->
+  <div class="container py-8">
+    <!-- Back Button -->
+    <a href="/user/dashboard" class="back-link">← Back to Dashboard</a>
+
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">📚 Reading Materials</h1>
-      <p class="text-gray-600">Access your mental health reading library</p>
+    <div class="header">
+      <h1>Mental Wellness Library</h1>
+      <p>Discover articles and guidance to support your mental health journey</p>
     </div>
 
-    <!-- Library Access Card -->
-    <div class="max-w-2xl mx-auto">
-      <div class="bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-2xl overflow-hidden">
-        <div class="p-12 text-center text-white">
-          <!-- Book Icon -->
-          <div class="mb-6">
-            <span class="text-8xl">📚</span>
-          </div>
-          
-          <!-- Title -->
-          <h2 class="text-3xl font-bold mb-4">Mental Health Library</h2>
-          <p class="text-lg mb-8 opacity-90">
-            Access reading materials uploaded by counselors.<br>
-            Choose from our collection of mental health resources.
-          </p>
-          
-          <!-- Stats -->
-          <div class="flex justify-center gap-8 mb-8">
-            <div class="text-center">
-              <div class="text-3xl font-bold">{{materials.length}}</div>
-              <div class="text-sm opacity-75">Available Books</div>
-            </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold">📕 📘</div>
-              <div class="text-sm opacity-75">PDF & DOCX</div>
-            </div>
-          </div>
-          
-          <!-- View Library Button -->
-          <a href="/reading/library" 
-             class="inline-block bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg transform hover:scale-105">
-            📖 Open Library
-          </a>
+    <!-- Search & Filter Section -->
+    <div class="stats-bar" style="border-left: 4px solid #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); gap: 16px; margin-bottom: 24px; display: flex; flex-direction: column;">
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; width: 100%;">
+        <!-- Search Input -->
+        <div>
+          <input type="text" id="searchInput" placeholder="🔍 Search materials..." 
+                 style="width: 100%; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 14px; font-family: inherit;" 
+                 onkeyup="filterMaterials()">
         </div>
-      </div>
-      
-      <!-- Info Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-        <div class="bg-white rounded-lg shadow p-4 text-center">
-          <div class="text-3xl mb-2">📕</div>
-          <div class="font-semibold text-gray-800">PDF Documents</div>
-          <div class="text-sm text-gray-600">Read in browser</div>
+        
+        <!-- Category Filter -->
+        <div>
+          <select id="categoryFilter" style="width: 100%; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 14px; font-family: inherit;" onchange="filterMaterials()">
+            <option value="">All Categories</option>
+            <option value="anxiety">Anxiety</option>
+            <option value="depression">Depression</option>
+            <option value="stress">Stress Management</option>
+            <option value="meditation">Meditation</option>
+            <option value="sleep">Sleep</option>
+            <option value="resilience">Resilience</option>
+            <option value="self-care">Self-Care</option>
+            <option value="fitness">Fitness</option>
+            <option value="reading tips">Reading Tips</option>
+            <option value="wellness">Wellness</option>
+          </select>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
-          <div class="text-3xl mb-2">📘</div>
-          <div class="font-semibold text-gray-800">DOCX Files</div>
-          <div class="text-sm text-gray-600">Online viewer</div>
-        </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
-          <div class="text-3xl mb-2">🔒</div>
-          <div class="font-semibold text-gray-800">Read Only</div>
-          <div class="text-sm text-gray-600">No downloads</div>
+
+        <!-- Type Filter -->
+        <div>
+          <select id="typeFilter" style="width: 100%; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 14px; font-family: inherit;" onchange="filterMaterials()">
+            <option value="">All Types</option>
+            <option value="article">📝 Articles</option>
+            <option value="video">🎥 Videos</option>
+            <option value="pdf">📄 PDFs</option>
+          </select>
         </div>
       </div>
     </div>
+
+    <!-- Check if materials exist -->
+    {{#if materials.length}}
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div>
+            <div class="stat-number">{{materials.length}}</div>
+            <div class="stat-label">Materials</div>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div>
+            <div class="stat-number">{{totalViews}}</div>
+            <div class="stat-label">Total Views</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials Table -->
+      <table class="materials-table" id="materialsTable">
+        <thead>
+          <tr>
+            <th style="width: 35%;">📚 Title</th>
+            <th style="width: 15%;">🏷️ Category</th>
+            <th style="width: 12%;">📺 Type</th>
+            <th style="width: 10%;">👁️ Views</th>
+            <th style="width: 16%;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="materialsBody">
+          {{#each materials}}
+          <tr class="material-row" data-title="{{this.title}}" data-category="{{this.category}}" data-type="{{this.fileType}}" data-material-id="{{this.id}}">
+            <td>
+              <a href="/reading/{{this.slug}}" class="material-title">{{this.title}}</a>
+            </td>
+            <td>
+              <span class="category-badge">{{this.category}}</span>
+            </td>
+            <td style="text-align: center;">
+              {{#if (eq this.fileType 'video')}}
+                <span style="color: #16a34a; font-weight: 600; font-size: 13px;">🎥 Video</span>
+              {{else if (eq this.fileType 'pdf')}}
+                <span style="color: #d97706; font-weight: 600; font-size: 13px;">📄 PDF</span>
+              {{else}}
+                <span style="color: #666; font-weight: 600; font-size: 13px;">📝 Article</span>
+              {{/if}}
+            </td>
+            <td style="text-align: center; color: #16a34a; font-weight: 600;">{{this.views}}</td>
+            <td style="text-align: center;">
+              <a href="/reading/{{this.slug}}" class="action-link">
+                {{#if (eq this.fileType 'video')}}Watch →{{else}}Read →{{/if}}
+              </a>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    {{else}}
+      <!-- No Materials Message -->
+      <div class="empty-state">
+        <h2>📚 No Materials Available</h2>
+        <p>Our counselors are building a library of reading materials. Check back soon!</p>
+        <a href="/user/dashboard" class="action-link">Return to Dashboard</a>
+      </div>
+    {{/if}}
   </div>
+
+  <script>
+    function filterMaterials() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
+      const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+      
+      const rows = document.querySelectorAll('.material-row');
+      let visibleCount = 0;
+      
+      rows.forEach(row => {
+        const title = row.getAttribute('data-title').toLowerCase();
+        const category = row.getAttribute('data-category').toLowerCase();
+        const type = row.getAttribute('data-type').toLowerCase();
+        
+        // Check if row matches all filter criteria (case-insensitive)
+        const matchesSearch = title.includes(searchInput);
+        const matchesCategory = !categoryFilter || category.toLowerCase() === categoryFilter;
+        const matchesType = !typeFilter || type.toLowerCase() === typeFilter;
+        
+        if (matchesSearch && matchesCategory && matchesType) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      // Show/hide empty state
+      const tbody = document.getElementById('materialsBody');
+      if (visibleCount === 0 && tbody) {
+        if (!document.getElementById('noResults')) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.id = 'noResults';
+          emptyRow.innerHTML = '<td colspan="5" style="text-align: center; padding: 40px; color: #999;">No materials found. Try adjusting your filters.</td>';
+          tbody.appendChild(emptyRow);
+        }
+      } else if (document.getElementById('noResults')) {
+        document.getElementById('noResults').remove();
+      }
+    }
+    
+    // Clear filters on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('typeFilter').value = '';
+      filterMaterials();
+    });
+  </script>
 </body>
 </html>

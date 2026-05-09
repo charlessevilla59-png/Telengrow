@@ -87,6 +87,10 @@
                 class="flex-1 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition">
           View All Notes 📝
         </button>
+        <button onclick="saveGratitudePoints()" 
+                class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+          Save Points 🎯
+        </button>
       </div>
 
       <!-- Tips -->
@@ -271,6 +275,76 @@
         addNote();
       }
     });
+
+    // 💾 Save Gratitude Points
+    async function saveGratitudePoints() {
+      if (notes.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Add some gratitude notes first!',
+          text: 'Fill your jar with at least one gratitude note before saving',
+          confirmButtonColor: '#d97706'
+        });
+        return;
+      }
+
+      const calculatedPoints = notes.length * 10 + 25;
+      
+      try {
+        const response = await fetch('/api/games/save-score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            gameType: 'gratitude-jar',
+            score: notes.length,
+            points: calculatedPoints,
+            duration: 0,
+            difficulty: 'easy',
+            accuracy: 100
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem('pointsUpdated', Date.now().toString());
+          playSound('celebrate');
+          
+          Swal.fire({
+            icon: 'success',
+            title: '🎉 Points Saved!',
+            html: `
+              <p class="text-lg mb-2">Thank you for practicing gratitude!</p>
+              <p class="text-3xl font-bold text-green-600 mb-2">+${calculatedPoints} Points!</p>
+              <p class="text-gray-600">You added ${notes.length} gratitude notes</p>
+              <p class="text-gray-600 mt-2">Total Points: ${data.totalPoints}</p>
+            `,
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'View Dashboard',
+            allowOutsideClick: false
+          }).then(() => {
+            window.location.href = '/user/dashboard';
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message || 'Failed to save points',
+            confirmButtonColor: '#d97706'
+          });
+        }
+      } catch (error) {
+        console.error('Save error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Connection Error',
+          text: 'Failed to save. Check your connection.',
+          confirmButtonColor: '#d97706'
+        });
+      }
+    }
     
     // Initialize
     updateDisplay();

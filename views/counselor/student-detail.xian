@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: #f8fafc;
+      color: #334155;
+      min-height: 100vh;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: #ffffff;
+      padding: 16px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-bottom: 2px solid #10b981;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-brand {
+      font-size: 20px;
+      font-weight: 600;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-button {
+      background: #10b981;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .back-button:hover {
+      background: #059669;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Main profile container */
+    .profile-page {
+      background: white;
+      max-width: 1100px;
+      margin: 25px auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    /* Profile Header */
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 30px;
+      padding: 30px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border-bottom: 3px solid #10b981;
+    }
+
+    .header-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .profile-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #059669;
+      margin-bottom: 5px;
+    }
+
+    .profile-subtitle {
+      font-size: 13px;
+      color: #10b981;
+      font-weight: 400;
+    }
+
+    .picture-box {
+      width: 140px;
+      height: 140px;
+      border: 3px solid #10b981;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .picture-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .picture-placeholder {
+      text-align: center;
+      color: #10b981;
+      font-size: 60px;
+      font-weight: bold;
+    }
+
+    /* Profile content */
+    .profile-content {
+      padding: 30px;
+    }
+
+    /* Section header */
+    .section-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: #10b981;
+      margin-top: 28px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #d1fae5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-header:first-child {
+      margin-top: 0;
+    }
+
+    /* Info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .info-grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .info-item {
+      background: #ffffff;
+      padding: 14px 16px;
+      border-left: 4px solid #10b981;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      border: 1px solid #e0f2f1;
+    }
+
+    .info-item:hover {
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .info-label {
+      font-size: 11600;
+      color: #10b981;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 13px;
+      color: #33415513px;
+      color: #333;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .info-value.empty {
+      color: #999;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    /* Table styling */
+    .education-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .education-table th,
+    .education-table td {
+      border: 1px solid #e0f2f1;
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    .education-tab#f0fdf4;
+      font-weight: 600;
+      color: #10b981;
+      border-color: #d1fae500;
+      color: #059669;
+    }
+
+    .education-table tbody tr:hover {
+      background: #f0fdf4;
+    }
+
+    .empty-state {
+      background: #f0fdf4;
+      padding: 16px;
+      text-align: center;
+      color: #999;
+      font-style: italic;
+      font-size: 13px;
+      border-left: 4px solid #10b981;
+      border-radius: 6px;
+    }
+
+    /* Badge styling */
+    .badge {#f0fdf4;
+      color: #10b981;
+      border: 1px solid #d1fae5;
+      font-size: 11px;
+      font-weight: 6;
+      border: 1px solid #10b981;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 6px;
+      margin-top: 5px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .badge:hover {
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: #10b981;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .action-btn:hover {
+      background: #059669;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .action-btn.download {
+      background: #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+
+    .action-btn.download:hover {
+      background: #2563eb;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .navbar {
+        display: none;
+      }
+
+      .profile-page {
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .profile-header {
+        page-break-after: avoid;
+        border-bottom: 3px solid #000;
+      }
+
+      .section-header {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+
+      .info-grid,
+      .education-table {
+        page-break-inside: avoid;
+      }
+
+      .action-buttons {
+        display: none;
+      }
+
+      .profile-subtitle,
+      .back-button {
+        display: none;
+      }
+
+      @page {
+        margin: 0.5in;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .picture-box {
+        width: 120px;
+        height: 120px;
+      }
+
+      .profile-page {
+        margin: 15px;
+        border-radius: 8px;
+      }
+
+      .profile-content {
+        padding: 20px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .section-header {
+        font-size: 13px;
+        margin-top: 20px;
+        margin-bottom: 12px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 15px;
+      }
+
+      .navbar-brand {
+        font-size: 18px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .action-btn,
+      .back-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <div class="navbar-brand">🌱 Tellngrow - Student Profile</div>
+    <div class="action-buttons">
+      <button class="action-btn" id="printBtn" onclick="printStudentInfo()">🖨️ Print Info</button>
+      <button class="action-btn download" id="downloadBtn" onclick="downloadStudentInfo()">📥 Download PDF</button>
+      <a href="/counselor/students" class="back-button">← Back to Students</a>
+    </div>
+  </div>
+
+  <!-- Main Profile Container -->
+  <div class="profile-page">
+    <!-- Profile Header Section -->
+    <div class="profile-header">
+      <div class="header-left">
+        <div class="profile-title">STUDENT INFORMATION PROFILE</div>
+        <div class="profile-subtitle">Complete Student Details & Records</div>
+      </div>
+      <div class="picture-box">
+        {{#if student.profilePicture}}
+          {{#if (eq (substring student.profilePicture 0 1) "/")}}
+            <img src="{{student.profilePicture}}" alt="{{student.name}}" />
+          {{else}}
+            <span class="picture-placeholder">{{student.profilePicture}}</span>
+          {{/if}}
+        {{else}}
+          <span class="picture-placeholder">👤</span>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+      <!-- Personal Information Section -->
+      <h2 class="section-header">📋 PERSONAL INFORMATION</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Full Name</div>
+          <div class="info-value">{{student.name}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Email Address</div>
+          <div class="info-value">{{#if student.email}}{{student.email}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Nickname</div>
+          <div class="info-value">{{#if student.nickname}}{{student.nickname}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Age</div>
+          <div class="info-value">{{#if student.age}}{{student.age}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Date of Birth</div>
+          <div class="info-value">{{#if student.dateOfBirth}}{{formatDate student.dateOfBirth}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Place of Birth</div>
+          <div class="info-value">{{#if student.placeOfBirth}}{{student.placeOfBirth}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Nationality</div>
+          <div class="info-value">{{#if student.nationality}}{{student.nationality}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Sex</div>
+          <div class="info-value">{{#if student.sex}}{{capitalize student.sex}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Civil Status</div>
+          <div class="info-value">{{#if student.civilStatus}}{{capitalize student.civilStatus}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Religion</div>
+          <div class="info-value">{{#if student.religion}}{{student.religion}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+      </div>
+
+      <!-- Academic Information Section -->
+      <h2 class="section-header">🎓 ACADEMIC INFORMATION</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Course/Program</div>
+          <div class="info-value">{{#if student.course}}<span class="badge">{{student.course}}</span>{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Year Level</div>
+          <div class="info-value">{{#if student.year}}<span class="badge">{{student.year}}</span>{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Section</div>
+          <div class="info-value">{{#if student.section}}{{student.section}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <h2 class="section-header">📞 CONTACT INFORMATION</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Contact Number</div>
+          <div class="info-value">{{#if student.contactNumber}}{{student.contactNumber}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Alternate Email</div>
+          <div class="info-value">{{#if student.emailAlternate}}{{student.emailAlternate}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        </div>
+      </div>
+
+      <!-- Address Information Section -->
+      {{#if (or student.currentAddress student.permanentAddress)}}
+      <h2 class="section-header">🏠 ADDRESS INFORMATION</h2>
+      <div class="info-grid full">
+        {{#if student.currentAddress}}
+        <div class="info-item">
+          <div class="info-label">Current Address</div>
+          <div class="info-value">{{student.currentAddress}}</div>
+        </div>
+        {{/if}}
+        {{#if student.permanentAddress}}
+        <div class="info-item">
+          <div class="info-label">Permanent Address</div>
+          <div class="info-value">{{student.permanentAddress}}</div>
+        </div>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      <!-- Status & Background Section -->
+      {{#if (or student.lgbtqia student.indigenousGroup student.personWithDisability)}}
+      <h2 class="section-header">ℹ️ STATUS & BACKGROUND</h2>
+      <div class="info-grid">
+        {{#if student.lgbtqia}}
+        <div class="info-item">
+          <div class="info-label">LGBTQIA+</div>
+          <div class="info-value">{{capitalize student.lgbtqia}}{{#if student.lgbtqiaSpecify}} - {{student.lgbtqiaSpecify}}{{/if}}</div>
+        </div>
+        {{/if}}
+        {{#if student.indigenousGroup}}
+        <div class="info-item">
+          <div class="info-label">Indigenous Group</div>
+          <div class="info-value">{{capitalize student.indigenousGroup}}{{#if student.indigenousGroupName}} - {{student.indigenousGroupName}}{{/if}}</div>
+        </div>
+        {{/if}}
+        {{#if student.personWithDisability}}
+        <div class="info-item">
+          <div class="info-label">Person with Disability</div>
+          <div class="info-value">{{capitalize student.personWithDisability}}{{#if student.disabilityType}} - {{student.disabilityType}}{{/if}}</div>
+        </div>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      <!-- Parents Information Section -->
+      {{#if (or student.fatherName student.motherName)}}
+      <h2 class="section-header">👨‍👩‍👧 PARENTS INFORMATION</h2>
+      <div class="info-grid">
+        {{#if student.fatherName}}
+        <div class="info-item">
+          <div class="info-label">Father's Name</div>
+          <div class="info-value">{{student.fatherName}}</div>
+        </div>
+        {{/if}}
+        {{#if student.fatherOccupation}}
+        <div class="info-item">
+          <div class="info-label">Father's Occupation</div>
+          <div class="info-value">{{student.fatherOccupation}}</div>
+        </div>
+        {{/if}}
+        {{#if student.motherName}}
+        <div class="info-item">
+          <div class="info-label">Mother's Name</div>
+          <div class="info-value">{{student.motherName}}</div>
+        </div>
+        {{/if}}
+        {{#if student.motherOccupation}}
+        <div class="info-item">
+          <div class="info-label">Mother's Occupation</div>
+          <div class="info-value">{{student.motherOccupation}}</div>
+        </div>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      <!-- Emergency Contact Section -->
+      {{#if (or student.emergencyContactName student.emergencyContactRelation)}}
+      <h2 class="section-header">🆘 EMERGENCY CONTACT</h2>
+      <div class="info-grid">
+        {{#if student.emergencyContactName}}
+        <div class="info-item">
+          <div class="info-label">Contact Name</div>
+          <div class="info-value">{{student.emergencyContactName}}</div>
+        </div>
+        {{/if}}
+        {{#if student.emergencyContactRelation}}
+        <div class="info-item">
+          <div class="info-label">Relationship</div>
+          <div class="info-value">{{student.emergencyContactRelation}}</div>
+        </div>
+        {{/if}}
+        {{#if student.emergencyContactNumber}}
+        <div class="info-item">
+          <div class="info-label">Contact Number</div>
+          <div class="info-value">{{student.emergencyContactNumber}}</div>
+        </div>
+        {{/if}}
+        {{#if student.emergencyContactEmail}}
+        <div class="info-item">
+          <div class="info-label">Email Address</div>
+          <div class="info-value">{{student.emergencyContactEmail}}</div>
+        </div>
+        {{/if}}
+        {{#if student.emergencyContactAddress}}
+        <div class="info-item full">
+          <div class="info-label">Address</div>
+          <div class="info-value">{{student.emergencyContactAddress}}</div>
+        </div>
+        {{/if}}
+      </div>
+      {{/if}}
+
+      <!-- Educational Background Section -->
+      {{#if (or student.elementarySchool student.juniorHighSchool student.seniorHighSchool student.collegeName)}}
+      <h2 class="section-header">📚 EDUCATIONAL BACKGROUND</h2>
+      <table class="education-table">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>School Attended</th>
+            <th>Dates</th>
+            <th>Honors/Scholarships</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#if student.elementarySchool}}
+          <tr>
+            <td>Elementary</td>
+            <td>{{student.elementarySchool}}</td>
+            <td>{{student.elementaryDates}}</td>
+            <td>{{#if student.elementaryHonors}}{{student.elementaryHonors}}{{else}}-{{/if}}</td>
+          </tr>
+          {{/if}}
+          {{#if student.juniorHighSchool}}
+          <tr>
+            <td>Junior High School</td>
+            <td>{{student.juniorHighSchool}}</td>
+            <td>{{student.juniorDates}}</td>
+            <td>{{#if student.juniorHonors}}{{student.juniorHonors}}{{else}}-{{/if}}</td>
+          </tr>
+          {{/if}}
+          {{#if student.seniorHighSchool}}
+          <tr>
+            <td>Senior High School</td>
+            <td>{{student.seniorHighSchool}}</td>
+            <td>{{student.seniorDates}}</td>
+            <td>{{#if student.seniorHonors}}{{student.seniorHonors}}{{else}}-{{/if}}</td>
+          </tr>
+          {{/if}}
+          {{#if student.collegeName}}
+          <tr>
+            <td>College</td>
+            <td>{{student.collegeName}}</td>
+            <td>{{student.collegeDates}}</td>
+            <td>{{#if student.collegeHonors}}{{student.collegeHonors}}{{else}}-{{/if}}</td>
+          </tr>
+          {{/if}}
+        </tbody>
+      </table>
+      {{/if}}
+
+      <!-- Skills & Hobbies Section -->
+      {{#if student.skillsHobbies}}
+      <h2 class="section-header">🎨 SKILLS & HOBBIES</h2>
+      <div class="info-grid full">
+        <div class="info-item">
+          <div class="info-value">{{student.skillsHobbies}}</div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <script>
+    // Print function
+    function printStudentInfo() {
+      window.print();
+    }
+
+    // Download as PDF function
+    function downloadStudentInfo() {
+      try {
+        var studentName = '{{student.name}}' || 'Student';
+        var element = document.querySelector('.profile-page');
+        
+        if (!element) {
+          alert('Error: Could not find student information');
+          return;
+        }
+
+        // Load html2pdf library dynamically
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        
+        script.onload = function() {
+          var filename = studentName + '_Profile.pdf';
+          var opt = {
+            margin: 10,
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+          };
+          
+          if (typeof html2pdf !== 'undefined') {
+            html2pdf().set(opt).from(element).save();
+          } else {
+            alert('PDF library failed to load. Using print instead.');
+            window.print();
+          }
+        };
+        
+        script.onerror = function() {
+          alert('Could not load PDF library. Using print instead.');
+          window.print();
+        };
+        
+        document.head.appendChild(script);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error generating PDF. Using print instead.');
+        window.print();
+      }
+    }
+  </script>
+</body>
+</html>

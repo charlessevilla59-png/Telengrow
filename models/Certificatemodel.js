@@ -24,8 +24,7 @@ const Certificate = sequelize.define('Certificate', {
   },
   certificateId: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+    allowNull: false
   },
   type: {
     type: DataTypes.STRING, // 'game' or 'quiz'

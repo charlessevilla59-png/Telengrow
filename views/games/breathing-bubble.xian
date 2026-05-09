@@ -7,18 +7,223 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    /* Background Animation */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Breathing Animation */
     @keyframes breathe {
       0%, 100% { transform: scale(0.5); opacity: 0.5; }
       50% { transform: scale(1.5); opacity: 1; }
     }
+
+    /* Floating Animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      25% { transform: translateY(-10px); }
+      75% { transform: translateY(10px); }
+    }
+
+    /* Shimmer Animation */
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    /* Glow Animation */
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
+    }
+
+    /* Fade In Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scale Pulse Animation */
+    @keyframes scalePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Body Background */
+    body {
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      min-height: 100vh;
+    }
+
     .breathing {
       animation: breathe 8s ease-in-out infinite;
     }
+
+    .card-glow {
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                  0 0 60px -15px rgba(168, 85, 247, 0.4);
+    }
+
+    /* Enhanced Container */
+    .game-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    /* Stats Container */
+    .stats-container {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Stat Item */
+    .stat-item {
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .stat-item:hover {
+      transform: scale(1.1) translateY(-5px);
+    }
+
+    /* Button Styling */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-success::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(56, 239, 125, 0.4);
+    }
+
+    .btn-success:hover::before {
+      left: 100%;
+    }
+
+    /* Tips Container */
+    .tips-container {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%);
+      border: 2px solid rgba(168, 85, 247, 0.3);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.8s ease-out 0.2s backwards;
+    }
+
+    /* Action Button */
+    .action-btn {
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Control Buttons Container */
+    .controls-container {
+      display: flex;
+      gap: 1rem;
+      animation: fadeIn 0.8s ease-out 0.3s backwards;
+    }
+
+    /* Button disabled state */
+    .btn-disabled {
+      opacity: 0.5;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
+
+    /* Header Animation */
+    .header-text {
+      animation: fadeIn 0.8s ease-out 0.1s backwards;
+    }
+
+    /* Breathing Circle Container */
+    .breathing-container {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* Instruction Text Animation */
+    #instruction {
+      animation: fadeIn 0.8s ease-out 0.2s backwards;
+    }
+
+    #countdown {
+      animation: scalePulse 1s ease-in-out infinite;
+    }
+
+    /* Smooth scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #9333ea, #db2777);
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-purple-500 to-pink-600 min-h-screen flex items-center justify-center">
+<body>
   <!-- Back Button -->
-  <a href="/games" class="fixed top-4 left-4 bg-white p-3 rounded-full shadow-lg hover:scale-110 transition z-50">
+  <a href="/games" class="fixed top-6 left-6 bg-white p-4 rounded-full shadow-lg hover:scale-110 transition z-50 action-btn hover:shadow-2xl">
     <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
     </svg>
@@ -26,78 +231,105 @@
 
   <!-- Sound Toggle Button -->
   <button onclick="toggleSound()" id="soundBtn" 
-          class="fixed top-4 right-4 bg-white p-3 rounded-full shadow-lg text-2xl hover:scale-110 transition z-50">
+          class="fixed top-6 right-6 bg-white p-4 rounded-full shadow-lg text-2xl hover:scale-110 transition z-50 action-btn hover:shadow-2xl">
     🔊
   </button>
 
-  <div class="container mx-auto p-6">
-    <!-- Header -->
-    <div class="text-center text-white mb-8">
-      <h1 class="text-4xl font-bold mb-2">🫧 Breathing Bubble</h1>
-      <p class="text-purple-100">Follow the bubble to breathe deeply</p>
-    </div>
-
-    <!-- Game Container -->
-    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
-      
-      <!-- Stats -->
-      <div class="grid grid-cols-3 gap-4 mb-8">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-purple-600" id="cycles">0</div>
-          <div class="text-sm text-gray-600">Cycles</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-pink-600" id="timer">8</div>
-          <div class="text-sm text-gray-600">Seconds</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-purple-600" id="points">0</div>
-          <div class="text-sm text-gray-600">Points</div>
-        </div>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="container max-w-2xl">
+      <!-- Header -->
+      <div class="text-center text-white mb-12 header-text">
+        <div class="text-7xl mb-4 animate-bounce">🫧</div>
+        <h1 class="text-5xl font-bold mb-3 drop-shadow-lg">Breathing Bubble</h1>
+        <p class="text-lg text-purple-100 drop-shadow">Follow the bubble to breathe deeply and calm your mind</p>
       </div>
 
-      <!-- Breathing Circle -->
-      <div class="relative h-96 flex items-center justify-center mb-8">
-        <svg class="absolute" width="400" height="400" viewBox="0 0 400 400">
-          <circle id="bubble" cx="200" cy="200" r="80" 
-                  fill="url(#gradient)" 
-                  class="breathing" />
-          <defs>
-            <radialGradient id="gradient">
-              <stop offset="0%" style="stop-color:rgb(168,85,247);stop-opacity:0.8" />
-              <stop offset="100%" style="stop-color:rgb(236,72,153);stop-opacity:0.4" />
-            </radialGradient>
-          </defs>
-        </svg>
+      <!-- Game Container -->
+      <div class="game-container card-glow rounded-3xl shadow-2xl p-8 md:p-12">
         
-        <!-- Instruction Text -->
-        <div class="absolute text-center">
-          <div id="instruction" class="text-2xl font-bold text-gray-800 mb-2">Breathe In</div>
-          <div id="countdown" class="text-6xl font-bold text-purple-600">4</div>
+        <!-- Stats -->
+        <div class="stats-container rounded-2xl p-6 mb-10 grid grid-cols-3 gap-4">
+          <div class="stat-item text-center">
+            <div class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" id="cycles">0</div>
+            <div class="text-sm text-gray-600 font-semibold mt-2">Cycles</div>
+          </div>
+          <div class="stat-item text-center">
+            <div class="text-4xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent" id="timer">8</div>
+            <div class="text-sm text-gray-600 font-semibold mt-2">Seconds</div>
+          </div>
+          <div class="stat-item text-center">
+            <div class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent" id="points">0</div>
+            <div class="text-sm text-gray-600 font-semibold mt-2">Points</div>
+          </div>
         </div>
-      </div>
 
-      <!-- Controls -->
-      <div class="flex gap-4">
-        <button id="startBtn" onclick="startBreathing()" 
-                class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-          Start
-        </button>
-        <button id="stopBtn" onclick="stopBreathing()" disabled
-                class="flex-1 bg-gray-300 text-gray-600 py-3 rounded-lg font-semibold cursor-not-allowed">
-          Stop
-        </button>
-      </div>
+        <!-- Breathing Circle -->
+        <div class="relative h-96 flex items-center justify-center mb-12 breathing-container">
+          <svg class="absolute" width="400" height="400" viewBox="0 0 400 400">
+            <defs>
+              <radialGradient id="gradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0.3" />
+              </radialGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <circle id="bubble" cx="200" cy="200" r="80" 
+                    fill="url(#gradient)" 
+                    filter="url(#glow)"
+                    class="breathing" />
+          </svg>
+          
+          <!-- Instruction Text -->
+          <div class="absolute text-center z-10">
+            <div id="instruction" class="text-3xl font-bold text-gray-800 mb-4">Breathe In</div>
+            <div id="countdown" class="text-7xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">4</div>
+          </div>
+        </div>
 
-      <!-- Tips -->
-      <div class="mt-6 bg-purple-50 rounded-lg p-4">
-        <h3 class="font-semibold text-purple-800 mb-2">💡 Tips:</h3>
-        <ul class="text-sm text-purple-700 space-y-1">
-          <li>• Breathe in through your nose for 4 seconds</li>
-          <li>• Breathe out through your mouth for 4 seconds</li>
-          <li>• Focus on the bubble expanding and contracting</li>
-          <li>• Try to complete at least 5 cycles</li>
-        </ul>
+        <!-- Controls -->
+        <div class="controls-container mb-6">
+          <button id="startBtn" onclick="startBreathing()" 
+                  class="flex-1 btn-primary text-white py-4 px-6 rounded-xl font-bold text-lg hover:text-white transition">
+            ▶️ Start
+          </button>
+          <button id="stopBtn" onclick="stopBreathing()" disabled
+                  class="flex-1 btn-disabled bg-gray-300 text-gray-600 py-4 px-6 rounded-xl font-bold text-lg">
+            ⏹️ Stop
+          </button>
+          <button id="finishBtn" onclick="finishAndSaveGame()" 
+                  class="flex-1 btn-success text-white py-4 px-6 rounded-xl font-bold text-lg hover:text-white transition">
+            ✅ Save & Finish
+          </button>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-container rounded-2xl p-6">
+          <h3 class="font-bold text-lg text-purple-900 mb-4">💡 How to Get Maximum Benefits:</h3>
+          <ul class="space-y-2 text-gray-700 font-medium">
+            <li class="flex items-start gap-3">
+              <span class="text-purple-600 font-bold">•</span>
+              <span>Breathe in through your nose for 4 seconds</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-600 font-bold">•</span>
+              <span>Breathe out through your mouth for 4 seconds</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-600 font-bold">•</span>
+              <span>Focus on the bubble expanding and contracting</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-600 font-bold">•</span>
+              <span>Try to complete at least 5 cycles for best results</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -267,6 +499,98 @@
       document.getElementById('countdown').textContent = countdown;
       document.getElementById('timer').textContent = countdown;
     }
+
+    // Calculate points based on cycles completed
+    function calculatePoints() {
+      return cycles * 10; // 10 points per cycle
+    }
+
+    // Save game score to database
+    async function finishAndSaveGame() {
+      if (cycles === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No cycles completed',
+          text: 'Please complete at least 1 breathing cycle before saving!',
+          timer: 2000,
+          toast: true,
+          position: 'top-end'
+        });
+        return;
+      }
+
+      stopBreathing();
+      
+      const finalPoints = calculatePoints();
+      
+      try {
+        const response = await fetch('/api/games/save-score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            gameType: 'breathing-bubble',
+            score: cycles,
+            points: finalPoints,
+            duration: Math.floor((Date.now() - gameStartTime) / 1000),
+            difficulty: 'easy',
+            accuracy: 100
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Store in localStorage to trigger dashboard update
+          localStorage.setItem('pointsUpdated', Date.now().toString());
+          
+          Swal.fire({
+            icon: 'success',
+            title: '🎉 Excellent!',
+            html: `
+              <div class="text-center">
+                <div class="mb-3">✅ Game Saved Successfully!</div>
+                <div class="text-3xl font-bold text-purple-600 mb-2">${finalPoints} Points! 🎯</div>
+                <div class="text-sm text-gray-600">You completed ${cycles} breathing cycles</div>
+                <div class="text-sm text-gray-600 mt-2">Total Points: ${data.totalPoints}</div>
+              </div>
+            `,
+            confirmButtonText: 'View Dashboard',
+            confirmButtonColor: '#9333ea',
+            allowOutsideClick: false
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = '/user/dashboard';
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error saving score',
+            text: data.message || 'Please try again',
+            timer: 2000,
+            toast: true
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to save game score',
+          timer: 2000,
+          toast: true
+        });
+      }
+    }
+
+    let gameStartTime = Date.now();
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      gameStartTime = Date.now();
+    });
   </script>
 </body>
 </html>

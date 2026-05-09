@@ -8,30 +8,56 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     .puzzle-piece {
-      cursor: move;
-      transition: transform 0.2s;
-      border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      cursor: grab;
+      transition: all 0.2s;
+      border: 2px solid #fff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      background-size: contain;
+      user-select: none;
     }
+    
+    .puzzle-piece:active {
+      cursor: grabbing;
+    }
+    
     .puzzle-piece:hover {
-      transform: scale(1.05);
-      z-index: 10;
+      transform: scale(1.08);
+      z-index: 100;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
     }
+    
     .puzzle-piece.correct {
       cursor: default;
-      opacity: 1;
-      border-color: #22c55e;
+      border: none;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
+    
     .drop-zone {
-      border: 2px dashed #cbd5e1;
-      background: rgba(255,255,255,0.5);
+      border: 2px dashed #9ca3af;
+      background: #e5e7eb;
+      transition: all 0.2s;
+      box-sizing: border-box;
     }
+    
+    .drop-zone:hover {
+      background: #d1d5db;
+      border-color: #6b7280;
+    }
+    
     @keyframes celebrate {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
     }
+    
     .celebrating {
       animation: celebrate 0.5s ease-in-out;
+    }
+    
+    #pieces-area {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      background: white;
     }
   </style>
 </head>
@@ -57,7 +83,7 @@
     </div>
 
     <!-- Game Container -->
-    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
+    <div class="bg-white rounded-2xl shadow-2xl p-8" style="max-width: 800px; margin: 0 auto;">
       
       <!-- Stats -->
       <div class="grid grid-cols-4 gap-4 mb-6">
@@ -186,107 +212,161 @@
 
     function createPuzzle(imageUrl, size) {
       const container = document.getElementById('puzzleContainer');
-      const pieceSize = 400 / size;
+      const pieceSize = 360 / size;
       
       container.innerHTML = `
-        <div class="grid grid-cols-2 gap-8">
+        <div class="flex gap-4">
+          <!-- Puzzle Board -->
           <div>
-            <h3 class="text-center font-semibold mb-2 text-gray-700">Puzzle Board</h3>
-            <div id="board" class="grid gap-1 bg-gray-200 p-2 rounded-lg" style="grid-template-columns: repeat(${size}, 1fr); width: 400px; height: 400px;"></div>
+            <h3 class="text-center font-semibold mb-3 text-gray-700">Puzzle Board - Place pieces here</h3>
+            <div id="board" class="bg-gray-300 rounded-lg shadow-lg" style="width: 364px; height: 364px; position: relative; border: 2px solid #999; display: grid; grid-template-columns: repeat(${size}, 1fr); grid-gap: 2px; padding: 2px;"></div>
           </div>
+          
+          <!-- Scattered Pieces -->
           <div>
-            <h3 class="text-center font-semibold mb-2 text-gray-700">Pieces</h3>
-            <div id="pieces" class="grid gap-2 p-4 bg-gray-100 rounded-lg" style="grid-template-columns: repeat(${Math.ceil(size/2)}, 1fr);"></div>
+            <h3 class="text-center font-semibold mb-3 text-gray-700">Available Pieces</h3>
+            <div id="pieces-area" class="bg-gray-100 rounded-lg shadow-lg p-4" style="width: 300px; height: 364px; overflow-y: auto; border: 2px solid #ddd; position: relative;"></div>
           </div>
         </div>
       `;
 
       const board = document.getElementById('board');
-      const piecesContainer = document.getElementById('pieces');
+      const piecesArea = document.getElementById('pieces-area');
       
-      // Create board slots
+      // Create drop zones on the board
       for (let i = 0; i < size * size; i++) {
         const slot = document.createElement('div');
-        slot.className = 'drop-zone rounded';
+        slot.className = 'drop-zone';
         slot.dataset.position = i;
         slot.style.width = pieceSize + 'px';
         slot.style.height = pieceSize + 'px';
+        slot.style.backgroundColor = '#e5e7eb';
+        slot.style.border = '2px dashed #9ca3af';
+        slot.style.borderRadius = '4px';
+        slot.style.cursor = 'pointer';
+        slot.style.position = 'relative';
+        
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('drop', handleDrop);
+        slot.addEventListener('dragleave', handleDragLeave);
+        
         board.appendChild(slot);
       }
-
-      // Create shuffled pieces
+      
+      // Create puzzle pieces - all in random order
       const positions = Array.from({length: size * size}, (_, i) => i);
       positions.sort(() => Math.random() - 0.5);
       
       positions.forEach((pos, index) => {
         const piece = document.createElement('div');
-        piece.className = 'puzzle-piece rounded';
+        piece.className = 'puzzle-piece';
         piece.draggable = true;
         piece.dataset.correctPosition = pos;
-        piece.style.width = (pieceSize - 4) + 'px';
-        piece.style.height = (pieceSize - 4) + 'px';
+        piece.style.width = (pieceSize - 2) + 'px';
+        piece.style.height = (pieceSize - 2) + 'px';
+        piece.style.flexShrink = 0;
+        piece.style.cursor = 'grab';
+        piece.style.borderRadius = '4px';
+        piece.style.margin = '4px';
+        piece.style.display = 'inline-block';
         
         const row = Math.floor(pos / size);
         const col = pos % size;
         piece.style.backgroundImage = `url(${imageUrl})`;
-        piece.style.backgroundSize = `${400}px ${400}px`;
+        piece.style.backgroundSize = `${pieceSize * size}px ${pieceSize * size}px`;
         piece.style.backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`;
+        piece.style.backgroundRepeat = 'no-repeat';
         
         piece.addEventListener('dragstart', handleDragStart);
         piece.addEventListener('dragend', handleDragEnd);
+        piece.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          rotatePreview(piece);
+        });
         
-        piecesContainer.appendChild(piece);
+        piecesArea.appendChild(piece);
       });
-
-      // Setup drop zones
-      document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.addEventListener('dragover', handleDragOver);
-        zone.addEventListener('drop', handleDrop);
-      });
+    }
+    
+    function rotatePreview(piece) {
+      let rotation = parseInt(piece.dataset.rotation || 0) + 90;
+      if (rotation >= 360) rotation = 0;
+      piece.dataset.rotation = rotation;
+      piece.style.transform = `rotate(${rotation}deg)`;
     }
 
     function handleDragStart(e) {
       playSound('pickup');
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', e.target.dataset.correctPosition);
-      e.target.style.opacity = '0.5';
+      e.dataTransfer.setData('pieceId', e.target.dataset.correctPosition);
+      e.target.style.opacity = '0.6';
+      e.target.style.cursor = 'grabbing';
     }
 
     function handleDragEnd(e) {
       e.target.style.opacity = '1';
+      e.target.style.cursor = 'grab';
     }
 
     function handleDragOver(e) {
-      if (e.preventDefault) e.preventDefault();
+      e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.style.backgroundColor = '#bfdbfe';
+      e.currentTarget.style.borderColor = '#3b82f6';
       return false;
+    }
+    
+    function handleDragLeave(e) {
+      e.currentTarget.style.backgroundColor = '#e5e7eb';
+      e.currentTarget.style.borderColor = '#9ca3af';
     }
 
     function handleDrop(e) {
-      if (e.stopPropagation) e.stopPropagation();
       e.preventDefault();
+      e.stopPropagation();
       
-      const correctPos = e.dataTransfer.getData('text/html');
-      const dropZone = e.target.closest('.drop-zone');
+      const correctPos = e.dataTransfer.getData('pieceId');
+      const dropZone = e.currentTarget;
       
-      if (!dropZone || dropZone.querySelector('.puzzle-piece')) return;
+      // Check if zone is already filled
+      if (dropZone.querySelector('.puzzle-piece')) {
+        playSound('wrong');
+        dropZone.style.backgroundColor = '#fecaca';
+        dropZone.style.borderColor = '#f87171';
+        setTimeout(() => {
+          dropZone.style.backgroundColor = '#e5e7eb';
+          dropZone.style.borderColor = '#9ca3af';
+        }, 200);
+        return false;
+      }
       
       moves++;
       document.getElementById('moves').textContent = moves;
       
       const piece = document.querySelector(`[data-correct-position="${correctPos}"]`);
       
-      if (dropZone.dataset.position === correctPos) {
-        // Correct placement
+      if (dropZone.dataset.position == correctPos) {
+        // ✅ CORRECT placement
         playSound('correct');
         piece.classList.add('correct');
         piece.draggable = false;
+        piece.style.cursor = 'default';
+        piece.style.transform = 'none';
+        piece.style.margin = '0';
+        piece.style.width = '100%';
+        piece.style.height = '100%';
+        piece.style.borderRadius = '0';
+        
+        dropZone.style.backgroundColor = '#dcfce7';
+        dropZone.style.borderColor = '#22c55e';
+        dropZone.style.border = 'none';
         dropZone.appendChild(piece);
         
         piecesPlaced++;
         document.getElementById('piecesPlaced').textContent = piecesPlaced;
         document.getElementById('piecesLeft').textContent = (gridSize * gridSize) - piecesPlaced;
         
+        // 🎉 Check if puzzle is complete
         if (piecesPlaced === gridSize * gridSize) {
           setTimeout(() => {
             clearInterval(timerInterval);
@@ -294,36 +374,104 @@
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
             const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            const calculatedPoints = Math.floor((60 - elapsed) * 2 + moves * 1.5 + 50);
             
-            // Play celebration sound first
             playSound('complete');
             
-            // Show popup after a short delay
             setTimeout(() => {
               Swal.fire({
                 icon: 'success',
-                title: '🎉 Congratulations!',
+                title: '🎉 Puzzle Complete!',
                 html: `
-                  <p class="text-lg mb-2">Puzzle completed!</p>
-                  <p class="text-gray-600">Time: ${timeStr}</p>
-                  <p class="text-gray-600">Moves: ${moves}</p>
+                  <p class="text-lg mb-2">Great job!</p>
+                  <p class="text-gray-600">Time: <strong>${timeStr}</strong></p>
+                  <p class="text-gray-600">Moves: <strong>${moves}</strong></p>
+                  <p class="text-2xl font-bold text-green-600 mt-3">+${calculatedPoints}! 🎯</p>
                 `,
                 confirmButtonColor: '#14b8a6',
-                confirmButtonText: 'Play Again'
+                confirmButtonText: 'Save & Dashboard',
+                showCancelButton: true,
+                cancelButtonText: 'Play Again',
+                cancelButtonColor: '#6b7280'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  savePuzzleScore(moves, calculatedPoints, elapsed);
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                  location.reload();
+                }
               });
             }, 200);
           }, 500);
         }
       } else {
-        // Wrong placement - piece returns
+        // ❌ Wrong placement - piece snaps back
         playSound('wrong');
+        dropZone.style.backgroundColor = '#fee2e2';
+        dropZone.style.borderColor = '#ef4444';
+        
         setTimeout(() => {
-          piece.style.transform = 'translateX(-10px)';
-          setTimeout(() => piece.style.transform = '', 100);
-        }, 100);
+          dropZone.style.backgroundColor = '#e5e7eb';
+          dropZone.style.borderColor = '#9ca3af';
+          piece.style.opacity = '1';
+        }, 200);
       }
       
       return false;
+    }
+
+    // 💾 Save Puzzle Score
+    async function savePuzzleScore(moves, points, duration) {
+      try {
+        const response = await fetch('/api/games/save-score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            gameType: 'puzzle-therapy',
+            score: moves,
+            points: points,
+            duration: duration,
+            difficulty: gridSize <= 3 ? 'easy' : gridSize <= 5 ? 'medium' : 'hard',
+            accuracy: Math.max(0, Math.floor((1 - (moves - (gridSize * gridSize)) / (gridSize * gridSize)) * 100))
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem('pointsUpdated', Date.now().toString());
+          Swal.fire({
+            icon: 'success',
+            title: '✅ Score Saved!',
+            html: `
+              <p class="text-lg mb-2">Great puzzle solving!</p>
+              <p class="text-3xl font-bold text-green-600 mb-2">+${points} Points!</p>
+              <p class="text-gray-600">Total Points: ${data.totalPoints}</p>
+            `,
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'View Dashboard',
+            allowOutsideClick: false
+          }).then(() => {
+            window.location.href = '/user/dashboard';
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message || 'Failed to save score',
+            confirmButtonColor: '#14b8a6'
+          });
+        }
+      } catch (error) {
+        console.error('Save error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Connection Error',
+          text: 'Failed to save. Check your connection.',
+          confirmButtonColor: '#14b8a6'
+        });
+      }
     }
   </script>
 </body>

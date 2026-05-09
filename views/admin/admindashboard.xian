@@ -3,740 +3,749 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow Admin</title>
+  <title>{{title}} - Telengrow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-fade-in-down {
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .animate-slide-in-left {
+      animation: slideInLeft 0.6s ease-out;
+    }
+
+    /* LIGHT YELLOW-GREEN THEME - MINSU STYLE */
+    .sidebar {
+      animation: slideInLeft 0.6s ease-out;
+      background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+      border-right: 1px solid rgba(0, 150, 136, 0.15);
+    }
+
+    .sidebar-header {
+      background: rgba(0, 150, 136, 0.08);
+      border-bottom: 1px solid rgba(0, 150, 136, 0.15);
+    }
+
+    .sidebar-link {
+      transition: all 0.3s ease;
+      color: #2C3E50;
+      border-left: 3px solid transparent;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+      background-color: rgba(0, 150, 136, 0.1);
+      border-left-color: #009688;
+      color: #009688;
+      box-shadow: inset 0 0 10px rgba(0, 150, 136, 0.08);
+    }
+
+    .sidebar-link.active {
+      background-color: rgba(0, 150, 136, 0.12);
+      border-left-color: #009688;
+      color: #009688;
+      font-weight: 600;
+      box-shadow: inset 0 0 10px rgba(0, 150, 136, 0.08);
+    }
+
+    .sidebar-profile {
+      background: rgba(0, 150, 136, 0.05);
+      border-top: 1px solid rgba(0, 150, 136, 0.15);
+    }
+
+    /* STAT CARDS - LIGHT THEME */
+    .stat-card {
+      animation: fadeInUp 0.6s ease-out backwards;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 12px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 150, 136, 0.12);
+      border-color: rgba(0, 150, 136, 0.3);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #009688;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #2C3E50;
+    }
+
+    /* CARDS */
+    .card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 20px rgba(0, 150, 136, 0.12);
+      border-color: rgba(0, 150, 136, 0.3);
+    }
+
+    /* NAVBAR */
+    .navbar-clean {
+      background: linear-gradient(to right, #FFFFFF, #F5F5F5);
+      border-bottom: 1px solid rgba(0, 150, 136, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* CHART STYLES */
+    .chart-container {
+      position: relative;
+      height: 400px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+      border: 1px solid rgba(0, 150, 136, 0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      background-color: rgba(0, 150, 136, 0.1);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #009688, #00796B);
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* TABLE STYLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background-color: rgba(0, 150, 136, 0.08);
+      border-bottom: 1px solid rgba(0, 150, 136, 0.15);
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #009688;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tbody td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(0, 150, 136, 0.1);
+      color: #2C3E50;
+    }
+
+    tbody tr:hover {
+      background-color: rgba(0, 150, 136, 0.05);
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      background: linear-gradient(135deg, #009688, #00796B);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary:hover {
+      background-color: #00796B;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: #F5F5F5;
+      color: #2C3E50;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 150, 136, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background-color: #E8E8E8;
+      border-color: rgba(0, 150, 136, 0.3);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <!-- Top Navigation -->
-  <nav class="bg-white border-b border-gray-200 shadow-sm p-4 sticky top-0 z-50">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <button onclick="toggleSidebar()" class="text-gray-600 hover:text-purple-600 transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-        <h1 class="text-2xl font-bold text-purple-600">🔐 Admin Dashboard</h1>
+<body class="bg-gradient-to-br from-white via-green-50 to-green-100 min-h-screen text-gray-800">
+  <!-- Sidebar -->
+  <div class="sidebar fixed left-0 top-0 w-64 h-screen overflow-y-auto">
+    <!-- Logo -->
+    <div class="sidebar-header p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <h1 class="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
       </div>
-      <div class="space-x-4 flex items-center">
-        <span class="text-gray-700">👤 {{user.name}}</span>
-        <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="flex">
-    <!-- Sidebar (Pushes content when open) -->
-    <aside id="adminSidebar" class="w-64 bg-white border-r border-gray-200 min-h-screen fixed top-16 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out z-40">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</h3>
-          <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <nav class="space-y-2">
-          <a href="#overview" onclick="scrollToSection('overview')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition">
-            <span class="text-xl">📊</span>
-            <span class="font-medium">Overview</span>
-          </a>
-          
-          <a href="#pending-counselors" onclick="scrollToSection('pending-counselors')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-yellow-50 text-gray-700 hover:text-yellow-600 transition">
-            <span class="text-xl">⏳</span>
-            <span class="font-medium">Pending Approvals</span>
-          </a>
-          
-          <a href="#users" onclick="scrollToSection('users')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600 transition">
-            <span class="text-xl">👥</span>
-            <span class="font-medium">Regular Users</span>
-          </a>
-          
-          <a href="#counselors" onclick="scrollToSection('counselors')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition">
-            <span class="text-xl">👨‍⚕️</span>
-            <span class="font-medium">Counselors</span>
-          </a>
-          
-          <a href="#activity-timeline" onclick="scrollToSection('activity-timeline')" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600 transition">
-            <span class="text-xl">📈</span>
-            <span class="font-medium">Activity Timeline</span>
-          </a>
-          
-          <div class="border-t border-gray-200 my-4"></div>
-          
-          <a href="/admin/analytics" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
-            <span class="text-xl">📊</span>
-            <span class="font-medium">Data Analytics</span>
-          </a>
-          
-          <a href="/admin/settings" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition">
-            <span class="text-xl">⚙️</span>
-            <span class="font-medium">Settings</span>
-          </a>
-        </nav>
-      </div>
-    </aside>
-
-    <!-- Main Content (Adjusts when sidebar opens) -->
-    <main id="mainContent" class="w-full p-6 transition-all duration-300 ease-in-out">
-    <div id="overview" class="mb-8">
-      <h2 class="text-3xl font-bold text-gray-900">Welcome, Admin {{user.name}}! 👨‍💼</h2>
-      <p class="text-gray-600 mt-1">Comprehensive user activity monitoring and analytics</p>
+      <p class="text-xs text-slate-600 font-medium text-center">Admin Dashboard</p>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="text-4xl mb-2">👥</div>
-        <div class="text-3xl font-bold">{{stats.totalUsers}}</div>
-        <div class="text-sm text-blue-100">Total Users</div>
-      </div>
+    <!-- Navigation -->
+    <nav class="mt-6 px-3 space-y-1">
+      <a href="/admin/dashboard" class="sidebar-link active block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2z"></path>
+        </svg>
+        <span>Users</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-link block px-4 py-3 rounded-lg mb-1 flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+        </svg>
+        <span>Analytics</span>
+      </a>
 
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="text-4xl mb-2">🎮</div>
-        <div class="text-3xl font-bold">{{stats.totalGames}}</div>
-        <div class="text-sm text-purple-100">Games Played</div>
-      </div>
+    </nav>
 
-      <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="text-4xl mb-2">📔</div>
-        <div class="text-3xl font-bold">{{stats.totalJournals}}</div>
-        <div class="text-sm text-pink-100">Journal Entries</div>
+    <!-- User Profile -->
+    <div class="sidebar-profile absolute bottom-0 left-0 right-0 p-4">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center font-bold text-white">
+          {{substring user.name 0 1}}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-sm text-gray-800 truncate">{{user.name}}</div>
+          <div class="text-xs text-gray-500">Administrator</div>
+        </div>
       </div>
-
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="text-4xl mb-2">📚</div>
-        <div class="text-3xl font-bold">{{stats.totalReadingSessions}}</div>
-        <div class="text-sm text-orange-100">Reading Sessions</div>
-      </div>
-
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="text-4xl mb-2">✨</div>
-        <div class="text-3xl font-bold">{{stats.activeToday}}</div>
-        <div class="text-sm text-green-100">Active Today</div>
-      </div>
+      <a href="/logout" class="btn-secondary w-full text-center py-2 text-sm">Logout</a>
     </div>
-
-    <!-- Pending Counselor Approvals -->
-    {{#if pendingCounselors.length}}
-    <div id="pending-counselors" class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 mb-8">
-      <h3 class="text-xl font-bold text-yellow-900 mb-4">⏳ Pending Counselor Approvals</h3>
-      <div class="space-y-3">
-        {{#each pendingCounselors}}
-        <div class="bg-white border-2 border-yellow-200 rounded-lg p-4">
-          <div class="flex justify-between items-start">
-            <div>
-              <h4 class="font-bold text-gray-900 text-lg">{{this.name}}</h4>
-              <p class="text-sm text-gray-600">{{this.email}}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="approveCounselor({{this.id}})" 
-                      class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm font-medium">
-                ✓ Approve
-              </button>
-              <button onclick="rejectCounselor({{this.id}})" 
-                      class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm font-medium">
-                ✗ Reject
-              </button>
-            </div>
-          </div>
-        </div>
-        {{/each}}
-      </div>
-    </div>
-    {{/if}}
-
-    <!-- Regular Users Activity Monitoring -->
-    <div id="users" class="bg-white rounded-xl shadow-lg p-6 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold text-gray-900">👥 Regular Users Activity</h3>
-        <button onclick="toggleUserMonitoring()" id="toggleMonitoringBtn" 
-                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-          Hide User Activities ▲
-        </button>
-      </div>
-      
-      <div id="userMonitoringSection">
-      {{#each users}}
-      <div class="border-2 border-gray-200 rounded-xl p-6 mb-6 hover:border-purple-300 transition">
-        <!-- User Header -->
-        <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-              {{substring this.name 0 1}}
-            </div>
-            <div>
-              <h4 class="text-xl font-bold text-gray-900">{{this.name}}</h4>
-              <p class="text-sm text-gray-600">{{this.email}}</p>
-              <div class="flex gap-3 mt-2 text-xs">
-                {{#if this.progress}}
-                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded">Level {{this.progress.level}}</span>
-                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">⭐ {{this.progress.totalPoints}} pts</span>
-                {{/if}}
-                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                  {{#if this.lastActive}}Last active: {{formatDate this.lastActive}}{{else}}Never{{/if}}
-                </span>
-              </div>
-            </div>
-          </div>
-          <a href="/admin/users/{{this.id}}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm font-medium">
-            View Details →
-          </a>
-        </div>
-
-        <!-- Activity Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div class="bg-purple-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">🎮</div>
-            <div class="text-2xl font-bold text-purple-600">{{this.gameSessions.length}}</div>
-            <div class="text-xs text-gray-600">Games Played</div>
-            {{#if this.totalGameTime}}
-            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalGameTime}}</div>
-            {{/if}}
-          </div>
-          
-          <div class="bg-pink-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">📔</div>
-            <div class="text-2xl font-bold text-pink-600">{{this.journalEntries.length}}</div>
-            <div class="text-xs text-gray-600">Journal Entries</div>
-          </div>
-          
-          <div class="bg-orange-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">📚</div>
-            <div class="text-2xl font-bold text-orange-600">{{this.readingSessions.length}}</div>
-            <div class="text-xs text-gray-600">Reading Sessions</div>
-            {{#if this.totalReadingTime}}
-            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalReadingTime}}</div>
-            {{/if}}
-          </div>
-        </div>
-
-        <!-- Recent Activities Toggle -->
-        <button onclick="toggleUserActivities('user-{{this.id}}')" 
-                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-sm font-medium transition">
-          Show Detailed Activities ▼
-        </button>
-
-        <!-- Recent Activities (Hidden by default) -->
-        <div id="user-{{this.id}}" class="hidden mt-4 space-y-3">
-          
-          <!-- Recent Games -->
-          {{#if this.gameSessions.length}}
-          <div class="bg-purple-50 rounded-lg p-4">
-            <h5 class="font-bold text-purple-900 mb-3 flex items-center justify-between">
-              <span>🎮 Recent Games ({{this.gameSessions.length}})</span>
-              <span class="text-xs font-normal text-purple-700">Total: {{formatDuration this.totalGameTime}}</span>
-            </h5>
-            <div class="space-y-2">
-              {{#each this.gameSessions}}
-              <div class="bg-white rounded p-3 text-sm border-l-4 border-purple-400">
-                <div class="flex justify-between items-start mb-1">
-                  <div class="flex-1">
-                    <div class="font-semibold text-purple-700">{{formatGameName this.gameType}}</div>
-                    <div class="text-xs text-gray-600 mt-1 space-x-2">
-                      {{#if this.score}}
-                      <span class="inline-block bg-purple-100 px-2 py-0.5 rounded">Score: {{this.score}}</span>
-                      {{/if}}
-                      {{#if this.duration}}
-                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">⏱️ {{formatDuration this.duration}}</span>
-                      {{/if}}
-                      {{#if this.difficulty}}
-                      <span class="inline-block bg-yellow-100 px-2 py-0.5 rounded">{{this.difficulty}}</span>
-                      {{/if}}
-                      {{#if this.completed}}
-                      <span class="inline-block bg-green-100 px-2 py-0.5 rounded">✓ Completed</span>
-                      {{else}}
-                      <span class="inline-block bg-gray-100 px-2 py-0.5 rounded">Incomplete</span>
-                      {{/if}}
-                    </div>
-                  </div>
-                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
-                </div>
-              </div>
-              {{/each}}
-            </div>
-          </div>
-          {{else}}
-          <div class="bg-purple-50 rounded-lg p-4 text-center text-purple-600">
-            <div class="text-3xl mb-2">🎮</div>
-            <p class="text-sm">No games played yet</p>
-          </div>
-          {{/if}}
-
-          <!-- Recent Journals -->
-          {{#if this.journalEntries.length}}
-          <div class="bg-pink-50 rounded-lg p-4">
-            <h5 class="font-bold text-pink-900 mb-3 flex items-center justify-between">
-              <span>📔 Recent Journal Entries ({{this.journalEntries.length}})</span>
-            </h5>
-            <div class="space-y-2">
-              {{#each this.journalEntries}}
-              <div class="bg-white rounded p-3 text-sm border-l-4 border-pink-400">
-                <div class="flex justify-between items-start mb-1">
-                  <div class="flex-1">
-                    <div class="font-semibold text-pink-700">{{this.title}}</div>
-                    <div class="text-xs text-gray-600 mt-1 space-x-2">
-                      <span class="inline-block bg-pink-100 px-2 py-0.5 rounded">Mood: {{this.mood}}</span>
-                      {{#if this.wordCount}}
-                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">{{this.wordCount}} words</span>
-                      {{/if}}
-                      {{#if this.isPrivate}}
-                      <span class="inline-block bg-gray-100 px-2 py-0.5 rounded">🔒 Private</span>
-                      {{/if}}
-                    </div>
-                  </div>
-                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
-                </div>
-              </div>
-              {{/each}}
-            </div>
-          </div>
-          {{else}}
-          <div class="bg-pink-50 rounded-lg p-4 text-center text-pink-600">
-            <div class="text-3xl mb-2">📔</div>
-            <p class="text-sm">No journal entries yet</p>
-          </div>
-          {{/if}}
-
-          <!-- Recent Reading -->
-          {{#if this.readingSessions.length}}
-          <div class="bg-orange-50 rounded-lg p-4">
-            <h5 class="font-bold text-orange-900 mb-3 flex items-center justify-between">
-              <span>📚 Recent Reading Sessions ({{this.readingSessions.length}})</span>
-              <span class="text-xs font-normal text-orange-700">Total: {{formatDuration this.totalReadingTime}}</span>
-            </h5>
-            <div class="space-y-2">
-              {{#each this.readingSessions}}
-              <div class="bg-white rounded p-3 text-sm border-l-4 border-orange-400">
-                <div class="flex justify-between items-start mb-1">
-                  <div class="flex-1">
-                    <div class="font-semibold text-orange-700">{{this.material.title}}</div>
-                    <div class="text-xs text-gray-600 mt-1 space-x-2">
-                      <span class="inline-block bg-orange-100 px-2 py-0.5 rounded">{{this.material.fileType}}</span>
-                      {{#if this.duration}}
-                      <span class="inline-block bg-blue-100 px-2 py-0.5 rounded">⏱️ {{formatDuration this.duration}}</span>
-                      {{/if}}
-                      {{#if this.completed}}
-                      <span class="inline-block bg-green-100 px-2 py-0.5 rounded">✓ Completed</span>
-                      {{/if}}
-                    </div>
-                  </div>
-                  <span class="text-xs text-gray-500 ml-2">{{formatDate this.createdAt}}</span>
-                </div>
-              </div>
-              {{/each}}
-            </div>
-          </div>
-          {{else}}
-          <div class="bg-orange-50 rounded-lg p-4 text-center text-orange-600">
-            <div class="text-3xl mb-2">📚</div>
-            <p class="text-sm">No reading sessions yet</p>
-          </div>
-          {{/if}}
-
-        </div>
-      </div>
-      {{else}}
-      <div class="text-center text-gray-500 py-12">
-        <div class="text-6xl mb-4">👥</div>
-        <p class="text-lg">No users yet</p>
-      </div>
-      {{/each}}
-    </div>
-    </div>
-
-    <!-- Counselors Activity Monitoring -->
-    <div id="counselors" class="bg-white rounded-xl shadow-lg p-6 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold text-gray-900">👨‍⚕️ Counselors Activity</h3>
-        <button onclick="toggleCounselorMonitoring()" id="toggleCounselorBtn" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-          Hide Counselor Activities ▲
-        </button>
-      </div>
-      
-      <div id="counselorMonitoringSection">
-      {{#each counselors}}
-      <div class="border-2 border-blue-200 rounded-xl p-6 mb-6 hover:border-blue-400 transition">
-        <!-- Counselor Header -->
-        <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-              {{substring this.name 0 1}}
-            </div>
-            <div>
-              <h4 class="text-xl font-bold text-gray-900">{{this.name}}</h4>
-              <p class="text-sm text-gray-600">{{this.email}}</p>
-              <div class="flex gap-3 mt-2 text-xs">
-                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">👨‍⚕️ Counselor</span>
-                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                  {{#if this.lastActive}}Last active: {{formatDate this.lastActive}}{{else}}Never{{/if}}
-                </span>
-              </div>
-            </div>
-          </div>
-          <a href="/admin/users/{{this.id}}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">
-            View Details →
-          </a>
-        </div>
-
-        <!-- Activity Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div class="bg-blue-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">🎮</div>
-            <div class="text-2xl font-bold text-blue-600">{{this.gameSessions.length}}</div>
-            <div class="text-xs text-gray-600">Games Played</div>
-            {{#if this.totalGameTime}}
-            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalGameTime}}</div>
-            {{/if}}
-          </div>
-          
-          <div class="bg-cyan-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">📔</div>
-            <div class="text-2xl font-bold text-cyan-600">{{this.journalEntries.length}}</div>
-            <div class="text-xs text-gray-600">Journal Entries</div>
-          </div>
-          
-          <div class="bg-teal-50 rounded-lg p-4">
-            <div class="text-2xl mb-1">📚</div>
-            <div class="text-2xl font-bold text-teal-600">{{this.readingSessions.length}}</div>
-            <div class="text-xs text-gray-600">Reading Sessions</div>
-            {{#if this.totalReadingTime}}
-            <div class="text-xs text-gray-500 mt-1">⏱️ {{formatDuration this.totalReadingTime}}</div>
-            {{/if}}
-          </div>
-        </div>
-      </div>
-      {{else}}
-      <div class="text-center text-gray-500 py-12">
-        <div class="text-6xl mb-4">👨‍⚕️</div>
-        <p class="text-lg">No counselors yet</p>
-      </div>
-      {{/each}}
-    </div>
-    </div>
-
-    <!-- System-Wide Activity Timeline -->
-    <div id="activity-timeline" class="bg-white rounded-xl shadow-lg p-6 mb-8">
-      <h3 class="text-xl font-bold text-gray-900 mb-6">📊 System-Wide Activity Timeline</h3>
-      
-      <!-- Activity Tabs -->
-      <div class="flex gap-2 mb-6 border-b border-gray-200">
-        <button onclick="showActivityTab('all')" id="tab-all" class="activity-tab px-4 py-2 font-medium text-purple-600 border-b-2 border-purple-600">
-          All Activities
-        </button>
-        <button onclick="showActivityTab('games')" id="tab-games" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
-          🎮 Games
-        </button>
-        <button onclick="showActivityTab('journals')" id="tab-journals" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
-          📔 Journals
-        </button>
-        <button onclick="showActivityTab('reading')" id="tab-reading" class="activity-tab px-4 py-2 font-medium text-gray-600 hover:text-purple-600">
-          📚 Reading
-        </button>
-      </div>
-
-      <!-- All Activities -->
-      <div id="activity-all" class="activity-content">
-        <div class="space-y-3 max-h-96 overflow-y-auto">
-          {{#each recentGameSessions}}
-          <div class="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">🎮</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} played {{formatGameName this.gameType}}</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    {{#if this.score}}Score: {{this.score}} • {{/if}}
-                    {{#if this.duration}}Duration: {{formatDuration this.duration}} • {{/if}}
-                    {{#if this.completed}}✓ Completed{{else}}Incomplete{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{/each}}
-          
-          {{#each recentJournals}}
-          <div class="bg-pink-50 rounded-lg p-4 border-l-4 border-pink-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">📔</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} wrote a journal entry</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    "{{this.title}}" • Mood: {{this.mood}}
-                    {{#if this.wordCount}} • {{this.wordCount}} words{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{/each}}
-          
-          {{#each recentReading}}
-          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">📚</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} read "{{this.material.title}}"</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    {{this.material.fileType}}
-                    {{#if this.duration}} • {{formatDuration this.duration}}{{/if}}
-                    {{#if this.completed}} • ✓ Completed{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{/each}}
-        </div>
-      </div>
-
-      <!-- Games Only -->
-      <div id="activity-games" class="activity-content hidden">
-        <div class="space-y-3 max-h-96 overflow-y-auto">
-          {{#each recentGameSessions}}
-          <div class="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">🎮</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} played {{formatGameName this.gameType}}</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    {{#if this.score}}Score: {{this.score}} • {{/if}}
-                    {{#if this.duration}}Duration: {{formatDuration this.duration}} • {{/if}}
-                    Difficulty: {{this.difficulty}} • 
-                    {{#if this.completed}}✓ Completed{{else}}Incomplete{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{else}}
-          <div class="text-center text-gray-500 py-8">
-            <div class="text-4xl mb-2">🎮</div>
-            <p>No game sessions yet</p>
-          </div>
-          {{/each}}
-        </div>
-      </div>
-
-      <!-- Journals Only -->
-      <div id="activity-journals" class="activity-content hidden">
-        <div class="space-y-3 max-h-96 overflow-y-auto">
-          {{#each recentJournals}}
-          <div class="bg-pink-50 rounded-lg p-4 border-l-4 border-pink-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">📔</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} wrote a journal entry</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    "{{this.title}}" • Mood: {{this.mood}}
-                    {{#if this.wordCount}} • {{this.wordCount}} words{{/if}}
-                    {{#if this.isPrivate}} • 🔒 Private{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{else}}
-          <div class="text-center text-gray-500 py-8">
-            <div class="text-4xl mb-2">📔</div>
-            <p>No journal entries yet</p>
-          </div>
-          {{/each}}
-        </div>
-      </div>
-
-      <!-- Reading Only -->
-      <div id="activity-reading" class="activity-content hidden">
-        <div class="space-y-3 max-h-96 overflow-y-auto">
-          {{#each recentReading}}
-          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-500">
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div class="text-2xl">📚</div>
-                <div>
-                  <div class="font-semibold text-gray-900">{{this.User.name}} read "{{this.material.title}}"</div>
-                  <div class="text-sm text-gray-600 mt-1">
-                    {{this.material.fileType}}
-                    {{#if this.duration}} • {{formatDuration this.duration}}{{/if}}
-                    {{#if this.completed}} • ✓ Completed{{/if}}
-                  </div>
-                </div>
-              </div>
-              <span class="text-xs text-gray-500">{{formatDate this.createdAt}}</span>
-            </div>
-          </div>
-          {{else}}
-          <div class="text-center text-gray-500 py-8">
-            <div class="text-4xl mb-2">📚</div>
-            <p>No reading sessions yet</p>
-          </div>
-          {{/each}}
-        </div>
-      </div>
-    </div>
-
   </div>
-  </main>
+
+  <!-- Main Content -->
+  <div class="ml-64 min-h-screen bg-gradient-to-br from-white via-green-50 to-yellow-50">
+    <!-- Top Navigation -->
+    <nav class="navbar-clean sticky top-0 z-30">
+      <div class="container mx-auto flex justify-between items-center px-6 py-4">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="text-right">
+            <p class="text-sm font-semibold text-gray-800">{{user.name}}</p>
+            <p class="text-xs text-gray-600">Admin</p>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mx-auto p-6">
+      <!-- Welcome Header -->
+      <div class="mb-8 animate-fade-in-down">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome Back, {{user.name}}</h1>
+        <p class="text-gray-600">📊 System Overview • {{stats.totalUsers}} users • {{stats.totalGames}} games • {{stats.activeToday}} active today</p>
+      </div>
+
+      <!-- Main Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+          <p class="stat-label">Total Users</p>
+          <p class="stat-value mt-2">{{stats.totalUsers}}</p>
+          <p class="text-sm text-gray-600 mt-2">Active accounts</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+          <p class="stat-label">Active Today</p>
+          <p class="stat-value mt-2">{{stats.activeToday}}</p>
+          <p class="text-sm text-gray-600 mt-2">Users online</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.3s;">
+          <p class="stat-label">7-Day Retention</p>
+          <p class="stat-value mt-2">{{stats.retention7Days}}%</p>
+          <p class="text-sm text-gray-600 mt-2">{{stats.activeUsers7Days}} users active</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.35s;">
+          <p class="stat-label">30-Day Retention</p>
+          <p class="stat-value mt-2">{{stats.retention30Days}}%</p>
+          <p class="text-sm text-gray-600 mt-2">{{stats.activeUsers30Days}} users active</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.4s;">
+          <p class="stat-label">Total Activity</p>
+          <p class="stat-value mt-2">{{add stats.totalGames stats.totalJournals stats.totalReadingSessions}}</p>
+          <p class="text-sm text-gray-600 mt-2">All interactions</p>
+        </div>
+      </div>
+
+      <!-- Secondary Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.45s;">
+          <p class="stat-label">Games Played</p>
+          <p class="stat-value mt-2">{{stats.totalGames}}</p>
+          <p class="text-sm text-gray-600 mt-2">Sessions completed</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.5s;">
+          <p class="stat-label">Journal Entries</p>
+          <p class="stat-value mt-2">{{stats.totalJournals}}</p>
+          <p class="text-sm text-gray-600 mt-2">User reflections</p>
+        </div>
+        <div class="stat-card p-6 animate-fade-in-up" style="animation-delay: 0.55s;">
+          <p class="stat-label">Reading Sessions</p>
+          <p class="stat-value mt-2">{{stats.totalReadingSessions}}</p>
+          <p class="text-sm text-gray-600 mt-2">Materials consumed</p>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- User Activity Chart -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.1s;">
+          <div class="p-6 border-b border-green-100">
+            <h2 class="text-lg font-bold text-gray-800">Game Activity (Last 7 Days)</h2>
+            <p class="text-sm text-gray-600 mt-1">Total sessions: {{stats.totalGames}}</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="userActivityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Game Performance Chart -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.2s;">
+          <div class="p-6 border-b border-green-100">
+            <h2 class="text-lg font-bold text-gray-800">Game Distribution</h2>
+            <p class="text-sm text-gray-600 mt-1">{{#if gameStats}}{{gameStats.length}} game types{{else}}No data{{/if}}</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="gameChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Activity Distribution -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.3s;">
+          <div class="p-6 border-b border-green-100">
+            <h2 class="text-lg font-bold text-gray-800">Activity Distribution</h2>
+            <p class="text-sm text-gray-600 mt-1">By content type</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="platformChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Engagement Rate -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.4s;">
+          <div class="p-6 border-b border-green-100">
+            <h2 class="text-lg font-bold text-gray-800">Engagement Metrics</h2>
+            <p class="text-sm text-gray-600 mt-1">Activity per user</p>
+          </div>
+          <div class="p-6 space-y-4">
+            <script>
+              const totalUsers = {{stats.totalUsers}} || 1;
+              const totalGames = {{stats.totalGames}};
+              const totalJournals = {{stats.totalJournals}};
+              const totalReadings = {{stats.totalReadingSessions}};
+              
+              const gamesPerUser = Math.min(100, Math.round((totalGames / totalUsers) * 100));
+              const journalsPerUser = Math.min(100, Math.round((totalJournals / totalUsers) * 100));
+              const readingsPerUser = Math.min(100, Math.round((totalReadings / totalUsers) * 100));
+              const totalActivities = totalGames + totalJournals + totalReadings;
+            </script>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-800">Game Sessions</span>
+                <span class="text-gray-600">{{stats.totalGames}} total</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="gameBar" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-800">Journal Activity</span>
+                <span class="text-gray-600">{{stats.totalJournals}} total</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="journalBar" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-800">Reading Engagement</span>
+                <span class="text-gray-600">{{stats.totalReadingSessions}} total</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="readingBar" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-semibold text-gray-800">Overall Activity</span>
+                <span class="text-gray-600" id="totalActivitySpan">0 activities</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="overallBar" style="width: 100%;"></div>
+              </div>
+            </div>
+            <script>
+              document.getElementById('gameBar').style.width = gamesPerUser + '%';
+              document.getElementById('journalBar').style.width = journalsPerUser + '%';
+              document.getElementById('readingBar').style.width = readingsPerUser + '%';
+              document.getElementById('totalActivitySpan').textContent = totalActivities + ' activities';
+            </script>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Sections Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent Users -->
+        <div class="lg:col-span-2 card animate-fade-in-up" style="animation-delay: 0.5s;">
+          <div class="p-6 border-b border-green-100">
+            <h2 class="text-lg font-bold text-gray-800">Recent Users</h2>
+            <p class="text-sm text-gray-600 mt-1">Latest registered members</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each users}}
+                {{#lt @index 5}}
+                <tr>
+                  <td class="font-semibold">{{this.name}}</td>
+                  <td>{{this.email}}</td>
+                  <td><span class="text-xs px-2 py-1 bg-teal-100 text-teal-700 rounded border border-teal-300">{{this.role}}</span></td>
+                  <td class="text-sm">{{formatDate this.createdAt}}</td>
+                  <td><a href="/admin/users/{{this.id}}" class="text-teal-600 hover:text-teal-800">View</a></td>
+                </tr>
+                {{/lt}}
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="space-y-6">
+          <!-- System Status - REAL DATA -->
+          <div class="card p-6 animate-fade-in-up" style="animation-delay: 0.6s;">
+            <h3 class="font-bold text-gray-800 mb-4">System Status</h3>
+            <div class="space-y-3">
+              <!-- Server Status -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">Server</span>
+                <span class="text-xs font-bold {{system.server.statusColor}} px-2 py-1 rounded border">
+                  ✓ Online
+                </span>
+              </div>
+              
+              <!-- Database Status -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">Database</span>
+                <span class="text-xs font-bold {{system.database.statusColor}} px-2 py-1 rounded border">
+                  {{#eq system.database.status 'connected'}}✓ Connected{{else}}✗ Error{{/eq}}
+                </span>
+              </div>
+              
+              <!-- Memory Usage -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">Memory</span>
+                <span class="text-xs font-bold {{system.memory.statusColor}} px-2 py-1 rounded">
+                  {{system.memory.usagePercent}}% ({{system.memory.used}}/{{system.memory.total}}MB)
+                </span>
+              </div>
+              
+              <!-- CPU Usage -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">CPU</span>
+                <span class="text-xs font-bold {{system.cpu.statusColor}} px-2 py-1 rounded">
+                  {{system.cpu.currentUsagePercent}}% ({{system.cpu.cores}} cores)
+                </span>
+              </div>
+              
+              <!-- Uptime -->
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">Uptime</span>
+                <span class="text-xs font-bold text-gray-600 bg-gray-200 px-2 py-1 rounded border border-gray-300">{{system.server.uptime}}</span>
+              </div>
+              
+              <!-- Overall Health -->
+              <div class="mt-4 pt-4 border-t border-green-100">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-semibold text-gray-800">Overall Health</span>
+                  <span class="text-xs font-bold {{#eq system.overallHealth.overall 'healthy'}}text-teal-600 bg-teal-100 border-teal-300{{else}}{{#eq system.overallHealth.overall 'warning'}}text-orange-600 bg-orange-100 border-orange-300{{else}}text-red-600 bg-red-100 border-red-300{{/eq}}{{/eq}} px-2 py-1 rounded border">
+                    {{#eq system.overallHealth.overall 'healthy'}}✓ Healthy{{else}}{{#eq system.overallHealth.overall 'warning'}}⚠ Warning{{else}}✗ Critical{{/eq}}{{/eq}}
+                  </span>
+                </div>
+                <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-gradient-to-r {{#eq system.overallHealth.overall 'healthy'}}from-teal-400 to-teal-500{{else}}{{#eq system.overallHealth.overall 'warning'}}from-orange-400 to-orange-500{{else}}from-red-400 to-red-500{{/eq}}{{/eq}} h-2 rounded-full" style="width: {{system.overallHealth.score}}%"></div>
+                </div>
+                <p class="text-xs text-gray-600 mt-1">{{system.overallHealth.score}}% system performance</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Engagement Metrics -->
+          <div class="card p-6 animate-fade-in-up" style="animation-delay: 0.65s;">
+            <h3 class="font-bold text-gray-800 mb-4">Engagement & Retention</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">7-Day Active</span>
+                <span class="text-sm font-bold text-teal-600">{{stats.activeUsers7Days}}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">7-Day Retention</span>
+                <span class="text-sm font-bold text-teal-600">{{stats.retention7Days}}%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">30-Day Active</span>
+                <span class="text-sm font-bold text-teal-600">{{stats.activeUsers30Days}}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-700">30-Day Retention</span>
+                <span class="text-sm font-bold text-teal-600">{{stats.retention30Days}}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="card p-6 animate-fade-in-up" style="animation-delay: 0.7s;">
+            <h3 class="font-bold text-gray-800 mb-4">Quick Links</h3>
+            <div class="space-y-2">
+              <a href="/admin/users" class="block text-sm text-teal-600 hover:text-teal-800 py-1">👥 View All Users</a>
+              <a href="/admin/analytics" class="block text-sm text-teal-600 hover:text-teal-800 py-1">📊 Full Analytics</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script>
-    // Toggle sidebar
-    function toggleSidebar() {
-      const sidebar = document.getElementById('adminSidebar');
-      const mainContent = document.getElementById('mainContent');
+    // Real chart configurations
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            font: { size: 12, weight: '600' },
+            color: '#cbd5e1',
+            padding: 15
+          }
+        },
+        filler: {
+          propagate: true
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', font: { size: 11 } }
+        },
+        y: {
+          grid: { color: 'rgba(16, 185, 129, 0.1)', drawBorder: false },
+          ticks: { color: '#9ca3af', font: { size: 11 } }
+        }
+      }
+    };
+
+    // Prepare data from server
+    const allRecentGames = [
+      {{#each recentGameSessions}}
+      {createdAt: '{{this.createdAt}}'},
+      {{/each}}
+    ].filter(g => g.createdAt);
+    
+    const allGameStats = [
+      {{#each gameStats}}
+      {gameType: '{{this.gameType}}', count: {{this.count}} },
+      {{/each}}
+    ].filter(g => g.gameType);
+
+    // User Activity Chart - Using real game data from last 7 days
+    const userActivityCtx = document.getElementById('userActivityChart');
+    if (userActivityCtx) {
+      // Group by date for last 7 days
+      const last7Days = [];
+      const today = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        last7Days.push(date.toISOString().split('T')[0]);
+      }
       
-      if (sidebar.classList.contains('-translate-x-full')) {
-        // Show sidebar and push content
-        sidebar.classList.remove('-translate-x-full');
-        sidebar.classList.add('translate-x-0');
-        mainContent.classList.add('ml-64');
-      } else {
-        // Hide sidebar and restore content
-        sidebar.classList.add('-translate-x-full');
-        sidebar.classList.remove('translate-x-0');
-        mainContent.classList.remove('ml-64');
-      }
-    }
-
-    // Smooth scroll to section
-    function scrollToSection(sectionId) {
-      event.preventDefault();
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Close sidebar after navigation on mobile
-        toggleSidebar();
-      }
-    }
-
-    // Toggle entire user monitoring section
-    function toggleUserMonitoring() {
-      const section = document.getElementById('userMonitoringSection');
-      const button = document.getElementById('toggleMonitoringBtn');
+      const activityByDate = {};
+      last7Days.forEach(date => activityByDate[date] = 0);
       
-      if (section.classList.contains('hidden')) {
-        section.classList.remove('hidden');
-        button.textContent = 'Hide User Activities ▲';
-        button.classList.remove('bg-green-600', 'hover:bg-green-700');
-        button.classList.add('bg-purple-600', 'hover:bg-purple-700');
-      } else {
-        section.classList.add('hidden');
-        button.textContent = 'Show User Activities ▼';
-        button.classList.remove('bg-purple-600', 'hover:bg-purple-700');
-        button.classList.add('bg-green-600', 'hover:bg-green-700');
-      }
-    }
-
-    // Toggle entire counselor monitoring section
-    function toggleCounselorMonitoring() {
-      const section = document.getElementById('counselorMonitoringSection');
-      const button = document.getElementById('toggleCounselorBtn');
-      
-      if (section.classList.contains('hidden')) {
-        section.classList.remove('hidden');
-        button.textContent = 'Hide Counselor Activities ▲';
-        button.classList.remove('bg-green-600', 'hover:bg-green-700');
-        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      } else {
-        section.classList.add('hidden');
-        button.textContent = 'Show Counselor Activities ▼';
-        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        button.classList.add('bg-green-600', 'hover:bg-green-700');
-      }
-    }
-
-    // Toggle user activities
-    function toggleUserActivities(userId) {
-      const element = document.getElementById(userId);
-      const button = event.target;
-      
-      if (element.classList.contains('hidden')) {
-        element.classList.remove('hidden');
-        button.textContent = 'Hide Activities ▲';
-      } else {
-        element.classList.add('hidden');
-        button.textContent = 'Show Detailed Activities ▼';
-      }
-    }
-
-    // Activity tab switching
-    function showActivityTab(tabName) {
-      // Hide all activity contents
-      document.querySelectorAll('.activity-content').forEach(content => {
-        content.classList.add('hidden');
+      allRecentGames.forEach(game => {
+        const gameDate = new Date(game.createdAt).toISOString().split('T')[0];
+        if (activityByDate.hasOwnProperty(gameDate)) {
+          activityByDate[gameDate]++;
+        }
       });
       
-      // Remove active state from all tabs
-      document.querySelectorAll('.activity-tab').forEach(tab => {
-        tab.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
-        tab.classList.add('text-gray-600');
+      new Chart(userActivityCtx, {
+        type: 'line',
+        data: {
+          labels: last7Days.map(d => new Date(d).toLocaleDateString('en-US', {weekday: 'short'})),
+          datasets: [{
+            label: 'Game Sessions',
+            data: last7Days.map(d => activityByDate[d]),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#0f172a',
+            pointBorderWidth: 2
+          }]
+        },
+        options: chartOptions
+      });
+    }
+
+    // Game Performance Chart - Using real gameStats data
+    const gameCtx = document.getElementById('gameChart');
+    if (gameCtx) {
+      const gameLabels = allGameStats.map(g => {
+        const gameName = g.gameType 
+          ? g.gameType.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          : 'Unknown';
+        return gameName;
       });
       
-      // Show selected content
-      document.getElementById('activity-' + tabName).classList.remove('hidden');
+      const gameCounts = allGameStats.map(g => parseInt(g.count) || 0);
       
-      // Activate selected tab
-      const activeTab = document.getElementById('tab-' + tabName);
-      activeTab.classList.remove('text-gray-600');
-      activeTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
-    }
-
-    // Counselor approval functions
-    async function approveCounselor(userId) {
-      if (!confirm('Approve this counselor account?')) return;
+      const colors = ['#10b981', '#059669', '#047857', '#065f46'];
       
-      try {
-        const response = await fetch(`/admin/counselor/approve/${userId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (response.ok) {
-          alert('✅ Counselor approved!');
-          location.reload();
-        } else {
-          alert('❌ Error approving counselor');
+      new Chart(gameCtx, {
+        type: 'doughnut',
+        data: {
+          labels: gameLabels.length > 0 ? gameLabels : ['No Data'],
+          datasets: [{
+            data: gameCounts.length > 0 ? gameCounts : [1],
+            backgroundColor: gameLabels.length > 0 
+              ? gameLabels.map((_, i) => colors[i % colors.length])
+              : ['#cbd5e1'],
+            borderColor: '#0f172a',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          ...chartOptions,
+          scales: {}
         }
-      } catch (error) {
-        alert('❌ Failed to approve counselor');
-      }
+      });
     }
 
-    async function rejectCounselor(userId) {
-      const reason = prompt('Reason for rejection (optional):');
-      if (reason === null) return;
-      
-      try {
-        const response = await fetch(`/admin/counselor/reject/${userId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: reason || 'No reason provided' })
-        });
-        
-        if (response.ok) {
-          alert('✅ Counselor rejected');
-          location.reload();
-        } else {
-          alert('❌ Error rejecting counselor');
-        }
-      } catch (error) {
-        alert('❌ Failed to reject counselor');
-      }
+    // Activity Distribution Chart - Based on activity types
+    const platformCtx = document.getElementById('platformChart');
+    if (platformCtx) {
+      new Chart(platformCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Games', 'Journals', 'Reading'],
+          datasets: [{
+            label: 'Total Activities',
+            data: [
+              {{stats.totalGames}},
+              {{stats.totalJournals}},
+              {{stats.totalReadingSessions}}
+            ],
+            backgroundColor: ['#10b981', '#059669', '#047857'],
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: chartOptions
+      });
     }
 
+    function formatDate(date) {
+      if (!date) return 'N/A';
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('✓ Admin Dashboard with Real System Data Loaded');
+    });
   </script>
 </body>
 </html>

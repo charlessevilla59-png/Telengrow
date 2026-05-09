@@ -3,14 +3,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 - Page Not Found</title>
+  <title>404 - Page Not Found | Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes swing {
+      0%, 100% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(-5deg);
+      }
+      75% {
+        transform: rotate(5deg);
+      }
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .animate-swing {
+      animation: swing 2s ease-in-out infinite;
+      transform-origin: top center;
+    }
+
+    .animate-fade-in-scale {
+      animation: fadeInScale 0.6s ease-out;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+    }
+
+    .btn-secondary {
+      transition: all 0.3s ease;
+      border: 2px solid #16a34a;
+      color: #16a34a;
+    }
+
+    .btn-secondary:hover {
+      background: #f0fdf4;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <h1 class="text-9xl font-bold text-gray-300">404</h1>
-    <p class="text-2xl text-gray-600 mb-4">Page Not Found</p>
-    <a href="/" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">Go Home</a>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+  <!-- Animated Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-10 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative text-center max-w-2xl">
+    <!-- 404 Icon/Animation -->
+    <div class="mb-8 animate-fade-in-scale">
+      <div class="inline-block">
+        <div class="text-9xl md:text-10xl font-black gradient-text mb-4 animate-swing" style="letter-spacing: -0.02em;">
+          404
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Message -->
+    <div class="mb-8 animate-slide-up">
+      <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Oops! Page Not Found</h1>
+      <p class="text-lg text-gray-600 leading-relaxed">
+        We couldn't find the page you're looking for. It might have been moved, deleted, or you may have mistyped the URL.
+      </p>
+    </div>
+
+    <!-- Illustration -->
+    <div class="mb-12 animate-slide-up" style="animation-delay: 0.2s;">
+      <div class="inline-flex items-center justify-center space-x-2">
+        <svg class="w-16 h-16 text-green-600 animate-bounce" style="animation-delay: 0s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-gray-400">→</span>
+        <svg class="w-16 h-16 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style="animation-delay: 0.4s;">
+      <a href="/user/dashboard" class="btn-primary text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl inline-flex items-center justify-center transition">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m0 0l4 4m-4-4v4"></path>
+        </svg>
+        Back to Dashboard
+      </a>
+      
+      <a href="/" class="btn-secondary font-semibold py-3 px-8 rounded-xl hover:shadow-lg inline-flex items-center justify-center transition">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"></path>
+        </svg>
+        Go to Home
+      </a>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="bg-white bg-opacity-70 backdrop-blur rounded-2xl p-8 shadow-lg animate-slide-up" style="animation-delay: 0.6s;">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Helpful Links</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="/journal" class="group p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg hover:shadow-md transition">
+          <div class="text-3xl mb-2">📔</div>
+          <p class="font-semibold text-gray-800 text-sm group-hover:text-purple-600 transition">Journal</p>
+        </a>
+        
+        <a href="/reading" class="group p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg hover:shadow-md transition">
+          <div class="text-3xl mb-2">📚</div>
+          <p class="font-semibold text-gray-800 text-sm group-hover:text-blue-600 transition">Reading</p>
+        </a>
+        
+        <a href="/games" class="group p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg hover:shadow-md transition">
+          <div class="text-3xl mb-2">🎮</div>
+          <p class="font-semibold text-gray-800 text-sm group-hover:text-orange-600 transition">Games</p>
+        </a>
+        
+        <a href="/user/progress" class="group p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg hover:shadow-md transition">
+          <div class="text-3xl mb-2">📊</div>
+          <p class="font-semibold text-gray-800 text-sm group-hover:text-green-600 transition">Progress</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Contact Support -->
+    <div class="mt-10 text-gray-600 text-sm">
+      <p>Still need help? <a href="/user/dashboard" class="text-green-600 font-semibold hover:underline">Contact our support team</a></p>
+    </div>
   </div>
 </body>
 </html>

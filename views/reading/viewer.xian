@@ -11,8 +11,34 @@
       height: calc(100vh - 120px);
       border: none;
     }
+    
+    /* ✅ Video Player Styles */
+    .video-container {
+      width: 100%;
+      height: calc(100vh - 120px);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .video-player {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .video-error {
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+      background: #1a1a1a;
+    }
+    
     .library-sidebar {
-      width: 300px;
+      width: 350px;
       height: calc(100vh - 60px);
       overflow-y: auto;
       transition: transform 0.3s ease;
@@ -27,15 +53,112 @@
       margin-left: 0;
     }
     .book-item {
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-radius: 8px;
+      position: relative;
     }
     .book-item:hover {
-      transform: translateX(5px);
-      background-color: #f3f4f6;
+      transform: translateX(8px);
+      background-color: #f0fdf4;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
     }
     .book-item.active {
-      background-color: #dbeafe;
-      border-left: 4px solid #3b82f6;
+      background-color: #dcfce7;
+      border-left: 4px solid #16a34a;
+      padding-left: calc(0.75rem - 4px);
+    }
+    
+    .library-header {
+      background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+      padding-bottom: 1rem;
+    }
+
+    /* Custom scrollbar for library */
+    .library-sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .library-sidebar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .library-sidebar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .library-sidebar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111827;
+      }
+
+      .library-sidebar {
+        background-color: #1f2937;
+      }
+
+      .library-sidebar::-webkit-scrollbar-track {
+        background: #1f2937;
+      }
+
+      .library-sidebar::-webkit-scrollbar-thumb {
+        background: #4b5563;
+      }
+
+      .library-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #6b7280;
+      }
+
+      .book-item {
+        color: #f3f4f6;
+      }
+
+      .book-item:hover {
+        background-color: #064e3b;
+      }
+
+      .book-item.active {
+        background-color: #22c55e;
+        border-left-color: #4ade80;
+      }
+    }
+
+    /* Star Rating Styles */
+    .star-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .star-btn:hover .star-icon,
+    .star-btn.active .star-icon {
+      filter: brightness(1.2);
+      transform: scale(1.15);
+    }
+
+    .star-btn .star-icon {
+      transition: all 0.2s ease;
+      color: #fbbf24;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .star-btn.filled .star-icon {
+      color: #fbbf24;
+    }
+
+    .star-btn.hovered .star-icon {
+      color: #fbbf24;
+    }
+
+    .star-btn.empty .star-icon {
+      color: #d1d5db;
     }
   </style>
 </head>
@@ -63,18 +186,18 @@
     </div>
   </nav>
 
-  <div class="flex pt-16">
+  <div class="flex pt-16 h-screen">
     <!-- Library Sidebar -->
     <div id="librarySidebar" class="library-sidebar bg-white shadow-lg border-r border-gray-200 fixed left-0 z-40">
-      <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-500 to-blue-500">
+      <div class="library-header p-4 border-b border-gray-200">
         <h2 class="text-xl font-bold text-white flex items-center">
           <span class="text-2xl mr-2">📚</span>
           Library
         </h2>
-        <p class="text-sm text-white opacity-90 mt-1">Choose a book to read</p>
+        <p class="text-sm text-blue-100 mt-1">All Available Materials</p>
       </div>
       
-      <div class="p-4">
+      <div class="p-3">
         <div id="libraryBooks" class="space-y-2">
           <!-- Books will be loaded here -->
           <div class="text-center py-8 text-gray-500">
@@ -86,56 +209,159 @@
     </div>
 
     <!-- Main Content -->
-    <div id="mainContent" class="main-content flex-1" style="margin-left: 300px;">
+    <div id="mainContent" class="main-content flex flex-col flex-1" style="margin-left: 300px; margin-top: -64px;">
       <!-- Material Info -->
-      <div class="bg-white border-b border-gray-200 p-4">
-        <div class="container mx-auto">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h1 class="text-2xl font-bold text-gray-900 mb-2">{{material.title}}</h1>
-              <div class="flex items-center gap-4 text-sm text-gray-600">
-                <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-semibold">{{material.category}}</span>
-                <span>⏱️ {{material.readingTime}} min read</span>
-                <span>👁️ {{material.views}} views</span>
-                {{#if material.counselor}}
-                <span>👨‍💼 By {{material.counselor.name}}</span>
-                {{/if}}
-              </div>
-              {{#if material.excerpt}}
-              <p class="text-gray-600 mt-2">{{material.excerpt}}</p>
+      <div class="bg-white border-b border-gray-200 px-6 py-4 sticky top-16 z-30 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{material.title}}</h1>
+            <div class="flex items-center gap-3 flex-wrap text-sm text-gray-600">
+              <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-semibold text-xs">{{material.category}}</span>
+              <span class="inline-flex items-center gap-1">⏱️ <span>{{material.readingTime}} min</span></span>
+              <span class="inline-flex items-center gap-1">👁️ <span>{{material.views}} views</span></span>
+              {{#if material.counselor}}
+              <span class="inline-flex items-center gap-1">👨‍💼 <span>{{material.counselor.name}}</span></span>
               {{/if}}
             </div>
-            <div class="ml-4">
-              {{#if (eq material.fileType 'pdf')}}
-              <span class="text-5xl">📕</span>
-              {{else}}
-              <span class="text-5xl">📘</span>
-              {{/if}}
-            </div>
+          </div>
+          <div class="ml-4 text-5xl flex-shrink-0">
+            {{#if (eq material.fileType 'pdf')}}
+            📕
+            {{else if (eq material.fileType 'video')}}
+            🎥
+            {{else}}
+            📘
+            {{/if}}
           </div>
         </div>
       </div>
 
-      <!-- PDF/Document Viewer -->
-      <div class="container mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <!-- PDF/Document/Video Viewer -->
+      <div class="p-4 bg-gray-50 flex-1 overflow-hidden">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden h-full">
           {{#if (eq material.fileType 'pdf')}}
-          <!-- PDF Viewer - Use route that sets inline headers -->
+          <!-- PDF Viewer -->
           <iframe 
             src="/reading/file/{{material.id}}" 
             class="pdf-viewer"
             type="application/pdf">
-            <p class="p-8 text-center">
-              <span class="text-4xl mb-4 block">📕</span>
-              <span class="text-gray-600">Your browser doesn't support PDF viewing.</span><br>
-              <span class="text-sm text-gray-500 mt-2 block">Please try using Chrome, Firefox, or Edge browser.</span>
-            </p>
+            <div class="p-8 text-center">
+              <span class="text-6xl mb-4 block">📕</span>
+              <span class="text-gray-600 block mb-2">Your browser doesn't support PDF viewing.</span>
+              <span class="text-sm text-gray-500 block">Please try using Chrome, Firefox, or Edge browser.</span>
+            </div>
           </iframe>
+          {{else if (eq material.fileType 'video')}}
+          <!-- Video Player -->
+          <div class="video-container">
+            {{#if material.filePath}}
+              <!-- Uploaded Video File - Use HTML5 Video Player -->
+              <video 
+                id="videoPlayer"
+                class="video-player"
+                controls
+                controlsList="nodownload"
+                onload="console.log('✅ Uploaded video loaded')"
+                onerror="showVideoError('Uploaded video failed to load')">
+                <source src="{{material.filePath}}" type="video/mp4">
+                <source src="{{material.filePath}}" type="video/webm">
+                <source src="{{material.filePath}}" type="video/avi">
+                <source src="{{material.filePath}}" type="video/mov">
+                Your browser does not support the video tag. Please use Chrome, Firefox, Safari, or Edge.
+              </video>
+              <script>
+                console.log('🎥 Uploaded Video Player Loaded');
+                console.log('Video Path:', '{{material.filePath}}');
+                console.log('Video Duration:', {{material.videoDuration}} + ' seconds');
+                
+                const videoPlayer = document.getElementById('videoPlayer');
+                
+                function showVideoError(msg) {
+                  console.error('❌ ' + msg);
+                  const container = videoPlayer.parentElement;
+                  container.innerHTML = `
+                    <div class="video-error">
+                      <div class="text-6xl mb-4">🎥</div>
+                      <h3 class="text-2xl font-bold text-white mb-4">Video Player Error</h3>
+                      <p class="text-gray-300 mb-2">${msg}</p>
+                      <p class="text-sm text-gray-400 mb-4">File: <code class="bg-gray-800 px-2 py-1 rounded">{{material.fileName}}</code></p>
+                      <a href="/reading/file/{{material.id}}" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Download Video →
+                      </a>
+                    </div>
+                  `;
+                }
+                
+                // Check if video can be played
+                videoPlayer.addEventListener('error', function() {
+                  console.error('❌ Video error: ' + videoPlayer.error.message);
+                  showVideoError('Unable to play the video file: ' + videoPlayer.error.message);
+                });
+                
+                videoPlayer.addEventListener('canplay', function() {
+                  console.log('✅ Video can play successfully');
+                });
+              </script>
+            {{else if material.videoUrl}}
+              <!-- YouTube/Embedded Video - Use iframe -->
+              <iframe 
+                id="videoPlayer"
+                src="{{material.videoUrl}}" 
+                width="100%" 
+                height="100%"
+                class="video-player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                onerror="showVideoError('YouTube video failed to load')">
+              </iframe>
+              <script>
+                console.log('🎥 YouTube Video Player Loaded');
+                console.log('Video URL:', '{{material.videoUrl}}');
+                console.log('Video Duration:', {{material.videoDuration}} + ' seconds');
+                
+                const videoPlayer = document.getElementById('videoPlayer');
+                
+                function showVideoError(msg) {
+                  console.error('❌ ' + msg);
+                  const container = videoPlayer.parentElement;
+                  container.innerHTML = `
+                    <div class="video-error">
+                      <div class="text-6xl mb-4">🎥</div>
+                      <h3 class="text-2xl font-bold text-white mb-4">Video Player Error</h3>
+                      <p class="text-gray-300 mb-2">${msg}</p>
+                      <p class="text-sm text-gray-400 mb-4">Video URL: <code class="bg-gray-800 px-2 py-1 rounded">{{material.videoUrl}}</code></p>
+                      <a href="{{material.videoUrl}}" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Try Opening in New Tab →
+                      </a>
+                    </div>
+                  `;
+                }
+                
+                // Check if video URL is valid
+                if (!videoPlayer.src || videoPlayer.src === 'undefined' || videoPlayer.src.includes('undefined')) {
+                  console.error('❌ No valid video URL provided');
+                  showVideoError('Invalid video URL');
+                } else {
+                  videoPlayer.addEventListener('load', function() {
+                    console.log('✅ YouTube video loaded successfully');
+                  });
+                }
+              </script>
+            {{else}}
+              <!-- No Video Source -->
+              <div class="video-error">
+                <div class="text-6xl mb-4">🎥</div>
+                <h3 class="text-2xl font-bold text-white mb-4">No Video Available</h3>
+                <p class="text-gray-300 mb-2">This material does not have a video file or URL associated with it.</p>
+                <p class="text-sm text-gray-400">Please contact the counselor to add video content.</p>
+              </div>
+            {{/if}}
+          </div>
           {{else}}
-          <!-- Document Viewer (for DOC/DOCX) using Microsoft Office Online Viewer -->
-          <div class="bg-gray-50 p-4 text-center border-b">
+          <!-- Document Viewer (for DOC/DOCX) -->
+          <div class="bg-gray-50 p-4 text-center border-b h-12 flex items-center justify-center">
             <p class="text-sm text-gray-600">📘 Loading document...</p>
-            <p class="text-xs text-gray-500 mt-1">Please wait while the document loads (this may take a few seconds)</p>
           </div>
           <iframe 
             id="docViewer"
@@ -145,16 +371,13 @@
             <div class="p-8 text-center">
               <div class="text-6xl mb-4">📘</div>
               <h3 class="text-xl font-bold text-gray-800 mb-2">{{material.fileName}}</h3>
-              <p class="text-gray-600 mb-6">Unable to display document in your browser.</p>
+              <p class="text-gray-600 mb-2">Unable to display document in your browser.</p>
               <p class="text-sm text-gray-500">Please try refreshing the page or use a different browser.</p>
             </div>
           </iframe>
           <script>
-            // Use Microsoft Office Online Viewer (no download, pure viewing)
             const docViewer = document.getElementById('docViewer');
             const fileUrl = encodeURIComponent(window.location.origin + '/reading/file/{{material.id}}');
-            
-            // Microsoft Office Online Viewer - READ ONLY, NO DOWNLOAD
             docViewer.src = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
             console.log('Loading document with Office Online Viewer:', fileUrl);
             
@@ -165,13 +388,114 @@
           {{/if}}
         </div>
       </div>
+
+      <!-- Rating Section -->
+      <div class="p-4 bg-gray-50">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="border-b border-gray-200 px-6 py-5 bg-gradient-to-r from-amber-50 to-orange-50">
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <span>⭐</span>
+              Rate this {{material.fileType}}
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">How helpful was this content?</p>
+          </div>
+
+          <!-- 1-5 Star Rating System -->
+          <div class="px-6 py-6">
+            <div class="flex flex-col gap-6">
+              <!-- Star Rating Display -->
+              <div class="flex flex-col items-center gap-4">
+                <div class="flex gap-2" id="starRatingContainer">
+                  <button onclick="setStarRating(1)" class="star-btn transition-all" data-rating="1" title="Poor">
+                    <span class="text-4xl star-icon">☆</span>
+                  </button>
+                  <button onclick="setStarRating(2)" class="star-btn transition-all" data-rating="2" title="Fair">
+                    <span class="text-4xl star-icon">☆</span>
+                  </button>
+                  <button onclick="setStarRating(3)" class="star-btn transition-all" data-rating="3" title="Good">
+                    <span class="text-4xl star-icon">☆</span>
+                  </button>
+                  <button onclick="setStarRating(4)" class="star-btn transition-all" data-rating="4" title="Very Good">
+                    <span class="text-4xl star-icon">☆</span>
+                  </button>
+                  <button onclick="setStarRating(5)" class="star-btn transition-all" data-rating="5" title="Excellent">
+                    <span class="text-4xl star-icon">☆</span>
+                  </button>
+                </div>
+                <p class="text-sm text-gray-600" id="ratingLabel">Hover to rate</p>
+              </div>
+
+              <!-- Average Rating Display -->
+              <div id="averageRatingDisplay" class="text-center p-4 bg-gray-50 rounded-lg hidden">
+                <p class="text-sm text-gray-600">Community Rating</p>
+                <div class="flex justify-center gap-1 mt-2" id="averageStars">
+                  <span>★★★★☆</span>
+                </div>
+                <p class="text-sm text-gray-700 mt-2"><span id="averageRatingValue">0</span> out of 5 (<span id="totalRatingsCount">0</span> ratings)</p>
+              </div>
+
+              <!-- Your Rating Display -->
+              <div id="userRatingDisplay" class="p-4 bg-green-50 border border-green-200 rounded-lg hidden">
+                <p class="text-sm text-green-800 flex items-center gap-2">
+                  <span>✅</span>
+                  <span>Your rating: <strong id="userRatingValue">★★★★★</strong></span>
+                </p>
+              </div>
+
+              <!-- Rating Success Message -->
+              <div id="ratingSuccess" class="p-4 bg-green-50 border border-green-200 rounded-lg hidden">
+                <p class="text-sm text-green-800 flex items-center gap-2">
+                  <span>✅</span>
+                  <span>Thank you! Your rating has been saved.</span>
+                </p>
+              </div>
+
+              <!-- Rating Error Message -->
+              <div id="ratingError" class="p-4 bg-red-50 border border-red-200 rounded-lg hidden">
+                <p class="text-sm text-red-800 flex items-center gap-2">
+                  <span>❌</span>
+                  <span id="errorMessage">Error</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="p-4 bg-gray-50">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="border-b border-gray-200 px-6 py-5 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <span>💬</span>
+              Comments & Discussion
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">Share your thoughts about this material</p>
+          </div>
+
+          <!-- Comment Input -->
+          <div class="border-b border-gray-200 px-6 py-5 bg-gray-50">
+            <div id="commentInputArea"></div>
+          </div>
+
+          <!-- Comments List -->
+          <div id="commentsList" class="px-6 py-6 space-y-6 max-h-[600px] overflow-y-auto">
+            <div class="text-center py-8 text-gray-500">
+              <p class="text-sm">Loading comments...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Script for handling viewer and library -->
+  <!-- Script for handling viewer, library and comments -->
   <script>
     const currentMaterialId = {{material.id}};
+    const currentUserId = {{userId}};
     let libraryOpen = true;
+    let commentsLoaded = false;
+    const EMOJI_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '🔥'];
 
     // Toggle library sidebar
     function toggleLibrary() {
@@ -197,6 +521,7 @@
         const materials = await response.json();
         
         const libraryBooks = document.getElementById('libraryBooks');
+
         
         if (materials.length === 0) {
           libraryBooks.innerHTML = `
@@ -210,18 +535,19 @@
         
         libraryBooks.innerHTML = materials.map(material => `
           <a href="/reading/view/${material.id}" 
-             class="book-item block p-3 rounded-lg border border-gray-200 ${material.id === currentMaterialId ? 'active' : ''}"
+             class="book-item block p-3 rounded-lg ${material.id === currentMaterialId ? 'active border-l-4 border-l-blue-500' : 'border border-gray-200 hover:border-gray-300'}"
              title="${material.title}">
             <div class="flex items-start space-x-3">
-              <div class="text-2xl flex-shrink-0">
+              <div class="text-3xl flex-shrink-0 leading-none">
                 ${material.fileType === 'pdf' ? '📕' : '📘'}
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-sm text-gray-900 truncate">${material.title}</h3>
+                <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 leading-tight">${material.title}</h3>
                 <p class="text-xs text-gray-500 mt-1">${material.category}</p>
-                <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                  <span>⏱️ ${material.readingTime}min</span>
-                  <span>👁️ ${material.views}</span>
+                <div class="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                  <span class="inline-flex items-center">⏱️ <span class="ml-1">${material.readingTime || 5}min</span></span>
+                  <span>•</span>
+                  <span class="inline-flex items-center">👁️ <span class="ml-1">${material.views || 0}</span></span>
                 </div>
               </div>
             </div>
@@ -242,6 +568,15 @@
 
     // Load library on page load
     loadLibrary();
+    
+    // Initialize rating system
+    loadUserRating();
+    
+    // Initialize comment input
+    initCommentInput();
+    
+    // Load comments
+    loadComments();
 
     // Check if PDF loaded successfully
     const iframe = document.querySelector('iframe');
@@ -251,6 +586,557 @@
         const fileUrl = encodeURIComponent(window.location.origin + '/reading/file/{{material.id}}');
         iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
       };
+    }
+    // ==================== STAR RATING FUNCTIONALITY (1-5) ====================
+    
+    let userCurrentRating = null;
+    let hoveredRating = 0;
+
+    // Helper function to render stars
+    function renderStars(rating) {
+      return Array.from({ length: 5 }, (_, i) => i < rating ? '★' : '☆').join('');
+    }
+
+    // Load user rating and average rating
+    async function loadUserRating() {
+      try {
+        // Load user's rating
+        const userResponse = await fetch(`/api/materials/${currentMaterialId}/user-rating`);
+        const userData = await userResponse.json();
+        
+        if (userData.success && userData.rating) {
+          userCurrentRating = userData.rating;
+          updateStarDisplay(userData.rating, false);
+          
+          const userDisplay = document.getElementById('userRatingDisplay');
+          document.getElementById('userRatingValue').textContent = renderStars(userData.rating);
+          userDisplay.classList.remove('hidden');
+        }
+
+        // Load average rating
+        const avgResponse = await fetch(`/api/materials/${currentMaterialId}/ratings`);
+        const avgData = await avgResponse.json();
+        
+        if (avgData.success && avgData.averageRating) {
+          const avgDisplay = document.getElementById('averageRatingDisplay');
+          const avgRating = parseFloat(avgData.averageRating);
+          const totalRatings = avgData.totalRatings || 0;
+          
+          document.getElementById('averageRatingValue').textContent = avgRating.toFixed(1);
+          document.getElementById('totalRatingsCount').textContent = totalRatings;
+          avgDisplay.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Error loading rating:', error);
+      }
+    }
+
+    // Set star rating on hover/click
+    function setStarRating(rating) {
+      if (userCurrentRating) {
+        showError('You have already rated this material. Thank you for your feedback!');
+        return;
+      }
+
+      submitStarRating(rating);
+    }
+
+    // Update star display
+    function updateStarDisplay(rating, isHover = false) {
+      const buttons = document.querySelectorAll('.star-btn');
+      buttons.forEach((btn, index) => {
+        const btnRating = index + 1;
+        if (btnRating <= rating) {
+          btn.classList.add('filled');
+          btn.classList.remove('empty');
+          btn.innerHTML = '<span class="star-icon">★</span>';
+        } else {
+          btn.classList.remove('filled');
+          btn.classList.add('empty');
+          btn.innerHTML = '<span class="star-icon">☆</span>';
+        }
+      });
+
+      // Update label
+      const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+      document.getElementById('ratingLabel').textContent = labels[rating] || 'Hover to rate';
+    }
+
+    // Handle hover effect
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', (e) => {
+        if (!userCurrentRating) {
+          const rating = parseInt(e.currentTarget.dataset.rating);
+          hoveredRating = rating;
+          updateStarDisplay(rating, true);
+        }
+      });
+    });
+
+    // Reset on mouse leave
+    document.getElementById('starRatingContainer')?.addEventListener('mouseleave', () => {
+      if (userCurrentRating) {
+        updateStarDisplay(userCurrentRating, false);
+      } else {
+        hoveredRating = 0;
+        document.querySelectorAll('.star-btn').forEach(btn => {
+          btn.classList.remove('filled', 'hovered');
+          btn.classList.add('empty');
+          btn.innerHTML = '<span class="star-icon">☆</span>';
+        });
+        document.getElementById('ratingLabel').textContent = 'Hover to rate';
+      }
+    });
+
+    // Submit star rating
+    async function submitStarRating(rating) {
+      try {
+        const response = await fetch(`/api/materials/${currentMaterialId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: rating })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          userCurrentRating = rating;
+          updateStarDisplay(rating, false);
+          
+          // Show success message
+          const successDiv = document.getElementById('ratingSuccess');
+          successDiv.classList.remove('hidden');
+          document.getElementById('ratingError').classList.add('hidden');
+          
+          // Show user rating
+          const userDisplay = document.getElementById('userRatingDisplay');
+          document.getElementById('userRatingValue').textContent = renderStars(rating);
+          userDisplay.classList.remove('hidden');
+          
+          // Disable star buttons
+          document.querySelectorAll('.star-btn').forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+          });
+          
+          // Hide success after 3 seconds
+          setTimeout(() => {
+            successDiv.classList.add('hidden');
+          }, 3000);
+          
+          console.log('✅ Rating submitted:', rating, 'stars');
+        } else {
+          showError(data.error || 'Failed to submit rating');
+        }
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        showError('Failed to submit rating');
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      const errorDiv = document.getElementById('ratingError');
+      document.getElementById('errorMessage').textContent = message;
+      errorDiv.classList.remove('hidden');
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 4000);
+    }
+
+    // ==================== COMMENTS FUNCTIONALITY ====================
+    
+    function initCommentInput() {
+      const area = document.getElementById('commentInputArea');
+      area.innerHTML = `
+        <div class="flex gap-4">
+          <img src="/images/default-avatar.png" alt="You" class="w-10 h-10 rounded-full flex-shrink-0">
+          <div class="flex-1">
+            <textarea 
+              id="newCommentInput" 
+              placeholder="Share your thoughts about this material..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows="3"></textarea>
+            <div class="flex justify-end mt-2">
+              <button 
+                id="submitCommentBtn"
+                onclick="submitComment()"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+                Post Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitComment() {
+      const input = document.getElementById('newCommentInput');
+      const content = input.value.trim();
+
+      if (!content) {
+        alert('Please write a comment first');
+        return;
+      }
+
+      const btn = document.getElementById('submitCommentBtn');
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
+
+      try {
+        const response = await fetch(`/api/reading/${currentMaterialId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) throw new Error('Failed to post comment');
+
+        input.value = '';
+        await loadComments();
+      } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('Failed to post comment');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Post Comment';
+      }
+    }
+
+    async function loadComments() {
+      try {
+        const response = await fetch(`/api/reading/${currentMaterialId}/comments?page=1&limit=20`);
+        const data = await response.json();
+
+        const commentsList = document.getElementById('commentsList');
+          userRatingDisplay.classList.remove('hidden');
+          
+          // Disable rating buttons
+          document.querySelectorAll('#ratingContainer button').forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+          });
+          
+          // Highlight selected rating button
+          const buttons = document.querySelectorAll('#ratingContainer button');
+          if (buttons[ratingValue - 1]) {
+            buttons[ratingValue - 1].style.opacity = '1';
+            buttons[ratingValue - 1].classList.add('border-green-400', 'bg-green-50');
+          }
+          
+          // Hide success message after 3 seconds
+          setTimeout(() => {
+            successDiv.classList.add('hidden');
+          }, 3000);
+          
+          // Refresh materials list in parent window (if opened from materials page)
+          if (window.opener && window.opener.location.href.includes('/reading')) {
+            window.opener.location.reload();
+          }
+          
+          console.log('✅ Rating submitted successfully:', ratingMap[ratingValue].label);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        alert('Failed to submit rating');
+      }
+    }
+    // ==================== COMMENTS FUNCTIONALITY ====================
+    
+    function initCommentInput() {
+      const area = document.getElementById('commentInputArea');
+      area.innerHTML = `
+        <div class="flex gap-4">
+          <img src="/images/default-avatar.png" alt="You" class="w-10 h-10 rounded-full flex-shrink-0">
+          <div class="flex-1">
+            <textarea 
+              id="newCommentInput" 
+              placeholder="Share your thoughts about this material..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows="3"></textarea>
+            <div class="flex justify-end mt-2">
+              <button 
+                id="submitCommentBtn"
+                onclick="submitComment()"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+                Post Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitComment() {
+      const input = document.getElementById('newCommentInput');
+      const content = input.value.trim();
+
+      if (!content) {
+        alert('Please write a comment first');
+        return;
+      }
+
+      const btn = document.getElementById('submitCommentBtn');
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
+
+      try {
+        const response = await fetch(`/api/reading/${currentMaterialId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) throw new Error('Failed to post comment');
+
+        input.value = '';
+        await loadComments();
+      } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('Failed to post comment');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Post Comment';
+      }
+    }
+
+    async function loadComments() {
+      try {
+        const response = await fetch(`/api/reading/${currentMaterialId}/comments?page=1&limit=20`);
+        const data = await response.json();
+
+        const commentsList = document.getElementById('commentsList');
+
+        if (data.comments.length === 0) {
+          commentsList.innerHTML = `
+            <div class="text-center py-12 text-gray-500">
+              <div class="text-4xl mb-3">💬</div>
+              <p class="text-sm">No comments yet. Be the first to share your thoughts!</p>
+            </div>
+          `;
+          return;
+        }
+
+        commentsList.innerHTML = data.comments.map(comment => renderComment(comment)).join('');
+        commentsLoaded = true;
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        document.getElementById('commentsList').innerHTML = `
+          <div class="text-center py-8 text-red-500">
+            <p class="text-sm">Failed to load comments</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderComment(comment, isReply = false) {
+      const isOwnComment = comment.user.id === currentUserId;
+      const replyCount = comment.replies ? comment.replies.length : 0;
+
+      return `
+        <div class="border-l-4 border-gray-200 pl-4 pb-4 ${isReply ? 'ml-8' : ''}">
+          <div class="flex gap-3">
+            <!-- User Avatar -->
+            <img src="${comment.user.profilePicture || '/images/default-avatar.png'}" 
+                 alt="${comment.user.name}" 
+                 class="w-10 h-10 rounded-full flex-shrink-0">
+            
+            <!-- Comment Content -->
+            <div class="flex-1">
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="font-semibold text-gray-900">${comment.user.name}</h3>
+                  ${isOwnComment ? `
+                    <div class="flex gap-2">
+                      <button onclick="editComment(${comment.id})" class="text-xs text-blue-500 hover:text-blue-700">Edit</button>
+                      <button onclick="deleteComment(${comment.id})" class="text-xs text-red-500 hover:text-red-700">Delete</button>
+                    </div>
+                  ` : ''}
+                </div>
+                <p class="text-sm text-gray-700 mb-2">${escapeHtml(comment.content)}</p>
+                <p class="text-xs text-gray-500">${formatDate(comment.createdAt)}${comment.isEdited ? ' (edited)' : ''}</p>
+              </div>
+
+              <!-- Reactions -->
+              <div class="flex gap-2 mt-3">
+                <div class="flex flex-wrap gap-2">
+                  ${comment.reactions ? renderReactions(comment.reactions, comment.id) : ''}
+                </div>
+                <button onclick="toggleReactionPicker(${comment.id})" 
+                        class="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded hover:bg-gray-100 transition">
+                  😊
+                </button>
+                <button onclick="toggleReplyForm(${comment.id})" 
+                        class="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded hover:bg-gray-100 transition">
+                  Reply
+                </button>
+              </div>
+
+              <!-- Reaction Picker (Hidden) -->
+              <div id="reactionPicker_${comment.id}" class="hidden mt-3 p-3 bg-gray-50 rounded-lg flex gap-2">
+                ${EMOJI_REACTIONS.map(emoji => `
+                  <button onclick="addReaction(${comment.id}, '${emoji}')" 
+                          class="text-xl hover:scale-125 transition">
+                    ${emoji}
+                  </button>
+                `).join('')}
+              </div>
+
+              <!-- Reply Form (Hidden) -->
+              <div id="replyForm_${comment.id}" class="hidden mt-3">
+                <div class="flex gap-2">
+                  <textarea id="replyInput_${comment.id}"
+                            placeholder="Write a reply..."
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            rows="2"></textarea>
+                </div>
+                <div class="flex gap-2 mt-2">
+                  <button onclick="submitReply(${comment.id})"
+                          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded text-sm transition">
+                    Reply
+                  </button>
+                  <button onclick="toggleReplyForm(${comment.id})"
+                          class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-1 rounded text-sm transition">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <!-- Replies -->
+              ${comment.replies && comment.replies.length > 0 ? `
+                <div class="mt-4 space-y-4">
+                  ${comment.replies.map(reply => renderComment(reply, true)).join('')}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderReactions(reactions, commentId) {
+      if (reactions.length === 0) return '';
+
+      const grouped = {};
+      reactions.forEach(reaction => {
+        if (!grouped[reaction.emoji]) {
+          grouped[reaction.emoji] = { count: 0, users: [], hasReacted: false };
+        }
+        grouped[reaction.emoji].count++;
+        grouped[reaction.emoji].users.push(reaction.userId);
+        if (reaction.userId === currentUserId) {
+          grouped[reaction.emoji].hasReacted = true;
+        }
+      });
+
+      return Object.entries(grouped).map(([emoji, data]) => `
+        <button onclick="toggleReaction(${commentId}, '${emoji}')"
+                title="${data.users.map(u => u.name).join(', ')}"
+                class="flex items-center gap-1 px-3 py-1 rounded-full text-sm transition ${
+                  data.hasReacted ? 'bg-blue-100 border-2 border-blue-500' : 'bg-gray-100 border border-gray-300 hover:bg-gray-200'
+                }">
+          <span>${emoji}</span>
+          <span class="text-xs font-semibold">${data.count}</span>
+        </button>
+      `).join('');
+    }
+
+    async function addReaction(commentId, emoji) {
+      try {
+        await fetch(`/api/comments/${commentId}/react`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emoji })
+        });
+
+        // Hide picker and reload
+        document.getElementById(`reactionPicker_${commentId}`).classList.add('hidden');
+        await loadComments();
+      } catch (error) {
+        console.error('Error adding reaction:', error);
+      }
+    }
+
+    async function toggleReaction(commentId, emoji) {
+      await addReaction(commentId, emoji);
+    }
+
+    function toggleReactionPicker(commentId) {
+      const picker = document.getElementById(`reactionPicker_${commentId}`);
+      picker.classList.toggle('hidden');
+    }
+
+    function toggleReplyForm(commentId) {
+      const form = document.getElementById(`replyForm_${commentId}`);
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        document.getElementById(`replyInput_${commentId}`).focus();
+      }
+    }
+
+    async function submitReply(commentId) {
+      const input = document.getElementById(`replyInput_${commentId}`);
+      const content = input.value.trim();
+
+      if (!content) {
+        alert('Please write a reply first');
+        return;
+      }
+
+      try {
+        await fetch(`/api/reading/${currentMaterialId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content, parentCommentId: commentId })
+        });
+
+        input.value = '';
+        toggleReplyForm(commentId);
+        await loadComments();
+      } catch (error) {
+        console.error('Error posting reply:', error);
+        alert('Failed to post reply');
+      }
+    }
+
+    async function deleteComment(commentId) {
+      if (!confirm('Are you sure you want to delete this comment?')) return;
+
+      try {
+        await fetch(`/api/comments/${commentId}`, { method: 'DELETE' });
+        await loadComments();
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+        alert('Failed to delete comment');
+      }
+    }
+
+    function editComment(commentId) {
+      alert('Edit functionality coming soon');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      
+      return date.toLocaleDateString();
     }
   </script>
 </body>

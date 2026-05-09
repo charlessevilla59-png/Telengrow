@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .overlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .activity-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .activity-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(16, 185, 129, 0.1);
+      border-color: #10b981;
+    }
+
+    .profile-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #10b981;
+    }
+
+    .activity-badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      background: #f0fdf4;
+      color: #10b981;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 6px;
+      margin-top: 4px;
+      border: 1px solid #d1fae5;
+    }
+
+    .activity-badge.journal {
+      background: #dbeafe;
+      color: #0284c7;
+      border-color: #0ea5e9;
+    }
+
+    .activity-badge.game {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #22c55e;
+    }
+
+    .activity-badge.reading {
+      background: #fcd34d;
+      color: #92400e;
+      border-color: #fbbf24;
+    }
+
+    .activity-badge.fitness {
+      background: #d4d4f4;
+      color: #4f46e5;
+      border-color: #6366f1;
+    }
+
+    .activity-badge.video {
+      background: #fecdd3;
+      color: #be123c;
+      border-color: #f43f5e;
+    }
+
+    .activity-badge.comment {
+      background: #c7d2fe;
+      color: #3730a3;
+      border-color: #4f46e5;
+    }
+
+    .search-input {
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-primary {
+      background: #10b981;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .activity-stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      background: #f9fafb;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    .stat-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      color: #d1d5db;
+    }
+
+    @media (max-width: 768px) {
+      .activity-card {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  {{> sidebar}}
+  
+  <nav class="bg-white shadow-md p-4 sticky top-0 z-40 border-b-2 border-green-100">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-green-600 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold text-green-600">🌱 Tellngrow</h1>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-6">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">⚡ Students Activity</h1>
+      </div>
+      <p class="text-gray-600">Track and monitor student activities - Journal, Games, and more</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- Search by Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search by Name</label>
+          <input 
+            type="text" 
+            id="searchName" 
+            class="search-input w-full"
+            placeholder="Enter student name..."
+            onkeyup="filterActivities()"
+          />
+        </div>
+
+        <!-- Filter by Course -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Course</label>
+          <select 
+            id="filterCourse"
+            class="search-input w-full"
+            onchange="filterActivities()"
+          >
+            <option value="">All Courses</option>
+            <option value="CPE">CPE (Computer Engineering)</option>
+            <option value="IT">IT (Information Technology)</option>
+            <option value="BSFI">BSFI (Business Administration - Finance)</option>
+            <option value="BSENTREP">BSENTREP (Business Administration - Entrepreneurship)</option>
+            <option value="BEED">BEED (Bachelor of Elementary Education)</option>
+            <option value="EDUC">EDUC (Bachelor of Secondary Education)</option>
+            <option value="CRIM">CRIM (Criminology)</option>
+            <option value="TOURISM">TOURISM (Tourism)</option>
+            <option value="HM">HM (Hospitality Management)</option>
+          </select>
+        </div>
+
+        <!-- Filter by Year -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Year Level</label>
+          <select 
+            id="filterYear"
+            class="search-input w-full"
+            onchange="filterActivities()"
+          >
+            <option value="">All Years</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 pt-6 border-t">
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{totalStudents}}</p>
+          <p class="text-sm text-gray-600">Total Students</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{totalActivities}}</p>
+          <p class="text-sm text-gray-600">Total Activities</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{activeStudents}}</p>
+          <p class="text-sm text-gray-600">Active Students</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-600">{{todayActivities}}</p>
+          <p class="text-sm text-gray-600">Today's Activities</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities List -->
+    {{#if activities}}
+      <div id="activitiesContainer" class="grid grid-cols-1 gap-4">
+        {{#each activities}}
+        <div class="activity-card activity-row" data-name="{{this.studentName}}" data-course="{{this.course}}" data-year="{{this.year}}">
+          <div class="p-6">
+            <!-- Header Row -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-4 flex-1">
+                <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-green-200 bg-white flex items-center justify-center flex-shrink-0">
+                  {{#if this.profilePicture}}
+                    {{#if (eq (substring this.profilePicture 0 1) "/")}}
+                      <img src="{{this.profilePicture}}" alt="{{this.studentName}}" class="w-full h-full object-cover" />
+                    {{else}}
+                      <span class="text-3xl">{{this.profilePicture}}</span>
+                    {{/if}}
+                  {{else}}
+                    <span class="text-3xl text-gray-400">👤</span>
+                  {{/if}}
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{this.studentName}}</h3>
+                  <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded">{{this.course}}</span>
+                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded">{{this.year}}</span>
+                  </div>
+                </div>
+              </div>
+              <a href="/counselor/student-activity/{{this.studentId}}" class="btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                View Activity
+              </a>
+            </div>
+
+            <!-- Activities Badges -->
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-700 mb-2">Recent Activities:</p>
+              <div class="flex flex-wrap gap-2">
+                {{#if this.journalEntries}}
+                  <span class="activity-badge journal">📔 Journal ({{this.journalEntries}})</span>
+                {{/if}}
+                {{#if this.gameSessions}}
+                  <span class="activity-badge game">🎮 Games ({{this.gameSessions}})</span>
+                {{/if}}
+                {{#if this.readingSessions}}
+                  <span class="activity-badge reading">📚 Reading ({{this.readingSessions}})</span>
+                {{/if}}
+                {{#if this.fitnessSessions}}
+                  <span class="activity-badge fitness">💪 Fitness ({{this.fitnessSessions}})</span>
+                {{/if}}
+                {{#if this.videoWatches}}
+                  <span class="activity-badge video">🎥 Videos ({{this.videoWatches}})</span>
+                {{/if}}
+                {{#if (or this.comments this.reactions)}}
+                  <span class="activity-badge comment">💬 Comments & Reactions ({{add this.comments this.reactions}})</span>
+                {{/if}}
+              </div>
+            </div>
+
+            <!-- Activity Stats -->
+            <div class="activity-stats">
+              {{#if this.lastActivityDate}}
+              <div class="stat-item">
+                <span class="stat-label">Last Active:</span>
+                <span class="stat-value">{{formatDate this.lastActivityDate}}</span>
+              </div>
+              {{/if}}
+              {{#if this.totalActivities}}
+              <div class="stat-item">
+                <span class="stat-label">Total Activities:</span>
+                <span class="stat-value">{{this.totalActivities}}</span>
+              </div>
+              {{/if}}
+              {{#if this.streak}}
+              <div class="stat-item">
+                <span class="stat-label">Activity Streak:</span>
+                <span class="stat-value">{{this.streak}} days</span>
+              </div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+
+      <!-- Results Counter -->
+      <div class="mt-4 text-center text-sm text-gray-600">
+        Showing <span id="visibleCount">{{activities.length}}</span> of <span id="totalCount">{{totalStudents}}</span> students
+      </div>
+    {{else}}
+      <div class="bg-white rounded-xl shadow-md p-12">
+        <div class="empty-state">
+          <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">No Activities Found</h3>
+          <p class="text-gray-600">There are no student activities to display yet.</p>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('show');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
+    }
+
+    function filterActivities() {
+      const searchName = document.getElementById('searchName').value.toLowerCase();
+      const filterCourse = document.getElementById('filterCourse').value;
+      const filterYear = document.getElementById('filterYear').value;
+      const rows = document.querySelectorAll('.activity-row');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const course = row.getAttribute('data-course');
+        const year = row.getAttribute('data-year');
+
+        const matchesName = name.includes(searchName);
+        const matchesCourse = filterCourse === '' || course === filterCourse;
+        const matchesYear = filterYear === '' || year === filterYear;
+
+        if (matchesName && matchesCourse && matchesYear) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('visibleCount').textContent = visibleCount;
+    }
+
+    // Close sidebar when clicking overlay
+    document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking a link
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (!link.target || link.target === '') {
+          setTimeout(closeSidebar, 100);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

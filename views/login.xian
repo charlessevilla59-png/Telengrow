@@ -6,151 +6,516 @@
   <title>{{title}} - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .bg-pattern {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(120px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes floatBlob1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, -60px) scale(0.9); }
+      75% { transform: translate(-40px, -20px) scale(1.05); }
+    }
+
+    @keyframes floatBlob2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-30px, 40px) scale(0.95); }
+      50% { transform: translate(50px, 20px) scale(1.1); }
+      75% { transform: translate(30px, -40px) scale(1); }
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 60px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+      }
+      50% {
+        box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .animate-fade-in-down {
+      animation: fadeInDown 0.7s ease-out;
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.7s ease-out 0.1s backwards;
+    }
+
+    .animate-slide-in-right {
+      animation: slideInRight 1s ease-out;
+    }
+
+    .float-blob-1 {
+      animation: floatBlob1 8s ease-in-out infinite;
+    }
+
+    .float-blob-2 {
+      animation: floatBlob2 8s ease-in-out infinite;
+    }
+
+    .pulse-glow {
+      animation: pulse-glow 3s infinite;
+    }
+
+    .glow-effect {
+      animation: glow 4s ease-in-out infinite;
+    }
+
+    .bg-gradient-green {
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    }
+
+    /* Premium gradient background with image overlay */
+    .premium-bg {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 25%, #d1fae5 50%, #a7f3d0 75%, #6ee7b7 100%);
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
     }
     
+    /* Fallback gradient if image doesn't load - removed */
+
+    /* Glass morphism effect - Enhanced */
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Premium card styling */
+    .card-premium {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+      border: 1px solid rgba(16, 185, 129, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(16, 185, 129, 0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Enhanced input styling */
+    .input-smooth {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid rgba(16, 185, 129, 0.2);
+      color: #0f172a;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .input-smooth::placeholder {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .input-smooth:hover {
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+      transform: translateY(-2px);
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .input-smooth:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25), 0 8px 25px rgba(16, 185, 129, 0.25);
+      background-color: #ffffff;
+      transform: translateY(-3px);
+    }
+
+    /* Enhanced button styling */
+    .btn-smooth {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-smooth::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: translate(-50%, -50%);
+      transition: width 0.7s, height 0.7s;
+    }
+
+    .btn-smooth:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      border: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .btn-gradient:hover:not(:disabled) {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-gradient:active:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .btn-gradient:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Social button styling */
+    .btn-social {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 253, 244, 0.95));
+      border: 2px solid rgba(16, 185, 129, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-social:hover {
+      border-color: #10b981;
+      background: linear-gradient(135deg, rgba(240, 253, 244, 1), rgba(220, 252, 231, 1));
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-social:active {
+      transform: translateY(-1px);
+    }
+
+    /* Decorative blob styling */
+    .blob {
+      position: absolute;
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      opacity: 0.6;
+      filter: blur(40px);
+    }
+
+    .blob-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(110, 231, 183, 0.2));
+      top: -100px;
+      left: -100px;
+    }
+
+    .blob-2 {
+      width: 350px;
+      height: 350px;
+      background: linear-gradient(135deg, rgba(5, 150, 105, 0.25), rgba(16, 185, 129, 0.2));
+      bottom: -100px;
+      right: -100px;
+    }
+
+    .blob-3 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, rgba(4, 120, 87, 0.2), rgba(5, 150, 105, 0.15));
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Premium input focus class */
+    .input-focus {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 2px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .input-focus:hover {
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .input-focus:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2), 0 8px 25px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Label enhancement */
+    label {
+      display: block;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.3px;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Divider enhancement */
+    .divider-text {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      height: 1px;
+      position: relative;
+    }
+
     /* Mobile-first responsive design */
     @media (max-width: 768px) {
       .mobile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
       }
+
+      .blob {
+        display: none;
+      }
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    }
+
+    /* Success/Error message enhancement */
+    .alert-success {
+      background: linear-gradient(135deg, rgba(240, 253, 244, 0.98), rgba(220, 252, 231, 0.98));
+      border-left: 4px solid #10b981;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .alert-error {
+      background: linear-gradient(135deg, rgba(254, 242, 242, 0.98), rgba(254, 226, 226, 0.98));
+      border-left: 4px solid #ef4444;
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
     }
   </style>
 </head>
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen premium-bg relative overflow-hidden">
+  <!-- Floating Decorative Blobs -->
+  <div class="blob blob-1 float-blob-1"></div>
+  <div class="blob blob-2 float-blob-2"></div>
+  <div class="blob blob-3 hidden lg:block float-blob-1" style="animation-delay: 2s;"></div>
+
   <!-- Mobile Header (visible only on mobile) -->
-  <div class="lg:hidden mobile-header text-white py-8 px-6 text-center">
-    <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center shadow-lg mb-4">
-      <span class="text-4xl">🌱</span>
+  <div class="lg:hidden mobile-header text-white py-8 px-6 text-center animate-fade-in-down">
+    <div class="w-24 h-24 bg-white rounded-full mx-auto flex items-center justify-center shadow-2xl pulse-glow mb-4">
+      <img src="/images/logo.svg" alt="Telengrow" class="w-24 h-24">
     </div>
-    <h2 class="text-3xl font-bold mb-2">Tellngrow</h2>
-    <p class="text-sm opacity-90">Mental Wellness Platform</p>
+    <h2 class="text-4xl font-bold mb-3">Tellngrow</h2>
+    <p class="text-sm opacity-95 font-medium">Mindoro State University</p>
   </div>
 
   <div class="flex min-h-screen">
     <!-- Left Side - Login Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
-      <div class="w-full max-w-md">
-        <!-- Desktop Title (hidden on mobile) -->
-        <div class="hidden lg:block mb-8">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
-          <p class="text-gray-600">Sign in to continue to Tellngrow</p>
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 bg-white">
+      <div class="w-full max-w-md animate-fade-in-up">
+          <!-- Desktop Title (hidden on mobile) -->
+        <div class="hidden lg:block mb-10">
+          <h1 class="text-5xl font-bold text-gray-900 mb-3">Welcome Back</h1>
+          <p class="text-gray-700 text-lg font-semibold">Continue your wellness journey</p>
+          <div class="w-16 h-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mt-4"></div>
         </div>
 
         <!-- Mobile Title (visible only on mobile) -->
-        <div class="lg:hidden mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome Back!</h1>
-          <p class="text-sm text-gray-600">Sign in to continue</p>
+        <div class="lg:hidden mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p class="text-sm text-gray-700 font-semibold">Sign in to your account</p>
         </div>
         
         {{#if success_msg}}
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          {{success_msg}}
+        <div class="alert-success rounded-xl px-5 py-4 mb-6 text-sm animate-fade-in-up flex items-center gap-3">
+          <svg class="w-6 h-6 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span class="text-green-800">{{success_msg}}</span>
         </div>
         {{/if}}
         
         {{#if error_msg}}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          {{error_msg}}
+        <div class="alert-error rounded-xl px-5 py-4 mb-6 text-sm animate-fade-in-up flex items-start gap-3">
+          <svg class="w-6 h-6 flex-shrink-0 mt-0.5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <span class="text-red-800">{{error_msg}}</span>
         </div>
         {{/if}}
         
-        <form action="/login" method="POST" autocomplete="off" id="loginForm">
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
-            <input type="email" name="email" id="email" required 
-                   autocomplete="off"
-                   value="{{email}}"
-                   placeholder="Enter your email"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base">
+        <form action="/login" method="POST" autocomplete="off" id="loginForm" class="space-y-6">
+          <!-- Email Field -->
+          <div class="space-y-3">
+            <label for="email" class="text-gray-900">Email Address</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-green-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <input type="email" name="email" id="email" required 
+                     autocomplete="off"
+                     value="{{email}}"
+                     placeholder="your.email@example.com"
+                     class="input-smooth w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:outline-none text-base">
+            </div>
           </div>
           
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
-            <input type="password" name="password" id="password" required 
-                   autocomplete="new-password"
-                   placeholder="Enter your password"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base">
+          <!-- Password Field -->
+          <div class="space-y-3">
+            <label for="password" class="text-gray-900">Password</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-green-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <input type="password" name="password" id="password" required 
+                     autocomplete="new-password"
+                     placeholder="••••••••"
+                     class="input-smooth w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:outline-none text-base">
+            </div>
           </div>
           
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
-            <a href="#" class="text-xs sm:text-sm text-blue-600 hover:underline">Need to verify email?</a>
-            <a href="/forgot-password" class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:underline">Forgot Password?</a>
+          <!-- Verify Email & Forgot Password Links -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
+            <a href="#" class="text-sm text-emerald-600 hover:text-emerald-700 font-semibold transition hover:underline">Verify Email</a>
+            <a href="/forgot-password" class="text-sm text-gray-600 hover:text-emerald-600 font-semibold transition hover:underline">Forgot Password?</a>
           </div>
           
+          <!-- Sign In Button -->
           <button type="submit" id="loginBtn"
-                  class="w-full bg-purple-600 text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-purple-700 transition shadow-lg text-base">
-            <span id="btnText">Login</span>
-            <span id="btnLoading" class="hidden">Logging in...</span>
+                  class="btn-smooth btn-gradient w-full text-white py-4 rounded-xl font-bold shadow-lg text-lg mt-8 hover:shadow-2xl">
+            <span id="btnText" class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+              </svg>
+              Sign In
+            </span>
+            <span id="btnLoading" class="hidden flex items-center justify-center gap-2">
+              <svg class="animate-spin w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Signing in...
+            </span>
           </button>
         </form>
 
-        <!-- Divider -->
-        <div class="relative my-6">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-white text-gray-500">OR</span>
-          </div>
-        </div>
-
-        <!-- Google Sign-In Button (Firebase) -->
-        <button type="button" id="googleSignInBtn"
-           class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition shadow-sm text-base">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span id="googleBtnText">Sign in with Google</span>
-          <span id="googleBtnLoading" class="hidden">Signing in...</span>
-        </button>
-        
-        <div class="mt-6 text-center text-gray-600 text-sm">
-          Don't have an account? <a href="/register" class="text-purple-600 hover:underline font-semibold">Sign Up</a>
+        <!-- Sign Up Link -->
+        <div class="mt-10 text-center text-gray-600 text-sm border-t border-gray-200 pt-8">
+          Don't have an account? <a href="/register" class="text-emerald-600 hover:text-emerald-700 font-bold transition hover:underline ml-1">Create one</a>
         </div>
       </div>
     </div>
 
     <!-- Right Side - Branding (Desktop Only) -->
-    <div class="hidden lg:flex lg:w-1/2 bg-pattern items-center justify-center p-12">
-      <div class="text-center text-white">
-        <div class="mb-8">
-          <div class="w-32 h-32 bg-white rounded-full mx-auto flex items-center justify-center shadow-2xl">
-            <span class="text-6xl">🌱</span>
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-green items-center justify-center p-12 relative overflow-hidden">
+      <!-- Animated background elements -->
+      <div class="absolute top-10 left-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-20 right-10 w-56 h-56 bg-white opacity-10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+      
+      <div class="text-center text-white relative z-10 animate-slide-in-right">
+        <div class="mb-10">
+          <div class="w-40 h-40 bg-white rounded-full mx-auto flex items-center justify-center shadow-2xl pulse-glow transform hover:scale-105 transition duration-500">
+            <img src="/images/logo.svg" alt="Telengrow" class="w-40 h-40">
           </div>
         </div>
-        <h2 class="text-5xl font-bold mb-4">Tellngrow</h2>
-        <p class="text-xl mb-2 opacity-90">Mental Wellness Platform</p>
-        <p class="text-lg opacity-75">Your journey to better mental health starts here</p>
+        <h2 class="text-7xl font-bold mb-5">Tellngrow</h2>
+        <p class="text-3xl mb-3 opacity-95 font-semibold">Mindoro State University</p>
+        <p class="text-2xl opacity-80 mb-12 font-medium">Mental Health & Wellness Platform</p>
+        
+        <!-- Benefits list with smooth animations -->
+        <div class="space-y-4 text-left max-w-sm mx-auto">
+          <div class="flex items-center gap-4 opacity-90 hover:opacity-100 transition-opacity transform hover:translate-x-2">
+            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <span class="text-lg font-semibold">HIPAA Compliant & Secure</span>
+          </div>
+          <div class="flex items-center gap-4 opacity-90 hover:opacity-100 transition-opacity transform hover:translate-x-2">
+            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <span class="text-lg font-semibold">Your Privacy Protected</span>
+          </div>
+          <div class="flex items-center gap-4 opacity-90 hover:opacity-100 transition-opacity transform hover:translate-x-2">
+            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <span class="text-lg font-semibold">Official MSU Counseling System</span>
+          </div>
+          <div class="flex items-center gap-4 opacity-90 hover:opacity-100 transition-opacity transform hover:translate-x-2">
+            <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <span class="text-lg font-semibold">24/7 Student Wellness Support</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-    // Firebase configuration - these will be injected from server
-    const firebaseConfig = {
-      apiKey: "{{firebaseApiKey}}",
-      authDomain: "{{firebaseAuthDomain}}",
-      projectId: "{{firebaseProjectId}}",
-      storageBucket: "{{firebaseStorageBucket}}",
-      messagingSenderId: "{{firebaseMessagingSenderId}}",
-      appId: "{{firebaseAppId}}"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    // Handle form submission
+  <script>
+    // Handle regular form submission
     const form = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const btnText = document.getElementById('btnText');
@@ -161,87 +526,21 @@
       loginBtn.disabled = true;
       btnText.classList.add('hidden');
       btnLoading.classList.remove('hidden');
-      
-      console.log('Form submitted with email:', document.getElementById('email').value);
-      
-      // Form will submit normally, don't prevent default
     });
 
-    // Handle Google Sign-In
-    const googleSignInBtn = document.getElementById('googleSignInBtn');
-    const googleBtnText = document.getElementById('googleBtnText');
-    const googleBtnLoading = document.getElementById('googleBtnLoading');
+    // Input focus effects
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
 
-    googleSignInBtn.addEventListener('click', async () => {
-      try {
-        // Show loading state
-        googleSignInBtn.disabled = true;
-        googleBtnText.classList.add('hidden');
-        googleBtnLoading.classList.remove('hidden');
-
-        console.log('🔵 Starting Firebase Google Sign-In...');
-
-        // Sign in with Google popup
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-
-        console.log('✅ Firebase authentication successful:', user.email);
-
-        // Get the ID token
-        const idToken = await user.getIdToken();
-
-        console.log('🔑 Got Firebase ID token, sending to server...');
-
-        // Send the token to your backend
-        const response = await fetch('/auth/firebase/google', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            idToken: idToken,
-            email: user.email,
-            name: user.displayName,
-            photoURL: user.photoURL,
-            uid: user.uid
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          console.log('✅ Server authentication successful, redirecting...');
-          window.location.href = data.redirectUrl || '/user/dashboard';
-        } else {
-          console.error('❌ Server authentication failed:', data.error);
-          alert(data.error || 'Authentication failed. Please try again.');
-          
-          // Reset button state
-          googleSignInBtn.disabled = false;
-          googleBtnText.classList.remove('hidden');
-          googleBtnLoading.classList.add('hidden');
-        }
-      } catch (error) {
-        console.error('❌ Google Sign-In error:', error);
-        
-        let errorMessage = 'Failed to sign in with Google. Please try again.';
-        
-        if (error.code === 'auth/popup-closed-by-user') {
-          errorMessage = 'Sign-in cancelled. Please try again.';
-        } else if (error.code === 'auth/popup-blocked') {
-          errorMessage = 'Pop-up blocked. Please allow pop-ups for this site.';
-        }
-        
-        alert(errorMessage);
-        
-        // Reset button state
-        googleSignInBtn.disabled = false;
-        googleBtnText.classList.remove('hidden');
-        googleBtnLoading.classList.add('hidden');
-      }
+    emailInput.addEventListener('focus', function() {
+      this.parentElement.classList.add('opacity-100');
     });
-    
-    console.log('Login page ready with Firebase');
+
+    passwordInput.addEventListener('focus', function() {
+      this.parentElement.classList.add('opacity-100');
+    });
+
+    console.log('✅ Login page loaded - All features enabled');
   </script>
 </body>
 </html>

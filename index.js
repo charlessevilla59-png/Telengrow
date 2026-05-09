@@ -23,7 +23,6 @@
     SOFTWARE.
     */
 
-// Load environment variables FIRST
 import dotenv from 'dotenv';
 dotenv.config();
     
@@ -32,11 +31,17 @@ import path from "path";
 import session from "express-session";
 import flash from "connect-flash";
 import router from "./routes/index.js";
+import messageRoutes from "./routes/messageRoutes.js";
 import fs from 'fs';
 import hbs from "hbs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import passport from "./config/passport.js";
+import { syncModels, sequelize } from "./models/index.js";
+import { downloadFaceApiModels, getModelFileInfo } from "./utils/downloadFaceApiModels.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { initializeSocketHandlers } from "./utils/socketManager.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,6 +70,22 @@ app.use(passport.session());
 
 app.use(flash());
 app.use(express.static(path.join(process.cwd(), "public")));
+app.use('/models', express.static(path.join(process.cwd(), "public", "models"), {
+  setHeaders: (res, filePath) => {
+    // Set correct headers for model files
+    if (filePath.endsWith('.json')) {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'max-age=86400'); // 24 hours
+    } else if (filePath.endsWith('.bin') || filePath.endsWith('-shard1') || filePath.match(/-shard\d+$/)) {
+      // Handle both old .bin files and new .shard1 files
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Cache-Control', 'max-age=86400'); // 24 hours
+    } else {
+      // Default binary type
+      res.setHeader('Content-Type', 'application/octet-stream');
+    }
+  }
+}));
 
 app.engine("xian", async (filePath, options, callback) => {
   try {
@@ -134,12 +155,42 @@ app.engine("xian", async (filePath, options, callback) => {
       return a < b;
     });
 
+    hbs.handlebars.registerHelper('gte', function(a, b, options) {
+      if (options && typeof options.fn === 'function') {
+        return a >= b ? options.fn(this) : options.inverse(this);
+      }
+      return a >= b;
+    });
+
+    hbs.handlebars.registerHelper('lte', function(a, b, options) {
+      if (options && typeof options.fn === 'function') {
+        return a <= b ? options.fn(this) : options.inverse(this);
+      }
+      return a <= b;
+    });
+
     hbs.handlebars.registerHelper('plus', function(a, b) {
       return a + b;
     });
 
+    hbs.handlebars.registerHelper('add', function(...args) {
+      // Remove the last argument which is the options object
+      const numbers = args.slice(0, -1);
+      return numbers.reduce((sum, num) => sum + (parseInt(num) || 0), 0);
+    });
+
     hbs.handlebars.registerHelper('minus', function(a, b) {
       return a - b;
+    });
+
+    hbs.handlebars.registerHelper('divide', function(a, b, options) {
+      const roundUp = options === 'roundUp';
+      const result = a / b;
+      return roundUp ? Math.ceil(result) : Math.floor(result);
+    });
+
+    hbs.handlebars.registerHelper('remainder', function(a, b) {
+      return a % b;
     });
 
     hbs.handlebars.registerHelper('range', function(start, end, options) {
@@ -193,9 +244,23 @@ app.engine("xian", async (filePath, options, callback) => {
       });
     });
 
-    // Helper for comparing values (eq)
-    hbs.handlebars.registerHelper('eq', function(a, b) {
+    // Helper for comparing values (eq) - support both subexpression and block syntax
+    hbs.handlebars.registerHelper('eq', function(a, b, options) {
+      // Check if this is being used as a block helper (has fn and inverse properties)
+      if (options && typeof options.fn === 'function') {
+        return a === b ? options.fn(this) : options.inverse(this);
+      }
+      // Otherwise, just return the boolean value for use in subexpressions
       return a === b;
+    });
+
+    // Helper for substring operations
+    hbs.handlebars.registerHelper('substring', function(str, start, end) {
+      if (!str) return '';
+      if (end === undefined) {
+        return str.substring(start);
+      }
+      return str.substring(start, end);
     });
 
     // Helper to get first character of string
@@ -212,6 +277,12 @@ app.engine("xian", async (filePath, options, callback) => {
       const diff = now - last;
       const minutes = Math.floor(diff / 60000);
       return minutes < 5; // Online if active in last 5 minutes
+    });
+
+    // Helper to slice arrays
+    hbs.handlebars.registerHelper('slice', function(array, start, end) {
+      if (!Array.isArray(array)) return array;
+      return array.slice(start, end);
     });
 
     const result = await new Promise((resolve, reject) => {
@@ -238,6 +309,15 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "xian");
 
 // Register Handlebars helpers
+hbs.registerHelper('formatDateForInput', function(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${year}-${month}-${day}`;
+});
+
 hbs.registerHelper('formatDate', function(date) {
   if (!date) return 'Never';
   const d = new Date(date);
@@ -260,6 +340,13 @@ hbs.registerHelper('formatGameName', function(gameType) {
   return gameType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 });
 
+hbs.registerHelper('truncate', function(text, length) {
+  if (!text) return '';
+  length = length || 100;
+  if (text.length <= length) return text;
+  return text.substring(0, length) + '...';
+});
+
 hbs.registerHelper('substring', function(str, start, end) {
   if (!str) return '';
   return str.substring(start, end).toUpperCase();
@@ -267,6 +354,19 @@ hbs.registerHelper('substring', function(str, start, end) {
 
 hbs.registerHelper('eq', function(a, b) {
   return a === b;
+});
+
+hbs.registerHelper('not', function(value, options) {
+  if (typeof options === 'object' && options.fn) {
+    return !value ? options.fn(this) : options.inverse(this);
+  }
+  return !value;
+});
+
+hbs.registerHelper('includes', function(array, value) {
+  if (!array) return false;
+  if (!Array.isArray(array)) return false;
+  return array.includes(value);
 });
 
 hbs.registerHelper('isOnline', function(lastActive) {
@@ -277,6 +377,21 @@ hbs.registerHelper('isOnline', function(lastActive) {
 
 hbs.registerHelper('json', function(context) {
   return JSON.stringify(context);
+});
+
+hbs.registerHelper('capitalize', function(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ');
+});
+
+hbs.registerHelper('or', function(...args) {
+  // Remove the last argument (options object)
+  const options = args.pop();
+  // Check if any of the remaining arguments are truthy
+  for (let arg of args) {
+    if (arg) return true;
+  }
+  return false;
 });
 
 // ✅ FIXED: Register partials synchronously with proper error handling
@@ -308,13 +423,62 @@ try {
   
 } catch (err) {
   console.error("❌ Could not read partials directory:", err.message);
-  console.error("Make sure the folder exists and contains .xian files");
+  console.error("Make sure the folder contains .xian files");
 }
 
+// Mount messageRoutes BEFORE main router so it catches /conversations first
+app.use("/", messageRoutes);
 app.use("/", router);
 
 export default app;
 
-if (!process.env.ELECTRON) {
-  app.listen(PORT, () => console.log(`🔥 XianFire running at http://localhost:${PORT}`));
+// Sync database and start server
+async function startServer() {
+  try {
+    // Sync all models with database
+    console.log("🔄 Syncing database models...");
+    // Use force: false and alter: false to avoid schema modification issues
+    // If you need to add new fields, create manual migrations instead
+    await sequelize.sync({ alter: false, force: false });
+    console.log("✅ Database synchronized successfully");
+    
+    // Initialize face-api models (download and cache them)
+    console.log("\n🤖 Initializing face-api models...");
+    const modelsReady = await downloadFaceApiModels();
+    
+    if (modelsReady) {
+      console.log("✅ Face-API models ready for use");
+    } else {
+      console.warn("⚠️  Models not fully downloaded - will attempt CDN fallback");
+    }
+    
+    if (!process.env.ELECTRON) {
+      // Create HTTP server for Socket.io compatibility
+      const httpServer = createServer(app);
+      const io = new Server(httpServer, {
+        cors: {
+          origin: "*",
+          methods: ["GET", "POST"]
+        },
+        transports: ['websocket', 'polling']
+      });
+
+      // Make io instance available globally for use in routes
+      app.locals.io = io;
+
+      // Initialize Socket.io handlers
+      initializeSocketHandlers(io);
+
+      httpServer.listen(PORT, () => {
+        console.log(`\n🔥 XianFire running at http://localhost:${PORT}`);
+        console.log(`📁 Models available at: http://localhost:${PORT}/models/`);
+        console.log(`🔌 WebSocket server running on port ${PORT}`);
+      });
+    }
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
+  }
 }
+
+startServer();

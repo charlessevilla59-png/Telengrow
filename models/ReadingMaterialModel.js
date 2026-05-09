@@ -43,7 +43,7 @@ export default (sequelize) => {
       allowNull: true
     },
     fileType: {
-      type: DataTypes.ENUM('article', 'pdf', 'document'),
+      type: DataTypes.ENUM('article', 'pdf', 'document', 'video'),
       defaultValue: 'article'
     },
     fileName: {
@@ -57,6 +57,16 @@ export default (sequelize) => {
     fileSize: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    videoUrl: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      comment: 'YouTube or video URL for video tips'
+    },
+    videoDuration: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Video duration in seconds'
     },
     readingTime: {
       type: DataTypes.INTEGER,

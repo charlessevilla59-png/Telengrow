@@ -5,153 +5,976 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow Counselor</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+      }
+    }
+    
+    .animate-fadeInDown {
+      animation: fadeInDown 0.6s ease-out;
+    }
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    .animate-slideInLeft {
+      animation: slideInLeft 0.6s ease-out;
+    }
+    .animate-scaleIn {
+      animation: scaleIn 0.6s ease-out;
+    }
+    .form-group {
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+    .form-group:nth-child(7) { animation-delay: 0.7s; }
+    .form-group:nth-child(8) { animation-delay: 0.8s; }
+    
+    .form-input, .form-select, .form-textarea {
+      border-color: #e5e7eb;
+      transition: all 0.3s ease;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+    
+    .success-toast {
+      animation: slideInLeft 0.4s ease-out;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(22, 163, 74, 0.3);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <nav class="bg-white border-b border-gray-200 shadow-sm p-4">
-    <div class="container mx-auto flex justify-between items-center">
+<body class="bg-white min-h-screen">
+  <!-- Navigation -->
+  <nav class="bg-white border-b-2 border-green-100 shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center px-6 py-4">
       <div class="flex items-center space-x-4">
-        <a href="/counselor/dashboard" class="text-2xl font-bold text-emerald-600 hover:text-emerald-700">🌱 Tellngrow Counselor</a>
+        <a href="/counselor/dashboard" class="text-2xl font-bold text-green-600 hover:text-green-700 transition">🌱 Tellngrow Counselor</a>
       </div>
-      <div class="space-x-4 flex items-center">
-        <a href="/counselor/dashboard" class="text-gray-600 hover:text-gray-800">Dashboard</a>
-        <span class="text-gray-700">👨‍💼 {{user.name}}</span>
-        <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
+      <div class="space-x-6 flex items-center text-gray-700">
+        <a href="/counselor/dashboard" class="hover:text-green-600 transition font-medium">Dashboard</a>
+        <span class="text-gray-500">|</span>
+        <span>👨‍💼 <span class="font-semibold">{{user.name}}</span></span>
+        <a href="/logout" class="text-red-600 hover:text-red-700 transition font-medium">Logout</a>
       </div>
     </div>
   </nav>
 
-  <div class="container mx-auto p-6 max-w-4xl">
-    <div class="mb-6">
-      <h2 class="text-3xl font-bold text-gray-900">Add New Reading Material</h2>
-      <p class="text-gray-600 mt-1">Create educational content for students</p>
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-12 max-w-4xl">
+    <!-- Header -->
+    <div class="mb-8 animate-fadeInDown">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Create Reading Material</h1>
+      <p class="text-lg text-gray-600">Share valuable insights and educational content with students</p>
+      <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mt-4"></div>
     </div>
 
-    <div class="bg-white border-2 border-gray-200 rounded-lg p-6">
-      <form action="/counselor/materials/create" method="POST" enctype="multipart/form-data">
+    <!-- Error Message (Hidden by default) -->
+    <div id="errorMessage" class="hidden success-toast bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-lg p-6 mb-6 shadow-lg">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <span class="text-4xl animate-bounce">❌</span>
+          <div class="flex-1">
+            <h3 class="font-bold text-red-800 text-xl">Upload Failed</h3>
+            <p id="errorMessageText" class="text-red-700 text-base mt-2"></p>
+            <p class="text-red-600 text-sm mt-3">Please check your file and try again. Make sure:</p>
+            <ul class="text-red-600 text-sm mt-2 ml-4 list-disc">
+              <li>File is not too large (Documents: 10MB, Videos: 100MB)</li>
+              <li>File format is supported</li>
+              <li>You have selected the correct file type</li>
+            </ul>
+          </div>
+        </div>
+        <button type="button" onclick="document.getElementById('errorMessage').remove()" class="text-red-600 hover:text-red-800 transition flex-shrink-0">
+          <span class="text-2xl">✕</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Success Message (Hidden by default) -->
+    <div id="successMessage" class="hidden success-toast bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6 mb-6 shadow-lg">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <span class="text-4xl animate-bounce">✅</span>
+          <div class="flex-1">
+            <h3 class="font-bold text-green-800 text-xl">Material Created & Published Successfully!</h3>
+            <p class="text-green-700 text-base mt-2"><strong>Your material is now visible to students!</strong></p>
+            <p class="text-green-600 text-sm mt-3">Students can now view, read, and interact with your material. You will receive notifications when they comment or save your content.</p>
+            <div class="mt-4 flex gap-3">
+              <a href="/counselor/materials" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">View All Materials</a>
+              <a href="/counselor/dashboard" class="bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg font-semibold text-sm transition">Back to Dashboard</a>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="document.getElementById('successMessage').remove()" class="text-green-600 hover:text-green-800 transition flex-shrink-0">
+          <span class="text-2xl">✕</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white border-2 border-green-100 rounded-2xl p-8 shadow-lg animate-scaleIn">
+      <form action="/counselor/materials/create" method="POST" enctype="multipart/form-data" onsubmit="handleFormSubmit(event)">
         <!-- Material Type -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Material Type</label>
+        <div class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">📄 Material Type <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">Choose how you want to share this material with students</p>
           <select name="fileType" id="fileType" required onchange="toggleContentType()"
-                  class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
-            <option value="article">Article (Text Content)</option>
-            <option value="pdf">PDF Document</option>
-            <option value="document">Other Document</option>
+                  class="form-select w-full px-4 py-3 border-2 rounded-lg focus:outline-none bg-white">
+            <option value="article">📝 Article (Write content directly in the form)</option>
+            <option value="video">🎥 Video (Paste YouTube or video URL)</option>
+            <option value="pdf">📕 PDF Document (Upload from PC/Laptop)</option>
+            <option value="document">📄 Office Document (Word, PowerPoint, Excel, etc.)</option>
           </select>
         </div>
 
         <!-- Title -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Title</label>
+        <div class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">📌 Title <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">Give your material a clear, descriptive title</p>
           <input type="text" name="title" required
-                 class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                 placeholder="e.g., Understanding Stress Management">
+                 class="form-input w-full px-4 py-3 border-2 rounded-lg focus:outline-none"
+                 placeholder="e.g., Understanding Stress Management Techniques">
         </div>
 
         <!-- Category -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Category</label>
+        <div class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">🏷️ Category <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">Select the most relevant category</p>
           <select name="category" required
-                  class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
-            <option value="">Select a category</option>
-            <option value="Mental Health">Mental Health</option>
-            <option value="Stress Management">Stress Management</option>
-            <option value="Anxiety">Anxiety</option>
-            <option value="Wellness">Wellness</option>
-            <option value="Self-Care">Self-Care</option>
-            <option value="Mindfulness">Mindfulness</option>
-            <option value="Other">Other</option>
+                  class="form-select w-full px-4 py-3 border-2 rounded-lg focus:outline-none bg-white">
+            <option value="">Choose a category...</option>
+            <option value="Mental Health">🧠 Mental Health</option>
+            <option value="Stress Management">😌 Stress Management</option>
+            <option value="Anxiety">💙 Anxiety</option>
+            <option value="Wellness">🌟 Wellness</option>
+            <option value="Self-Care">💆 Self-Care</option>
+            <option value="Mindfulness">🧘 Mindfulness</option>
+            <option value="Fitness">💪 Fitness</option>
+            <option value="Other">📚 Other</option>
           </select>
         </div>
 
         <!-- Excerpt -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Short Description</label>
+        <div class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">✍️ Short Description <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">Provide a brief summary (this will appear in the materials list)</p>
           <textarea name="excerpt" rows="3" required
-                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                    placeholder="Brief summary of the material (2-3 sentences)"></textarea>
+                    class="form-textarea w-full px-4 py-3 border-2 rounded-lg focus:outline-none resize-none"
+                    placeholder="What is this material about? What will students learn? (2-3 sentences)"></textarea>
         </div>
 
-        <!-- File Upload (for PDF/Document) -->
-        <div id="fileUploadSection" class="mb-6 hidden">
-          <label class="block text-gray-700 font-semibold mb-2">Upload File</label>
-          <input type="file" name="materialFile" accept=".pdf,.doc,.docx"
-                 class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
-          <p class="text-sm text-gray-500 mt-1">Accepted formats: PDF, DOC, DOCX (Max 10MB)</p>
+        <!-- Video Section -->
+        <div id="videoSection" class="form-group mb-8 hidden">
+          <!-- Tabs for YouTube vs Upload -->
+          <div class="flex gap-2 mb-4 border-b-2 border-gray-200">
+            <button type="button" onclick="switchVideoMode('youtube')" 
+                    class="videoModeTab px-4 py-3 font-semibold text-gray-700 border-b-4 border-transparent hover:text-green-600 transition"
+                    id="youtubeTab">
+              🎥 YouTube Link
+            </button>
+            <button type="button" onclick="switchVideoMode('upload')" 
+                    class="videoModeTab px-4 py-3 font-semibold text-gray-700 border-b-4 border-transparent hover:text-green-600 transition"
+                    id="uploadTab">
+              📤 Upload Video File
+            </button>
+          </div>
+
+          <!-- YouTube URL Option -->
+          <div id="youtubeMode" class="videoMode mb-8">
+            <label class="block text-gray-800 font-bold mb-3 text-lg">🎥 YouTube URL <span class="text-red-500">*</span></label>
+            <p class="text-gray-600 text-sm mb-3">Paste any YouTube URL - we'll automatically convert it for you</p>
+            
+            <div class="space-y-4">
+              <input type="url" name="videoUrl" 
+                     class="form-input w-full px-4 py-3 border-2 rounded-lg focus:outline-none"
+                     placeholder="Paste YouTube URL here (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)" 
+                     id="videoUrl" onpaste="handleVideoUrlPaste(event)" oninput="previewYouTubeVideo()">
+              
+              <div id="videoPreviewContainer" class="hidden bg-gray-900 rounded-lg overflow-hidden aspect-video">
+                <iframe id="videoPreview" class="w-full h-full border-none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </div>
+              
+              <p class="text-xs text-gray-600">
+                <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">ℹ️ Accepts:</span>
+                <span class="ml-2">youtube.com/watch?v=ID | youtu.be/ID | youtube.com/embed/ID</span>
+              </p>
+            </div>
+            
+            <label class="block text-gray-800 font-bold mb-3 text-lg mt-6">⏱️ Video Duration <span class="text-red-500">*</span></label>
+            <p class="text-gray-600 text-sm mb-3">Duration in seconds (e.g., 300 for 5 minutes)</p>
+            <div class="flex items-center gap-4">
+              <input type="number" name="videoDuration" min="1" value="300"
+                     class="form-input w-32 px-4 py-3 border-2 rounded-lg focus:outline-none" id="videoDuration">
+              <span class="text-gray-600 font-semibold">seconds</span>
+              <span id="durationDisplay" class="text-sm text-gray-600 ml-4">(5 minutes)</span>
+            </div>
+          </div>
+
+          <!-- Video File Upload Option -->
+          <div id="uploadMode" class="videoMode hidden mb-8">
+            <label class="block text-gray-800 font-bold mb-3 text-lg">📤 Upload Video File <span class="text-red-500">*</span></label>
+            <p class="text-gray-600 text-sm mb-4">Upload your video from PC/Laptop - drag and drop or click to browse</p>
+            
+            <!-- Drag & Drop Area for Video -->
+            <div id="videoDropZone" class="border-3 border-dashed border-green-400 rounded-xl p-10 text-center hover:bg-green-50 transition cursor-pointer bg-gradient-to-br from-white to-green-50"
+                 style="min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="text-6xl mb-4">🎬</div>
+              <p class="font-bold text-gray-800 text-lg mb-2">Drop your video file here</p>
+              <p class="text-gray-600 text-sm mb-4">or <span class="text-green-600 font-semibold cursor-pointer hover:underline">click to browse</span></p>
+              <div class="flex flex-wrap gap-2 justify-center">
+                <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">MP4</span>
+                <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">AVI</span>
+                <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">MOV</span>
+                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">WebM</span>
+                <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full font-medium">FLV</span>
+                <span class="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">MKV</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-4">Maximum file size: 100MB</p>
+              <input type="file" id="videoFile" name="videoFile" accept="video/*" 
+                     class="hidden" onchange="updateVideoFileName(this)">
+            </div>
+            
+            <!-- Video File Preview Section -->
+            <div id="videoFilePreview" class="hidden mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start gap-4 flex-1">
+                  <div class="text-4xl mt-1">🎬</div>
+                  <div class="flex-1">
+                    <p class="font-bold text-gray-800 break-all" id="selectedVideoName">File name</p>
+                    <p class="text-sm text-gray-600 mt-1">
+                      <span id="selectedVideoSize">0 MB</span> • 
+                      <span id="selectedVideoType">Type</span>
+                    </p>
+                    <div class="mt-2 w-full bg-gray-300 rounded-full h-2">
+                      <div id="videoSizeBar" class="bg-green-500 h-2 rounded-full" style="width: 10%"></div>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">✓ Ready to upload</p>
+                  </div>
+                </div>
+                <button type="button" onclick="clearVideoFileSelection()" 
+                        class="text-gray-400 hover:text-red-600 transition ml-2">
+                  <span class="text-2xl">✕</span>
+                </button>
+              </div>
+            </div>
+            
+            <p id="videoFileError" class="text-sm text-red-600 font-semibold mt-2 hidden"></p>
+          </div>
         </div>
 
-        <!-- Content (for Article) -->
-        <div id="contentSection" class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Content</label>
+        <!-- File Upload Section - ENHANCED -->
+        <div id="fileUploadSection" class="form-group mb-8 hidden">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">📤 Upload File from Your PC/Laptop <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-4">Drag and drop your file or click to browse from your computer</p>
+          
+          <!-- Drag & Drop Area -->
+          <div id="dropZone" class="border-3 border-dashed border-green-400 rounded-xl p-10 text-center hover:bg-green-50 transition cursor-pointer bg-gradient-to-br from-white to-green-50"
+               style="min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div class="text-6xl mb-4" id="dropIcon">📄</div>
+            <p class="font-bold text-gray-800 text-lg mb-2">Drop your file here</p>
+            <p class="text-gray-600 text-sm mb-4">or <span class="text-green-600 font-semibold cursor-pointer hover:underline">click to browse</span></p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">PDF</span>
+              <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">DOC</span>
+              <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">DOCX</span>
+              <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">PPT</span>
+              <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">PPTX</span>
+              <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">XLS</span>
+              <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">XLSX</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Maximum file size: 10MB</p>
+            <input type="file" id="materialFile" name="materialFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" 
+                   class="hidden" onchange="updateFileName(this)">
+          </div>
+          
+          <!-- File Preview Section -->
+          <div id="filePreview" class="hidden mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-4 flex-1">
+                <div id="fileTypeIcon" class="text-4xl mt-1">📄</div>
+                <div class="flex-1">
+                  <p class="font-bold text-gray-800 break-all" id="selectedFileName">File name</p>
+                  <p class="text-sm text-gray-600 mt-1">
+                    <span id="selectedFileSize">0 MB</span> • 
+                    <span id="selectedFileType">Type</span>
+                  </p>
+                  <div class="mt-2 w-full bg-gray-300 rounded-full h-2">
+                    <div id="fileSizeBar" class="bg-green-500 h-2 rounded-full" style="width: 10%"></div>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-1" id="fileStatus">✓ Ready to upload</p>
+                </div>
+              </div>
+              <button type="button" onclick="clearFileSelection()" 
+                      class="text-gray-400 hover:text-red-600 transition ml-2">
+                <span class="text-2xl">✕</span>
+              </button>
+            </div>
+          </div>
+          
+          <p id="fileName" class="text-sm text-green-600 font-semibold mt-2 hidden">✓ File selected and ready</p>
+          <p id="fileError" class="text-sm text-red-600 font-semibold mt-2 hidden"></p>
+        </div>
+
+        <!-- Content Section (for Article) -->
+        <div id="contentSection" class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">📖 Article Content <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">Write your complete article or educational content here</p>
           <textarea name="content" rows="15"
-                    class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500"
-                    placeholder="Write your full article content here..."></textarea>
-          <p class="text-sm text-gray-500 mt-1">You can use paragraphs, lists, and basic formatting</p>
+                    class="form-textarea w-full px-4 py-3 border-2 rounded-lg focus:outline-none resize-none font-mono text-sm"
+                    placeholder="Start typing your article content here...&#10;&#10;You can use:&#10;• Multiple paragraphs&#10;• Lists and bullet points&#10;• Line breaks for structure&#10;&#10;Focus on clear, engaging language that students can understand."></textarea>
+          <p class="text-sm text-gray-600 mt-2">💡 Tip: Use clear paragraphs, lists, and formatting to make content easy to read</p>
         </div>
 
         <!-- Reading Time -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Estimated Reading Time (minutes)</label>
-          <input type="number" name="readingTime" min="1" max="60" value="5" required
-                 class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
+        <div class="form-group mb-8">
+          <label class="block text-gray-800 font-bold mb-3 text-lg">⏱️ Estimated Reading Time <span class="text-red-500">*</span></label>
+          <p class="text-gray-600 text-sm mb-3">How many minutes do you estimate for students to read this?</p>
+          <div class="flex items-center gap-4">
+            <input type="number" name="readingTime" min="1" max="60" value="5" required
+                   class="form-input w-24 px-4 py-3 border-2 rounded-lg focus:outline-none">
+            <span class="text-gray-600 font-semibold">minutes</span>
+          </div>
         </div>
 
         <!-- Publish Status -->
-        <div class="mb-6">
-          <label class="flex items-center cursor-pointer">
-            <input type="checkbox" name="isPublished" value="true"
-                   class="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500">
-            <span class="ml-3 text-gray-700 font-semibold">Publish immediately</span>
+        <div class="form-group mb-8">
+          <input type="hidden" id="isPublishedValue" name="isPublished" value="true" />
+          <label class="flex items-center cursor-pointer p-4 rounded-lg border-2 border-green-100 hover:bg-green-50 transition">
+            <input type="checkbox" id="publishCheckbox" onchange="updatePublishValue()" checked
+                   class="w-6 h-6 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer">
+            <div class="ml-4">
+              <span class="text-gray-800 font-bold text-lg block">Publish Immediately</span>
+              <span class="text-gray-600 text-sm">Material visible in user dashboard and counselor materials</span>
+            </div>
           </label>
-          <p class="text-sm text-gray-500 mt-1">If unchecked, material will be saved as draft</p>
+          <div class="mt-4 p-3 bg-green-50 border-l-4 border-green-500 rounded">
+            <p class="text-sm text-green-800"><span class="font-bold">✓ Published by default</span> - appears immediately to users</p>
+            <p class="text-sm text-green-800 mt-2">Uncheck to save as draft (only visible in your materials list)</p>
+          </div>
         </div>
 
-        <!-- Buttons -->
-        <div class="flex gap-4">
+        <!-- Action Buttons -->
+        <div class="form-group flex gap-4 pt-4 border-t-2 border-green-100">
           <button type="submit"
-                  class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-semibold hover:bg-emerald-700 transition">
-            Create Material
+                  class="btn-primary flex-1 bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <span>🚀</span> Create Material
           </button>
+          <a href="/counselor/materials"
+             class="flex-1 bg-gray-100 text-gray-700 py-4 rounded-lg font-bold text-lg hover:bg-gray-200 transition text-center flex items-center justify-center gap-2">
+            <span>📋</span> View Materials
+          </a>
           <a href="/counselor/dashboard"
-             class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-center">
-            Cancel
+             class="flex-1 bg-white border-2 border-gray-300 text-gray-700 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition text-center flex items-center justify-center gap-2">
+            <span>←</span> Back
           </a>
         </div>
       </form>
     </div>
 
-    <!-- Tips -->
-    <div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-      <h3 class="font-bold text-blue-900 mb-2">💡 Tips for Creating Great Content:</h3>
-      <ul class="text-sm text-blue-800 space-y-1">
-        <li>• <strong>Articles:</strong> Write directly in the content area</li>
-        <li>• <strong>PDFs:</strong> Upload existing documents, books, or guides</li>
-        <li>• <strong>Documents:</strong> Upload Word files or other formats</li>
-        <li>• Use clear, simple language that students can understand</li>
-        <li>• Keep file sizes under 10MB for faster loading</li>
-      </ul>
+    <!-- Help Section -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeInUp">
+      <!-- Tips Card -->
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+        <h3 class="font-bold text-green-900 text-lg mb-4 flex items-center gap-2">
+          <span>💡</span> Tips for Great Content
+        </h3>
+        <ul class="text-sm text-green-800 space-y-2">
+          <li class="flex gap-2">
+            <span class="text-green-600 font-bold">•</span>
+            <span><strong>Be Clear:</strong> Use simple language students understand</span>
+          </li>
+          <li class="flex gap-2">
+            <span class="text-green-600 font-bold">•</span>
+            <span><strong>Structure:</strong> Use paragraphs and lists for readability</span>
+          </li>
+          <li class="flex gap-2">
+            <span class="text-green-600 font-bold">•</span>
+            <span><strong>Practical:</strong> Include examples students can relate to</span>
+          </li>
+          <li class="flex gap-2">
+            <span class="text-green-600 font-bold">•</span>
+            <span><strong>Accurate:</strong> Fact-check your content before publishing</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Format Guide Card -->
+      <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6">
+        <h3 class="font-bold text-blue-900 text-lg mb-4 flex items-center gap-2">
+          <span>📚</span> Supported File Formats
+        </h3>
+        <div class="space-y-3 text-sm text-blue-800">
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">📝</span>
+            <span><strong>Article:</strong> Write content directly in the form (no file needed)</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">🎥</span>
+            <span><strong>Video:</strong> Paste YouTube link OR upload your own video file (MP4, AVI, MOV, WebM, etc.)</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">📕</span>
+            <span><strong>PDF Files:</strong> .pdf (any PDF document)</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">📄</span>
+            <span><strong>Word Documents:</strong> .doc, .docx, .odt</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">🎨</span>
+            <span><strong>Presentations:</strong> .ppt, .pptx, .odp</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">📊</span>
+            <span><strong>Spreadsheets:</strong> .xls, .xlsx, .ods</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-blue-600 font-bold">⚡</span>
+            <span><strong>File Size Limits:</strong> Documents 10MB • Videos 100MB</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    // Current video mode (youtube or upload)
+    let currentVideoMode = 'youtube';
+
+    // Update the hidden publish value based on checkbox
+    function updatePublishValue() {
+      const checkbox = document.getElementById('publishCheckbox');
+      const hiddenInput = document.getElementById('isPublishedValue');
+      hiddenInput.value = checkbox.checked ? 'true' : 'false';
+      console.log('📤 Publish status set to:', hiddenInput.value);
+    }
+
+    // Switch between YouTube and Upload modes
+    function switchVideoMode(mode) {
+      currentVideoMode = mode;
+      const youtubeMode = document.getElementById('youtubeMode');
+      const uploadMode = document.getElementById('uploadMode');
+      const youtubeTab = document.getElementById('youtubeTab');
+      const uploadTab = document.getElementById('uploadTab');
+      
+      if (mode === 'youtube') {
+        youtubeMode.classList.remove('hidden');
+        uploadMode.classList.add('hidden');
+        youtubeTab.classList.add('border-green-600');
+        youtubeTab.classList.remove('border-transparent');
+        uploadTab.classList.remove('border-green-600');
+        uploadTab.classList.add('border-transparent');
+      } else {
+        youtubeMode.classList.add('hidden');
+        uploadMode.classList.remove('hidden');
+        youtubeTab.classList.remove('border-green-600');
+        youtubeTab.classList.add('border-transparent');
+        uploadTab.classList.add('border-green-600');
+        uploadTab.classList.remove('border-transparent');
+      }
+    }
+
+    // Update video file name display with preview
+    function updateVideoFileName(input) {
+      const filePreview = document.getElementById('videoFilePreview');
+      const fileError = document.getElementById('videoFileError');
+      
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const maxSize = 100 * 1024 * 1024; // 100MB for videos
+        
+        // Check file size
+        if (file.size > maxSize) {
+          showVideoFileError(`❌ File size exceeds 100MB limit (${(file.size / 1024 / 1024).toFixed(2)}MB). Please choose a smaller file.`);
+          input.value = '';
+          filePreview.classList.add('hidden');
+          return;
+        }
+        
+        // Validate video file type
+        if (!file.type.startsWith('video/')) {
+          showVideoFileError(`❌ Invalid file type. Please select a video file (MP4, AVI, MOV, WebM, etc.)`);
+          input.value = '';
+          filePreview.classList.add('hidden');
+          return;
+        }
+        
+        // Show preview
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        
+        document.getElementById('selectedVideoName').textContent = file.name;
+        document.getElementById('selectedVideoSize').textContent = fileSizeMB + ' MB';
+        document.getElementById('selectedVideoType').textContent = fileExt.toUpperCase() + ' Video';
+        
+        // Update size bar
+        const sizePercent = Math.min((file.size / maxSize) * 100, 100);
+        document.getElementById('videoSizeBar').style.width = sizePercent + '%';
+        
+        filePreview.classList.remove('hidden');
+        fileError.classList.add('hidden');
+      }
+    }
+
+    // Show video file error
+    function showVideoFileError(message) {
+      const fileError = document.getElementById('videoFileError');
+      fileError.textContent = message;
+      fileError.classList.remove('hidden');
+    }
+
+    // Clear video file selection
+    function clearVideoFileSelection() {
+      document.getElementById('videoFile').value = '';
+      document.getElementById('videoFilePreview').classList.add('hidden');
+      document.getElementById('videoFileError').classList.add('hidden');
+    }
+
+    // Toggle between file upload and content sections
     function toggleContentType() {
       const fileType = document.getElementById('fileType').value;
       const fileUploadSection = document.getElementById('fileUploadSection');
       const contentSection = document.getElementById('contentSection');
+      const videoSection = document.getElementById('videoSection');
       const contentTextarea = contentSection.querySelector('textarea');
-      const fileInput = fileUploadSection.querySelector('input[type="file"]');
+      const videoUrl = document.getElementById('videoUrl');
+      const videoDuration = document.getElementById('videoDuration');
+      const fileInput = document.getElementById('materialFile');
+      const videoFile = document.getElementById('videoFile');
       
       if (fileType === 'article') {
         fileUploadSection.classList.add('hidden');
         contentSection.classList.remove('hidden');
+        videoSection.classList.add('hidden');
         contentTextarea.required = true;
+        videoUrl.required = false;
+        videoDuration.required = false;
         fileInput.required = false;
+        videoFile.required = false;
+      } else if (fileType === 'video') {
+        fileUploadSection.classList.add('hidden');
+        contentSection.classList.add('hidden');
+        videoSection.classList.remove('hidden');
+        contentTextarea.required = false;
+        fileInput.required = false;
+        // Either video URL or video file is required, will check in validation
+        switchVideoMode('youtube'); // Default to YouTube mode
       } else {
         fileUploadSection.classList.remove('hidden');
         contentSection.classList.add('hidden');
+        videoSection.classList.add('hidden');
         contentTextarea.required = false;
+        videoUrl.required = false;
+        videoDuration.required = false;
         fileInput.required = true;
+        videoFile.required = false;
       }
     }
+
+    // Update video duration display
+    document.getElementById('videoDuration')?.addEventListener('input', function() {
+      const seconds = parseInt(this.value) || 0;
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      const display = minutes > 0 ? `(${minutes}m ${secs}s)` : `(${seconds}s)`;
+      document.getElementById('durationDisplay').textContent = display;
+    });
+
+    // Update file name display with enhanced preview
+    function updateFileName(input) {
+      const fileName = document.getElementById('fileName');
+      const filePreview = document.getElementById('filePreview');
+      const fileError = document.getElementById('fileError');
+      
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        
+        // Check file size
+        if (file.size > maxSize) {
+          showFileError(`❌ File size exceeds 10MB limit (${(file.size / 1024 / 1024).toFixed(2)}MB). Please choose a smaller file.`);
+          input.value = '';
+          filePreview.classList.add('hidden');
+          return;
+        }
+        
+        // Show preview
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        const fileTypeIcon = getFileTypeIcon(fileExt);
+        
+        document.getElementById('fileTypeIcon').textContent = fileTypeIcon;
+        document.getElementById('selectedFileName').textContent = file.name;
+        document.getElementById('selectedFileSize').textContent = fileSizeMB + ' MB';
+        document.getElementById('selectedFileType').textContent = fileExt.toUpperCase() + ' Document';
+        
+        // Update size bar
+        const sizePercent = Math.min((file.size / maxSize) * 100, 100);
+        document.getElementById('fileSizeBar').style.width = sizePercent + '%';
+        
+        filePreview.classList.remove('hidden');
+        fileName.classList.add('hidden');
+        fileError.classList.add('hidden');
+      }
+    }
+
+    // Get file type icon
+    function getFileTypeIcon(ext) {
+      const icons = {
+        'pdf': '📕',
+        'doc': '📄',
+        'docx': '📄',
+        'ppt': '🎨',
+        'pptx': '🎨',
+        'xls': '📊',
+        'xlsx': '📊',
+        'txt': '📝',
+        'zip': '📦'
+      };
+      return icons[ext] || '📎';
+    }
+
+    // Show file error
+    function showFileError(message) {
+      const fileError = document.getElementById('fileError');
+      fileError.textContent = message;
+      fileError.classList.remove('hidden');
+    }
+
+    // Clear file selection
+    function clearFileSelection() {
+      document.getElementById('materialFile').value = '';
+      document.getElementById('filePreview').classList.add('hidden');
+      document.getElementById('fileName').classList.add('hidden');
+      document.getElementById('fileError').classList.add('hidden');
+    }
+
+    // Handle form submission with validation
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const fileType = document.getElementById('fileType').value;
+      const title = form.querySelector('input[name="title"]').value.trim();
+      const category = form.querySelector('select[name="category"]').value;
+      const excerpt = form.querySelector('textarea[name="excerpt"]').value.trim();
+      const readingTime = form.querySelector('input[name="readingTime"]').value;
+      
+      console.log('\n========================================');
+      console.log('📝 FORM SUBMISSION STARTED');
+      console.log('========================================');
+      console.log('📄 File Type:', fileType);
+      console.log('📋 Title:', title);
+      console.log('🏷️  Category:', category);
+      console.log('📖 Reading Time:', readingTime, 'min');
+      
+      // Validation
+      if (!title) {
+        alert('❌ Please enter a title for the material');
+        return;
+      }
+      if (!category) {
+        alert('❌ Please select a category');
+        return;
+      }
+      if (!excerpt) {
+        alert('❌ Please provide a brief description');
+        return;
+      }
+      if (readingTime < 1 || readingTime > 60) {
+        alert('❌ Reading time must be between 1 and 60 minutes');
+        return;
+      }
+
+      // File/Content validation
+      if (fileType === 'article') {
+        const content = form.querySelector('textarea[name="content"]').value.trim();
+        if (!content) {
+          alert('❌ Please write article content');
+          return;
+        }
+      } else if (fileType === 'video') {
+        // For video, check if either YouTube URL or video file is provided
+        const videoUrl = form.querySelector('input[name="videoUrl"]').value.trim();
+        const videoFile = document.getElementById('videoFile');
+        const hasVideoFile = videoFile.files && videoFile.files[0];
+        
+        console.log('🎥 Video validation:');
+        console.log('  YouTube URL:', videoUrl ? '✓ Provided' : '✗ Empty');
+        console.log('  Video file:', hasVideoFile ? '✓ ' + videoFile.files[0].name + ' (' + (videoFile.files[0].size / 1024 / 1024).toFixed(2) + 'MB)' : '✗ Not selected');
+        
+        if (!videoUrl && !hasVideoFile) {
+          alert('❌ Please either paste a YouTube URL or upload a video file\n\nYou must select one of:\n• YouTube URL from the YouTube tab\n• Video file upload from Upload tab');
+          return;
+        }
+        
+        // If YouTube URL is provided, ensure duration is set
+        if (videoUrl && (!document.getElementById('videoDuration').value || document.getElementById('videoDuration').value < 1)) {
+          alert('❌ Please enter video duration in seconds');
+          return;
+        }
+
+        if (hasVideoFile) {
+          // Validate video file before upload
+          const file = videoFile.files[0];
+          const maxSize = 100 * 1024 * 1024; // 100MB
+          if (file.size > maxSize) {
+            alert('❌ Video file is too large!\n\nFile size: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB\nMaximum size: 100MB\n\nPlease choose a smaller video file.');
+            return;
+          }
+          console.log('✅ Using uploaded video file');
+        } else if (videoUrl) {
+          console.log('✅ Using YouTube URL');
+        }
+      } else {
+        // For PDF/Document files
+        const fileInput = document.getElementById('materialFile');
+        if (!fileInput.files || !fileInput.files[0]) {
+          alert('❌ Please select a file to upload');
+          return;
+        }
+        
+        // Validate file before upload
+        const file = fileInput.files[0];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+          alert('❌ File is too large!\n\nFile size: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB\nMaximum size: 10MB\n\nPlease choose a smaller file.');
+          return;
+        }
+        
+        console.log('📄 Document selected:', file.name, '(' + (file.size / 1024 / 1024).toFixed(2) + 'MB)');
+      }
+
+      console.log('✅ All validations passed, submitting form...');
+
+      // Show loading state on submit button
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Publishing Material...';
+      submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+      // Log form data for debugging
+      console.log('📤 Form fields:');
+      const formData = new FormData(form);
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: [FILE] ${value.name} (${(value.size / 1024 / 1024).toFixed(2)}MB)`);
+        } else {
+          console.log(`  ${key}:`, value);
+        }
+      }
+
+      // Submit form
+      setTimeout(() => {
+        console.log('📨 Sending request to server...');
+        form.submit();
+      }, 500);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check for error or success messages from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMessage = urlParams.get('error');
+      const successMessage = urlParams.get('success');
+      
+      if (errorMessage) {
+        console.error('❌ Error from server:', errorMessage);
+        const errorDiv = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorMessageText');
+        errorText.textContent = '❌ ' + decodeURIComponent(errorMessage);
+        errorDiv.classList.remove('hidden');
+        
+        // Scroll to error message
+        setTimeout(() => {
+          errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+      
+      if (successMessage) {
+        console.log('✅ Material created successfully');
+        const successDiv = document.getElementById('successMessage');
+        successDiv.classList.remove('hidden');
+        
+        // Scroll to success message
+        setTimeout(() => {
+          successDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+      
+      // Set initial state
+      toggleContentType();
+      
+      // Enhanced drag and drop for file upload
+      const dropZone = document.getElementById('dropZone');
+      if (dropZone) {
+        // Click to browse
+        dropZone.addEventListener('click', (e) => {
+          if (e.target.id !== 'materialFile') {
+            document.getElementById('materialFile').click();
+          }
+        });
+        
+        // Drag over
+        dropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.style.borderColor = '#16a34a';
+          dropZone.style.backgroundColor = '#f0fdf4';
+          dropZone.style.transform = 'scale(1.02)';
+        });
+        
+        // Drag leave
+        dropZone.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.style.borderColor = '#4ade80';
+          dropZone.style.backgroundColor = '';
+          dropZone.style.transform = 'scale(1)';
+        });
+        
+        // Drop
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.style.borderColor = '#4ade80';
+          dropZone.style.backgroundColor = '';
+          dropZone.style.transform = 'scale(1)';
+          
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            // Use DataTransfer to properly set files
+            const dt = new DataTransfer();
+            for (let i = 0; i < files.length; i++) {
+              dt.items.add(files[i]);
+            }
+            const fileInput = document.getElementById('materialFile');
+            fileInput.files = dt.files;
+            updateFileName(fileInput);
+            console.log('📁 File dropped:', files[0].name, 'Size:', (files[0].size / 1024 / 1024).toFixed(2) + 'MB');
+          }
+        });
+      }
+
+      // Enhanced drag and drop for video file upload
+      const videoDropZone = document.getElementById('videoDropZone');
+      if (videoDropZone) {
+        // Click to browse
+        videoDropZone.addEventListener('click', (e) => {
+          if (e.target.id !== 'videoFile') {
+            document.getElementById('videoFile').click();
+          }
+        });
+        
+        // Drag over
+        videoDropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          videoDropZone.style.borderColor = '#16a34a';
+          videoDropZone.style.backgroundColor = '#f0fdf4';
+          videoDropZone.style.transform = 'scale(1.02)';
+        });
+        
+        // Drag leave
+        videoDropZone.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          videoDropZone.style.borderColor = '#4ade80';
+          videoDropZone.style.backgroundColor = '';
+          videoDropZone.style.transform = 'scale(1)';
+        });
+        
+        // Drop - FIXED: Use DataTransfer for proper file handling
+        videoDropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          videoDropZone.style.borderColor = '#4ade80';
+          videoDropZone.style.backgroundColor = '';
+          videoDropZone.style.transform = 'scale(1)';
+          
+          const files = e.dataTransfer.files;
+          console.log('🎥 Video drop detected:', files.length, 'file(s)');
+          
+          if (files.length > 0) {
+            const file = files[0];
+            console.log('📹 File name:', file.name);
+            console.log('📏 File size:', (file.size / 1024 / 1024).toFixed(2) + 'MB');
+            console.log('🎬 MIME type:', file.type);
+            
+            // Use DataTransfer to properly set files - this is the key fix!
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const videoFile = document.getElementById('videoFile');
+            videoFile.files = dt.files;
+            console.log('✅ Video file assigned to input');
+            updateVideoFileName(videoFile);
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

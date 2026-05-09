@@ -3,120 +3,397 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
+  <title>Saved Materials - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; }
+    
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+    
+    .animate-fade-in-down { animation: fadeInDown 0.6s ease-out; }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+    .animate-scale-in { animation: scaleIn 0.5s ease-out; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    
+    /* Book Card Design - Professional Book Cover */
+    .book-card {
+      perspective: 1000px;
+      position: relative;
+      height: 420px;
+    }
+    
+    .book-cover {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25), 8px 8px 25px rgba(0, 0, 0, 0.2);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px 24px;
+      cursor: pointer;
+      transform-style: preserve-3d;
+    }
+    
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0.03) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .book-card:hover .book-cover {
+      transform: translateY(-12px) rotateX(3deg) rotateZ(1deg);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), 10px 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    
+    .book-content {
+      position: relative;
+      z-index: 2;
+      color: #1f2937;
+      text-shadow: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+      gap: 15px;
+    }
+    
+    /* Book Graphic - Prominent Icon */
+    .book-graphic {
+      position: relative;
+      z-index: 2;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      opacity: 0.95;
+      margin-bottom: 10px;
+    }
+    
+    /* Anxiety Pattern - Gold Knot */
+    .book-anxiety-graphic {
+      background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.15) 0%, transparent 50%);
+      clip-path: polygon(0% 50%, 20% 30%, 40% 40%, 50% 20%, 60% 40%, 80% 30%, 100% 50%, 80% 70%, 60% 60%, 50% 80%, 40% 60%, 20% 70%);
+    }
+    
+    /* Depression Pattern */
+    .book-depression-graphic::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(59,130,246,0.1) 10px, rgba(59,130,246,0.1) 20px);
+      clip-path: polygon(0% 40%, 10% 35%, 20% 30%, 30% 35%, 40% 40%, 50% 45%, 60% 40%, 70% 35%, 80% 30%, 90% 35%, 100% 40%, 100% 100%, 0% 100%);
+    }
+    
+    /* Sleep Pattern */
+    .book-sleep-graphic::after {
+      content: '⭐ ⭐ ⭐';
+      position: absolute;
+      font-size: 48px;
+      color: rgba(59,130,246,0.3);
+      letter-spacing: 15px;
+      text-shadow: none;
+    }
+    
+    /* Resilience Pattern */
+    .book-resilience-graphic::after {
+      content: '↗';
+      font-size: 80px;
+      color: rgba(59,130,246,0.25);
+      font-weight: bold;
+      transform: rotate(45deg);
+    }
+    
+    /* Mindfulness Pattern */
+    .book-mindfulness-graphic {
+      border: 3px solid rgba(59,130,246,0.3);
+      border-radius: 50%;
+      width: 90px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 45px;
+    }
+    
+    /* Self-Care Pattern */
+    .book-self-care-graphic::after {
+      content: '❀';
+      font-size: 80px;
+      color: rgba(59,130,246,0.3);
+    }
+    
+    .book-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+      max-height: 100px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+      letter-spacing: 0px;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+    
+    .book-author {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.7;
+      margin: 8px 0 0 0;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #3b82f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+    
+    .book-reading-time {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+    
+    .book-title {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      max-height: 60px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    
+    .book-excerpt {
+      font-size: 13px;
+      line-height: 1.4;
+      opacity: 0.8;
+      max-height: 50px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 12px;
+    }
+    
+    .book-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(59, 130, 246, 0.15);
+      color: #6b7280;
+    }
+    
+    .book-views {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.8;
+    }
+    
+    .book-cta {
+      font-weight: 600;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      color: #3b82f6;
+    }
+    
+    .book-card:hover .book-cta {
+      opacity: 1;
+      transform: translateX(4px);
+      color: #1e3a8a;
+    }
+    
+    /* Category Colors - Blue & White */
+    .book-anxiety { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-depression { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-sleep { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-resilience { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-mindfulness { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-self-care { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    .book-default { background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 2px solid #3b82f6; }
+    
+    .navbar-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+      border-bottom: 3px solid #16a34a;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.08);
+    }
+
+    .header-gradient {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header-gradient::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+    }
+    
+    .header-content {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #16a34a;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-gray-50 via-white to-gray-100 min-h-screen">
   {{> sidebar}}
   
-  <nav class="bg-white shadow-md p-4">
+  <!-- Navigation -->
+  <nav class="navbar-gradient sticky top-0 z-30 p-4">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-green-600 focus:outline-none transition p-2 rounded-lg hover:bg-green-50">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <a href="/user/dashboard" class="text-gray-600 hover:text-gray-800 flex items-center space-x-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-          <span>Back to Dashboard</span>
-        </a>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Saved Library</h1>
       </div>
     </div>
   </nav>
 
+  <!-- Main Content -->
   <div class="container mx-auto p-6">
+    <!-- Back Button -->
+    <div class="mb-6 animate-fade-in-down">
+      <a href="/user/dashboard" class="inline-flex items-center text-green-600 hover:text-green-700 transition font-semibold group">
+        <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>Back to Dashboard</span>
+      </a>
+    </div>
+
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">⭐ Saved Materials</h1>
-      <p class="text-gray-600">Your bookmarked reading materials</p>
+    <div class="header-gradient rounded-2xl px-8 py-12 mb-12 animate-fade-in-down">
+      <div class="header-content">
+        <h1 class="text-5xl md:text-6xl font-bold mb-3">Your Saved Materials</h1>
+        <p class="text-lg text-blue-100">Bookmarked articles and resources for later reading</p>
+      </div>
     </div>
 
     <!-- Saved Materials Grid -->
     {{#if savedMaterials.length}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {{#each savedMaterials}}
-      <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-        <!-- Book Icon Header -->
-        <div class="h-48 bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
-          {{#if (eq this.material.fileType 'pdf')}}
-          <span class="text-7xl">📕</span>
-          {{else if (eq this.material.fileType 'document')}}
-          <span class="text-7xl">📘</span>
-          {{else}}
-          <span class="text-7xl">📖</span>
-          {{/if}}
-        </div>
-
-        <!-- Content -->
-        <div class="p-6">
-          <!-- Category & Reading Time -->
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">
-              {{this.material.category}}
-            </span>
-            <span class="text-xs text-gray-500">⏱️ {{this.material.readingTime}} min</span>
+      <h2 class="section-title animate-fade-in-up">Your Saved Books ({{savedMaterials.length}})</h2>
+      
+      <!-- Book Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
+        {{#each savedMaterials}}
+          <!-- Book Card -->
+          {{#with this.material}}
+          <div class="book-card group animate-fade-in-up" style="animation-delay: {{@index}}00ms;">
+            <div class="book-cover {{#if (eq this.category 'Understanding Anxiety')}}book-anxiety{{else if (eq this.category 'Managing Depression')}}book-depression{{else if (eq this.category 'Better Sleep')}}book-sleep{{else if (eq this.category 'Building Resilience')}}book-resilience{{else if (eq this.category 'Mindfulness Meditation')}}book-mindfulness{{else if (eq this.category 'Self Care')}}book-self-care{{else}}book-default{{/if}}"
+              onclick="{{#if (eq this.fileType 'article')}}window.location.href='/reading/{{this.slug}}'{{else}}window.location.href='/reading/view/{{this.id}}'{{/if}}">
+              
+              <div class="book-content">
+                <!-- Book Graphic - Prominent Icon -->
+                <div class="book-graphic {{#if (eq this.category 'Understanding Anxiety')}}book-anxiety-graphic{{else if (eq this.category 'Managing Depression')}}book-depression-graphic{{else if (eq this.category 'Better Sleep')}}book-sleep-graphic{{else if (eq this.category 'Building Resilience')}}book-resilience-graphic{{else if (eq this.category 'Mindfulness Meditation')}}book-mindfulness-graphic{{else if (eq this.category 'Self Care')}}book-self-care-graphic{{/if}}">
+                  {{#if (eq this.category 'Mindfulness Meditation')}}🧘{{/if}}
+                </div>
+                
+                <!-- Book Title - Main Focus -->
+                <h3 class="book-title">{{this.title}}</h3>
+                
+                <!-- Category/Author Name -->
+                <p class="book-author">{{this.category}}</p>
+              </div>
+              
+              <!-- Footer -->
+              <div class="book-footer">
+                <span class="book-views">
+                  👁️ {{this.views}}
+                </span>
+                <span class="book-cta">Open →</span>
+              </div>
+            </div>
+            
+            <!-- Remove Button -->
+            <div class="mt-3">
+              <button onclick="removeSaved(event, {{this.id}})" 
+                      class="w-full bg-red-50 text-red-600 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 hover:text-red-700 transition border border-red-200">
+                Remove from Saved
+              </button>
+            </div>
           </div>
-
-          <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-800 mb-2">{{this.material.title}}</h3>
-
-          <!-- Excerpt -->
-          <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{this.material.excerpt}}</p>
-
-          <!-- Meta Info -->
-          <div class="flex items-center gap-3 text-xs text-gray-500 mb-4">
-            <span>👁️ {{this.material.views}} views</span>
-            {{#if this.material.counselor}}
-            <span>👨‍💼 {{this.material.counselor.name}}</span>
-            {{/if}}
-          </div>
-
-          <!-- Saved Date -->
-          <div class="mb-4">
-            <span class="text-xs text-gray-500">⭐ Saved {{formatDate this.savedAt}}</span>
-          </div>
-
-          <!-- Buttons -->
-          <div class="flex gap-2">
-            {{#if (eq this.material.fileType 'article')}}
-            <a href="/reading/{{this.material.slug}}" 
-               class="flex-1 bg-emerald-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-emerald-700 transition text-sm">
-              📖 Read
-            </a>
-            {{else}}
-            <a href="/reading/view/{{this.material.id}}" 
-               class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm">
-              👁️ View
-            </a>
-            {{/if}}
-            <button onclick="removeSaved({{this.material.id}})" 
-                    class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition text-sm">
-              🗑️
-            </button>
-          </div>
-        </div>
+          {{/with}}
+        {{/each}}
       </div>
-      {{/each}}
-    </div>
+
+      <!-- Saved Materials Footer -->
+      <div class="text-center py-16 border-t border-gray-200 animate-fade-in-up">
+        <div class="text-5xl mb-4">⭐</div>
+        <p class="text-gray-700 text-lg">
+          <strong class="text-gray-800">{{savedMaterials.length}}</strong> carefully saved resources<br>
+          <span class="text-gray-600">Ready for your next reading session</span>
+        </p>
+      </div>
+
     {{else}}
-    <div class="bg-white rounded-xl shadow-md p-12 text-center">
-      <div class="text-8xl mb-4">⭐</div>
-      <h3 class="text-2xl font-bold text-gray-700 mb-2">No Saved Materials Yet</h3>
-      <p class="text-gray-600 mb-6">Start saving materials you want to read later!</p>
-      <a href="/reading" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
-        Browse Materials
-      </a>
-    </div>
+      <!-- Empty State -->
+      <div class="text-center py-20 animate-fade-in-up">
+        <div class="text-8xl mb-6 animate-float">⭐</div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">No Saved Materials Yet</h2>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto text-lg">Start saving materials you want to read later and they'll appear here.</p>
+        <a href="/reading" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Browse Our Library
+        </a>
+      </div>
     {{/if}}
   </div>
 
   <script>
-    async function removeSaved(materialId) {
-      if (!confirm('Remove this material from saved?')) return;
+    async function removeSaved(event, materialId) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      if (!confirm('Remove this material from your saved items?')) return;
       
       try {
         const response = await fetch(`/reading/unsave/${materialId}`, {
@@ -127,15 +404,28 @@
         const result = await response.json();
         
         if (result.success) {
-          alert('✅ Material removed from saved');
-          location.reload();
+          // Smooth fade out of the card
+          const buttons = document.querySelectorAll('button');
+          buttons.forEach(btn => {
+            if (btn.textContent.includes('Remove')) {
+              btn.closest('.book-card')?.parentElement?.style.animation = 'fadeOut 0.3s ease-out forwards';
+            }
+          });
+          setTimeout(() => location.reload(), 300);
         } else {
-          alert('❌ Error: ' + result.message);
+          alert('Error: ' + result.message);
         }
       } catch (error) {
         console.error('Remove error:', error);
-        alert('❌ Failed to remove material');
+        alert('Failed to remove material');
       }
+    }
+    
+    function formatDate(dateString) {
+      if (!dateString) return 'Recently';
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
     }
   </script>
 </body>

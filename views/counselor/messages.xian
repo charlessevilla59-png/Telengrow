@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages - Tellngrow Counselor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <a href="/counselor/dashboard" class="text-green-600 hover:text-green-700 font-semibold mb-2 inline-block">← Back to Dashboard</a>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Messages</h1>
+        <p class="text-gray-600">Connect and communicate with your students</p>
+      </div>
+      <!-- Notification Bell -->
+      <div class="relative">
+        <button id="notificationBell" class="relative p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition">
+          <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span id="notificationBadge" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <!-- Left Sidebar - Conversations List -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-lg p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gray-800">Your Students</h2>
+          </div>
+
+          <!-- Conversations List -->
+          <div id="conversationsList" class="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
+            <div class="text-center py-8 text-gray-500">
+              <p>Loading conversations...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Content - Chat Area -->
+      <div class="lg:col-span-3">
+        <div id="chatContainer" class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-[600px] hidden">
+          <!-- Chat Header -->
+          <div id="chatHeader" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <img id="chatUserPic" src="/images/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                <div>
+                  <h3 id="chatUserName" class="font-bold"></h3>
+                  <p id="chatUserStatus" class="text-sm text-green-100">
+                    <span id="onlineStatus">Online</span>
+                  </p>
+                </div>
+              </div>
+              <button id="closeChat" class="text-white hover:bg-green-600 px-3 py-1 rounded">✕</button>
+            </div>
+          </div>
+
+          <!-- Messages Area with Offline Indicator -->
+          <div id="offlineIndicator" class="bg-yellow-50 border-b border-yellow-200 p-3 hidden">
+            <p class="text-sm text-yellow-800">
+              📶 <strong>Messages will be delivered when they come online</strong>
+            </p>
+          </div>
+
+          <div id="messagesArea" class="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
+            <div class="text-center py-8 text-gray-500">
+              <p>Loading messages...</p>
+            </div>
+          </div>
+
+          <!-- Message Input Area -->
+          <div class="border-t border-gray-200 p-4 bg-white">
+            <div class="flex gap-2">
+              <input type="text" id="messageInput" placeholder="Type a message..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              <button id="sendBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="bg-white rounded-lg shadow-lg p-12 text-center">
+          <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">No student selected</h3>
+          <p class="text-gray-600">Select a student from the list to start chatting</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Panel -->
+  <div id="notificationsPanel" class="hidden fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-40 overflow-y-auto">
+    <div class="sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 flex items-center justify-between">
+      <h3 class="font-bold text-lg">New Messages</h3>
+      <button id="closeNotifications" class="text-white hover:bg-green-600 px-2 py-1 rounded text-xl">✕</button>
+    </div>
+    <div id="notificationsContent" class="p-4 space-y-3">
+      <p class="text-center text-gray-500 py-8">No new messages</p>
+    </div>
+  </div>
+
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  let currentConversationId = null;
+  let currentUserId = {{ userId }};
+  let currentUserProfilePicture = '{{ userProfilePicture }}' || '/images/default-avatar.png';
+  let loadedMessages = [];
+  let conversationsList = [];
+  let isSendingMessage = false;
+  let lastMessageTimestamp = null;
+  let socket = null;
+  let pollInterval = null;
+
+  // Initialize Socket.io connection
+  function initializeSocket() {
+    socket = io({
+      auth: {
+        userId: currentUserId,
+        token: localStorage.getItem('authToken') || ''
+      },
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 10,
+      transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+      console.log('✅ Connected to real-time server');
+      // Join user-specific room
+      socket.emit('join-conversation', { conversationId: 0 }); // For user room
+    });
+
+    socket.on('message-received', (message) => {
+      console.log('📨 Message received:', message);
+      
+      // Check if message is for current conversation
+      if (message.conversationId === currentConversationId) {
+        // Check if message already exists (to avoid duplicates)
+        const exists = loadedMessages.some(m => m.id === message.id);
+        if (!exists) {
+          loadedMessages.push(message);
+          loadedMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          renderMessages();
+        }
+      }
+      
+      // Update conversations list
+      loadConversations();
+      
+      // Show notification if not in current conversation
+      if (message.conversationId !== currentConversationId) {
+        loadNotifications();
+      }
+    });
+
+    socket.on('messages-read', (data) => {
+      console.log('✅ Messages read:', data);
+      data.messageIds.forEach(msgId => {
+        const msg = loadedMessages.find(m => m.id === msgId);
+        if (msg) msg.isRead = true;
+      });
+      renderMessages();
+    });
+
+    socket.on('new-message-notification', (notif) => {
+      console.log('🔔 New message notification:', notif);
+      if (notif.conversationId !== currentConversationId) {
+        loadNotifications();
+      }
+    });
+
+    socket.on('user-typing', (data) => {
+      if (data.conversationId === currentConversationId && data.isTyping) {
+        console.log(`${data.senderId} is typing...`);
+        // You can add visual feedback here
+      }
+    });
+
+    socket.on('user-online', (data) => {
+      console.log(`👤 User ${data.userId} is online`);
+    });
+
+    socket.on('user-offline', (data) => {
+      console.log(`👤 User ${data.userId} went offline`);
+    });
+
+    socket.on('error', (error) => {
+      console.error('❌ Socket error:', error);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('❌ Disconnected from real-time server');
+      // Fall back to polling
+      startPolling();
+    });
+  }
+
+  // Fallback polling (in case socket.io is unavailable)
+  function startPolling() {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(() => {
+      loadConversations();
+      loadNotifications();
+      if (currentConversationId && !isSendingMessage) {
+        loadMessages();
+      }
+    }, 3000);
+  }
+
+  // Load saved conversation from localStorage
+  function loadSavedConversation() {
+    const saved = localStorage.getItem('lastCounselorConversationId');
+    return saved ? parseInt(saved) : null;
+  }
+
+  // Save current conversation to localStorage
+  function saveCurrentConversation() {
+    if (currentConversationId) {
+      localStorage.setItem('lastCounselorConversationId', currentConversationId.toString());
+    }
+  }
+
+  // Load conversations on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeSocket();
+    loadConversations();
+    loadNotifications();
+    
+    // Restore previous conversation if it exists
+    setTimeout(() => {
+      const savedConvId = loadSavedConversation();
+      if (savedConvId) {
+        // Find the conversation in the list and restore it
+        const conversation = conversationsList.find(c => c.id === savedConvId);
+        if (conversation) {
+          const otherUser = conversation.user?.id === currentUserId ? conversation.counselor : conversation.user;
+          selectConversation(conversation.id, otherUser);
+        }
+      }
+    }, 500);
+    
+    // Event listeners
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Emit typing event
+    document.getElementById('messageInput').addEventListener('input', function(e) {
+      if (socket && currentConversationId && socket.connected) {
+        const conversation = conversationsList.find(c => c.id === currentConversationId);
+        if (conversation) {
+          const receiverId = conversation.user?.id === currentUserId ? conversation.counselor?.id : conversation.user?.id;
+          socket.emit('typing', {
+            conversationId: currentConversationId,
+            receiverId: receiverId,
+            isTyping: e.target.value.length > 0
+          });
+        }
+      }
+    });
+
+    document.getElementById('closeChat').addEventListener('click', closeChat);
+    document.getElementById('notificationBell').addEventListener('click', toggleNotifications);
+    document.getElementById('closeNotifications').addEventListener('click', closeNotifications);
+  });
+
+  function toggleNotifications() {
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('hidden');
+  }
+
+  function closeNotifications() {
+    document.getElementById('notificationsPanel').classList.add('hidden');
+  }
+
+  async function loadNotifications() {
+    try {
+      const response = await fetch('/api/notifications');
+      const data = await response.json();
+      
+      const unreadNotifications = data.notifications.filter(n => !n.isRead);
+      updateNotificationBadge(unreadNotifications.length);
+      
+      // Render unread notifications
+      const content = document.getElementById('notificationsContent');
+      if (unreadNotifications.length === 0) {
+        content.innerHTML = '<p class="text-center text-gray-500 py-8">No new messages</p>';
+        return;
+      }
+
+      content.innerHTML = '';
+      unreadNotifications.forEach(notif => {
+        const element = document.createElement('div');
+        element.className = 'p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 cursor-pointer transition';
+        element.innerHTML = `
+          <div class="flex items-start gap-3">
+            <img src="${notif.sender?.profilePicture || '/images/default-avatar.png'}" alt="${notif.senderName}" class="w-8 h-8 rounded-full">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-gray-800">${notif.senderName}</p>
+              <p class="text-xs text-gray-600 line-clamp-2">${notif.messagePreview}</p>
+              <p class="text-xs text-gray-500 mt-1">${new Date(notif.createdAt).toLocaleString()}</p>
+            </div>
+          </div>
+        `;
+        element.addEventListener('click', async () => {
+          // Open the conversation
+          const convResponse = await fetch('/api/conversations');
+          const convData = await convResponse.json();
+          const conversation = convData.conversations.find(c => c.id === notif.conversationId);
+          if (conversation) {
+            const otherUser = conversation.user?.id === currentUserId ? conversation.counselor : conversation.user;
+            selectConversation(conversation.id, otherUser);
+            closeNotifications();
+          }
+          // Mark as read
+          await fetch('/api/notifications/read/' + notif.conversationId, { method: 'PUT' });
+          loadNotifications();
+        });
+        content.appendChild(element);
+      });
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  }
+
+  function updateNotificationBadge(count) {
+    const badge = document.getElementById('notificationBadge');
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  async function loadConversations() {
+    try {
+      const response = await fetch('/api/conversations');
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error('Error loading conversations:', data.error);
+        return;
+      }
+
+      conversationsList = data.conversations;
+      const listElement = document.getElementById('conversationsList');
+      listElement.innerHTML = '';
+
+      if (data.conversations.length === 0) {
+        listElement.innerHTML = '<p class="text-center text-gray-500 py-4">No active conversations</p>';
+        return;
+      }
+
+      data.conversations.forEach(conv => {
+        const otherUser = conv.user?.id === currentUserId ? conv.counselor : conv.user;
+        const lastMessagePreview = conv.lastMessage || 'No messages yet';
+        
+        // Check if has unread notifications
+        const hasUnread = conv.counselorLastReadAt && conv.lastMessageTime && new Date(conv.lastMessageTime) > new Date(conv.counselorLastReadAt);
+        
+        const element = document.createElement('div');
+        element.className = `p-3 rounded-lg hover:bg-green-50 cursor-pointer transition border-l-4 ${hasUnread ? 'border-red-500 bg-green-50' : 'border-gray-200'}`;
+        element.innerHTML = `
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <img src="${otherUser?.profilePicture || '/images/default-avatar.png'}" alt="${otherUser?.name}" class="w-8 h-8 rounded-full">
+              ${hasUnread ? '<span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>' : ''}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-gray-800">${otherUser?.name}</p>
+              <p class="text-xs text-gray-600 truncate">${lastMessagePreview}</p>
+            </div>
+          </div>
+        `;
+        element.addEventListener('click', () => selectConversation(conv.id, otherUser));
+        listElement.appendChild(element);
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      document.getElementById('conversationsList').innerHTML = '<p class="text-red-500">Error loading conversations</p>';
+    }
+  }
+
+  async function selectConversation(conversationId, otherUser) {
+    currentConversationId = conversationId;
+    saveCurrentConversation(); // Save to localStorage
+    
+    // Clear old messages from previous conversation
+    loadedMessages = [];
+    
+    // Update UI
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('chatContainer').classList.remove('hidden');
+    document.getElementById('chatUserName').textContent = otherUser.name;
+    document.getElementById('chatUserPic').src = otherUser.profilePicture || '/images/default-avatar.png';
+    
+    // Show loading state
+    const messagesArea = document.getElementById('messagesArea');
+    messagesArea.innerHTML = '<div class="text-center py-8 text-gray-500"><p>Loading messages...</p></div>';
+    
+    // Join conversation room via Socket.io
+    if (socket && socket.connected) {
+      socket.emit('join-conversation', { conversationId: conversationId });
+      console.log(`👥 Joined conversation room: ${conversationId}`);
+    }
+    
+    // Load messages from database
+    await loadMessages();
+
+    // Mark as read
+    await fetch(`/api/conversations/${conversationId}/read`, { method: 'PUT' });
+    
+    // Mark notifications as read
+    await fetch(`/api/notifications/read/${conversationId}`, { method: 'PUT' });
+    
+    // Reload notifications badge
+    loadNotifications();
+  }
+
+  async function loadMessages() {
+    try {
+      const response = await fetch(`/api/conversations/${currentConversationId}/messages?page=1&limit=100`);
+      const data = await response.json();
+      
+      if (!data.messages) return;
+
+      const newMessages = data.messages;
+      
+      // If switching conversations, replace everything. Otherwise merge.
+      if (loadedMessages.length === 0) {
+        // First time loading this conversation
+        loadedMessages = newMessages;
+      } else {
+        // Merge new messages with existing ones (avoid duplicates)
+        loadedMessages = loadedMessages.filter(m => m.id && typeof m.id === 'number');
+        
+        // Add any new messages from server
+        newMessages.forEach(newMsg => {
+          const exists = loadedMessages.some(m => m.id === newMsg.id);
+          if (!exists) {
+            loadedMessages.push(newMsg);
+          } else {
+            // Update existing message with server data (e.g., update isRead status)
+            const index = loadedMessages.findIndex(m => m.id === newMsg.id);
+            if (index !== -1) {
+              loadedMessages[index] = { ...loadedMessages[index], ...newMsg };
+            }
+          }
+        });
+      }
+      
+      // Sort by creation time
+      loadedMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      renderMessages();
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  }
+
+  function renderMessages() {
+    const messagesArea = document.getElementById('messagesArea');
+    messagesArea.innerHTML = '';
+
+    loadedMessages.forEach(msg => {
+      const isOwn = msg.senderId === currentUserId;
+      const element = document.createElement('div');
+      element.className = `flex ${isOwn ? 'justify-end' : 'justify-start'}`;
+      
+      const time = new Date(msg.createdAt).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      const bgColor = isOwn ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800';
+      
+      // Get status indicator for sent messages
+      let statusIndicator = '';
+      if (isOwn) {
+        if (msg.isRead) {
+          statusIndicator = '✓✓'; // Double checkmark for seen/read
+        } else {
+          statusIndicator = '✓'; // Single checkmark for sent
+        }
+      }
+      
+      element.innerHTML = `
+        <div class="flex gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end max-w-xs">
+          <img src="${msg.sender?.profilePicture || '/images/default-avatar.png'}" alt="${msg.sender?.name}" class="w-6 h-6 rounded-full">
+          <div class="${bgColor} px-4 py-2 rounded-lg">
+            <p class="break-words">${escapeHtml(msg.content)}</p>
+            <div class="flex items-center justify-between gap-2 mt-1">
+              <p class="text-xs opacity-70">${time}</p>
+              ${isOwn ? `<span class="text-xs opacity-70 ${msg.isRead ? 'font-bold text-green-200' : ''}">${statusIndicator}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+      messagesArea.appendChild(element);
+    });
+
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const content = document.getElementById('messageInput').value.trim();
+    if (!content || !currentConversationId || isSendingMessage) return;
+
+    isSendingMessage = true;
+    document.getElementById('messageInput').value = '';
+    document.getElementById('sendBtn').disabled = true;
+
+    try {
+      // Get receiver ID from current conversation
+      const conversation = conversationsList.find(c => c.id === currentConversationId);
+      const receiverId = conversation.user?.id === currentUserId ? conversation.counselor?.id : conversation.user?.id;
+
+      // Create optimistic message (show immediately)
+      const optimisticId = Date.now();
+      const optimisticMessage = {
+        id: optimisticId, // temporary id
+        conversationId: currentConversationId,
+        senderId: currentUserId,
+        receiverId: receiverId,
+        content: content,
+        messageType: 'text',
+        isRead: false,
+        createdAt: new Date().toISOString(),
+        sender: {
+          id: currentUserId,
+          name: 'You',
+          profilePicture: currentUserProfilePicture
+        },
+        isPending: true
+      };
+
+      // Show message immediately (optimistic update)
+      loadedMessages.push(optimisticMessage);
+      renderMessages();
+
+      // Send via Socket.io if connected, otherwise use HTTP
+      if (socket && socket.connected) {
+        socket.emit('send-message', {
+          conversationId: currentConversationId,
+          content: content,
+          receiverId: receiverId
+        }, (ack) => {
+          if (ack && ack.error) {
+            console.error('Error sending message via socket:', ack.error);
+            // Fallback to HTTP
+            sendMessageViaHTTP(content, receiverId, optimisticId);
+          } else {
+            console.log('✅ Message sent via socket.io');
+          }
+        });
+      } else {
+        // Fallback to HTTP request
+        sendMessageViaHTTP(content, receiverId, optimisticId);
+      }
+
+      // Refresh conversations to update last message
+      loadConversations();
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      isSendingMessage = false;
+      document.getElementById('sendBtn').disabled = false;
+    }
+  }
+
+  async function sendMessageViaHTTP(content, receiverId, optimisticId) {
+    try {
+      const response = await fetch(`/api/conversations/${currentConversationId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, receiverId })
+      });
+
+      if (!response.ok) {
+        console.error('Error sending message via HTTP');
+        return;
+      }
+
+      const data = await response.json();
+      
+      // Replace optimistic message with server response
+      const index = loadedMessages.findIndex(m => m.id === optimisticId);
+      if (index !== -1) {
+        loadedMessages[index] = { ...data.message, isPending: false };
+      } else {
+        loadedMessages.push({ ...data.message, isPending: false });
+      }
+      
+      // Ensure messages are sorted by time
+      loadedMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      renderMessages();
+    } catch (error) {
+      console.error('Error sending message via HTTP:', error);
+    }
+  }
+
+  function closeChat() {
+    if (currentConversationId && socket && socket.connected) {
+      socket.emit('leave-conversation', { conversationId: currentConversationId });
+      console.log(`👋 Left conversation room: ${currentConversationId}`);
+    }
+    
+    currentConversationId = null;
+    localStorage.removeItem('lastCounselorConversationId'); // Clear saved conversation
+    document.getElementById('chatContainer').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Note: Polling is now started only if Socket.io connection fails (as fallback)
+  // The startPolling() function will be called automatically in the socket.on('disconnect') handler
+
+</script>
+
+<style>
+  .bg-green-500 {
+    background-color: #22c55e;
+  }
+  .text-white {
+    color: white;
+  }
+  .bg-gray-200 {
+    background-color: #e5e7eb;
+  }
+  .text-gray-800 {
+    color: #1f2937;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+  </div>
+  </div>
+</body>
+</html>
