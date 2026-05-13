@@ -364,12 +364,56 @@
         </div>
       </div>
 
+      <!-- Activity Filter & Sort Section -->
+      <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #d1fae5;">
+        <h3 style="margin-bottom: 15px; font-size: 13px; font-weight: 600; color: #10b981;">🔍 Activity Filters & Sorting</h3>
+        
+        <!-- Activity Type Filter Buttons -->
+        <div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+          <span style="font-size: 12px; font-weight: 600; color: #666; margin-right: 8px;">Filter by Type:</span>
+          <button onclick="filterActivityType('all')" class="activity-filter-btn active" data-activity-type="all" style="padding: 6px 12px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">All Activities</button>
+          {{#if journalEntries}}<button onclick="filterActivityType('journal')" class="activity-filter-btn" data-activity-type="journal" style="padding: 6px 12px; border: 2px solid #0284c7; background: white; color: #0284c7; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">📔 Journal</button>{{/if}}
+          {{#if gameSessions}}<button onclick="filterActivityType('game')" class="activity-filter-btn" data-activity-type="game" style="padding: 6px 12px; border: 2px solid #15803d; background: white; color: #15803d; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">🎮 Games</button>{{/if}}
+          {{#if readingSessions}}<button onclick="filterActivityType('reading')" class="activity-filter-btn" data-activity-type="reading" style="padding: 6px 12px; border: 2px solid #92400e; background: white; color: #92400e; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">📚 Reading</button>{{/if}}
+          {{#if comments}}<button onclick="filterActivityType('video')" class="activity-filter-btn" data-activity-type="video" style="padding: 6px 12px; border: 2px solid #be123c; background: white; color: #be123c; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">🎥 Videos</button>{{/if}}
+          {{#if reactions}}<button onclick="filterActivityType('comment')" class="activity-filter-btn" data-activity-type="comment" style="padding: 6px 12px; border: 2px solid #3730a3; background: white; color: #3730a3; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">💬 Comments</button>{{/if}}
+        </div>
+
+        <!-- Sort Options -->
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+          <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #666; margin-bottom: 6px;">Sort by:</label>
+            <select id="sortActivities" onchange="sortActivities()" style="width: 100%; padding: 8px 12px; border: 1px solid #d1fae5; border-radius: 6px; font-size: 12px; background: white; cursor: pointer;">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">Title (A-Z)</option>
+              <option value="duration">Duration</option>
+            </select>
+          </div>
+
+          <!-- Search Activities -->
+          <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #666; margin-bottom: 6px;">Search:</label>
+            <input 
+              type="text" 
+              id="searchActivities" 
+              placeholder="Search activities..."
+              onkeyup="filterActivityType(document.querySelector('.activity-filter-btn.active')?.getAttribute('data-activity-type') || 'all')"
+              style="width: 100%; padding: 8px 12px; border: 1px solid #d1fae5; border-radius: 6px; font-size: 12px; background: white;"
+            />
+          </div>
+
+          <!-- Clear Filters -->
+          <button onclick="clearActivityFilters()" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; align-self: flex-end; margin-bottom: 0;">Clear</button>
+        </div>
+      </div>
+
       <!-- Journal Activities -->
       {{#if journalEntries}}
       <h2 class="section-header">📔 JOURNAL ENTRIES</h2>
-      <ul class="activity-list">
+      <ul class="activity-list activity-section" data-activity-type="journal">
         {{#each journalEntries}}
-        <li class="activity-list-item">
+        <li class="activity-list-item activity-item" data-type="journal" data-title="{{#if this.title}}{{this.title}}{{else}}(Untitled){{/if}}" data-date="{{this.createdAt}}" data-searchable="{{this.title}} {{this.content}} {{this.mood}}">
           <div class="activity-info">
             <div class="activity-title">
               <span>📝 Journal Entry</span>
@@ -395,9 +439,9 @@
       <!-- Game Sessions -->
       {{#if gameSessions}}
       <h2 class="section-header">🎮 GAME SESSIONS</h2>
-      <ul class="activity-list">
+      <ul class="activity-list activity-section" data-activity-type="game">
         {{#each gameSessions}}
-        <li class="activity-list-item">
+        <li class="activity-list-item activity-item" data-type="game" data-title="{{this.gameName}}" data-date="{{this.createdAt}}" data-duration="{{this.duration}}" data-searchable="{{this.gameName}} {{this.status}}">
           <div class="activity-info">
             <div class="activity-title">
               <span>🎮 {{this.gameName}}</span>
@@ -425,9 +469,9 @@
       <!-- Reading Sessions -->
       {{#if readingSessions}}
       <h2 class="section-header">📚 READING SESSIONS</h2>
-      <ul class="activity-list">
+      <ul class="activity-list activity-section" data-activity-type="reading">
         {{#each readingSessions}}
-        <li class="activity-list-item">
+        <li class="activity-list-item activity-item" data-type="reading" data-title="{{this.materialTitle}}" data-date="{{this.createdAt}}" data-duration="{{this.duration}}" data-searchable="{{this.materialTitle}} {{this.category}}">
           <div class="activity-info">
             <div class="activity-title">
               <span>📚 {{this.materialTitle}}</span>
@@ -450,9 +494,9 @@
       <!-- Video Watch Sessions -->
       {{#if comments}}
       <h2 class="section-header">🎥 VIDEO WATCH HISTORY</h2>
-      <ul class="activity-list">
+      <ul class="activity-list activity-section" data-activity-type="video">
         {{#each comments}}
-        <li class="activity-list-item">
+        <li class="activity-list-item activity-item" data-type="video" data-title="{{this.materialTitle}}" data-date="{{this.createdAt}}" data-searchable="{{this.materialTitle}}">
           <div class="activity-info">
             <div class="activity-title">
               <span>🎥 {{this.materialTitle}}</span>
@@ -475,9 +519,9 @@
       <!-- Comments & Reactions -->
       {{#if reactions}}
       <h2 class="section-header">💬 COMMENTS & REACTIONS</h2>
-      <ul class="activity-list">
+      <ul class="activity-list activity-section" data-activity-type="comment">
         {{#each reactions}}
-        <li class="activity-list-item">
+        <li class="activity-list-item activity-item" data-type="comment" data-title="{{this.commentType}}" data-date="{{this.createdAt}}" data-searchable="{{this.commentType}} {{this.materialTitle}} {{this.content}} {{this.emoji}}">
           <div class="activity-info">
             <div class="activity-title">
               <span>💬 {{this.commentType}} on {{this.materialTitle}}</span>
@@ -676,6 +720,92 @@
   </div>
 
   <script>
+    // Activity filtering functionality
+    function filterActivityType(activityType) {
+      const filterBtns = document.querySelectorAll('.activity-filter-btn');
+      const searchText = document.getElementById('searchActivities')?.value?.toLowerCase() || '';
+      
+      // Update button states
+      filterBtns.forEach(btn => {
+        const isActive = btn.getAttribute('data-activity-type') === activityType;
+        btn.classList.toggle('active', isActive);
+        btn.style.background = isActive ? btn.style.borderColor || '#10b981' : 'white';
+        btn.style.color = isActive ? (activityType === 'all' ? 'white' : btn.style.borderColor) : btn.style.borderColor;
+      });
+
+      // Filter activities
+      const allItems = document.querySelectorAll('.activity-item');
+      allItems.forEach(item => {
+        const itemType = item.getAttribute('data-type');
+        const itemSearchable = item.getAttribute('data-searchable')?.toLowerCase() || '';
+        const matchesType = activityType === 'all' || itemType === activityType;
+        const matchesSearch = searchText === '' || itemSearchable.includes(searchText);
+
+        if (matchesType && matchesSearch) {
+          item.style.display = '';
+          item.style.animation = 'fadeIn 0.3s ease';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      // Show/hide sections based on filtered items
+      const sections = document.querySelectorAll('.activity-section');
+      sections.forEach(section => {
+        const visibleItems = Array.from(section.querySelectorAll('.activity-item')).filter(item => item.style.display !== 'none').length;
+        section.closest('.activity-list').style.display = visibleItems > 0 ? '' : 'none';
+        
+        // Hide section header if no items visible
+        const prevHeader = section.previousElementSibling;
+        if (prevHeader && prevHeader.classList.contains('section-header')) {
+          prevHeader.style.display = visibleItems > 0 ? '' : 'none';
+        }
+      });
+    }
+
+    function sortActivities() {
+      const sortOption = document.getElementById('sortActivities').value;
+      const allItems = document.querySelectorAll('.activity-item:not([style*="display: none"])');
+      const sections = document.querySelectorAll('.activity-section');
+
+      sections.forEach(section => {
+        const items = Array.from(section.querySelectorAll('.activity-item')).filter(item => item.style.display !== 'none');
+        
+        items.sort((a, b) => {
+          const dateA = new Date(a.getAttribute('data-date'));
+          const dateB = new Date(b.getAttribute('data-date'));
+          const titleA = a.getAttribute('data-title');
+          const titleB = b.getAttribute('data-title');
+          const durationA = parseInt(a.getAttribute('data-duration') || 0);
+          const durationB = parseInt(b.getAttribute('data-duration') || 0);
+
+          switch(sortOption) {
+            case 'oldest':
+              return dateA - dateB;
+            case 'title':
+              return titleA.localeCompare(titleB);
+            case 'duration':
+              return durationB - durationA;
+            case 'newest':
+            default:
+              return dateB - dateA;
+          }
+        });
+
+        // Reorder DOM elements
+        items.forEach(item => {
+          section.appendChild(item);
+        });
+      });
+    }
+
+    function clearActivityFilters() {
+      document.getElementById('searchActivities').value = '';
+      document.getElementById('sortActivities').value = 'newest';
+      filterActivityType('all');
+      sortActivities();
+    }
+
     // Mood filter functionality
     function filterMoodEntries(emotion) {
       const entries = document.querySelectorAll('.mood-entry-card');
@@ -738,7 +868,7 @@
       }
     }
 
-    // Add fade-in animation
+    // Add fade-in animation and styles
     const style = document.createElement('style');
     style.textContent = `
       @keyframes fadeIn {
@@ -752,15 +882,18 @@
         }
       }
       
+      .activity-filter-btn,
       .mood-filter-btn {
         transition: all 0.3s ease;
       }
       
+      .activity-filter-btn:hover,
       .mood-filter-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
       
+      .activity-filter-btn.active,
       .mood-filter-btn.active {
         font-weight: 700;
       }
@@ -791,6 +924,17 @@
         filterMoodEntries(filter);
       });
     });
+
+    document.querySelectorAll('.activity-filter-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const type = this.getAttribute('data-activity-type');
+        filterActivityType(type);
+      });
+    });
+
+    // Initialize with all activities shown
+    filterActivityType('all');
   </script>
 </body>
 </html>
