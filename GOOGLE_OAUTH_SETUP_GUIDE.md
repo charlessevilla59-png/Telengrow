@@ -53,7 +53,7 @@ A popup appears with:
 **COPY BOTH!**
 
 ### Step 6: Update Your .env File
-Open `Telengrow/.env` and replace:
+Open `Tell 'n Grow/.env` and replace:
 
 ```env
 GOOGLE_CLIENT_ID=PASTE_YOUR_CLIENT_ID_HERE

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activity Log - Telengrow Admin</title>
+  <title>Activity Log - Tell 'n Grow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * {
@@ -72,8 +72,8 @@
     <!-- Logo -->
     <div class="p-6 border-b border-green-200">
       <div class="flex items-center gap-3 mb-3">
-        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
+        <img src="/images/logo.jpg" alt="Tell 'n Grow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Tell 'n Grow</h1>
       </div>
       <p class="text-gray-600 text-xs font-semibold text-center">Mindoro State University</p>
     </div>

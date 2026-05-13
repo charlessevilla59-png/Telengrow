@@ -275,7 +275,7 @@ export const User = sequelize.define("User", {
     allowNull: true
   },
   profilePicture: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true
   },
   authProvider: {

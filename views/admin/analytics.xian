@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analytics - Telengrow Admin</title>
+  <title>Analytics - Tell 'n Grow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -203,8 +203,8 @@
     <!-- Logo -->
     <div class="p-6 border-b border-green-200">
       <div class="flex items-center gap-3 mb-3">
-        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Telengrow</h1>
+        <img src="/images/logo.jpg" alt="Tell 'n Grow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">Tell 'n Grow</h1>
       </div>
       <p class="text-gray-600 text-xs font-semibold text-center">Mindoro State University</p>
     </div>
@@ -271,16 +271,29 @@
           <span class="text-xs bg-emerald-900 text-emerald-200 px-3 py-1 rounded-full font-semibold border border-emerald-700">Real-time</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <!-- Average Game Score -->
+          <!-- Times Games Played -->
           <div class="metric-card">
             <div class="flex justify-between items-start mb-4">
               <div class="text-5xl">🎮</div>
-              <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Games</span>
+              <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Plays</span>
             </div>
-            <div class="text-4xl font-bold text-blue-400 mb-2">{{avgGameScore}}</div>
-            <div class="text-slate-300 font-semibold">Avg Game Score</div>
+            <div class="text-4xl font-bold text-blue-400 mb-2">{{timesGamesPlayed}}</div>
+            <div class="text-slate-300 font-semibold">Times Games Played</div>
             <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 72%"></div>
+            </div>
+          </div>
+
+          <!-- Ties Count -->
+          <div class="metric-card">
+            <div class="flex justify-between items-start mb-4">
+              <div class="text-5xl">🤝</div>
+              <span class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Ties</span>
+            </div>
+            <div class="text-4xl font-bold text-indigo-400 mb-2">{{tiesCount}}</div>
+            <div class="text-slate-300 font-semibold">Game Ties</div>
+            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full" style="width: 45%"></div>
             </div>
           </div>
 
@@ -307,19 +320,6 @@
             <div class="text-slate-300 font-semibold">Completion Rate</div>
             <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style="width: {{completionRate}}%"></div>
-            </div>
-          </div>
-
-          <!-- User Engagement -->
-          <div class="metric-card">
-            <div class="flex justify-between items-start mb-4">
-              <div class="text-5xl">👥</div>
-              <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Engagement</span>
-            </div>
-            <div class="text-4xl font-bold text-orange-400 mb-2">{{engagementRate}}%</div>
-            <div class="text-slate-300 font-semibold">User Engagement</div>
-            <div class="mt-4 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" style="width: {{engagementRate}}%"></div>
             </div>
           </div>
         </div>
@@ -454,57 +454,67 @@
         </div>
       </div>
 
-      <!-- User Engagement List -->
+      <!-- Student Journal Entries List -->
       <div class="mb-12">
         <div class="flex items-center gap-3 mb-8">
-          <h2 class="text-2xl font-bold text-gray-100">👥 Top Engaged Users</h2>
-          <span class="text-xs bg-emerald-900 text-emerald-200 px-3 py-1 rounded-full font-semibold border border-emerald-700">Leaderboard</span>
+          <h2 class="text-2xl font-bold text-gray-100">📔 Student Journal Entries</h2>
+          <span class="text-xs bg-emerald-900 text-emerald-200 px-3 py-1 rounded-full font-semibold border border-emerald-700">All Students</span>
         </div>
         <div class="table-card overflow-hidden shadow-lg">
-          {{#if topUsers.length}}
+          {{#if studentJournalEntries.length}}
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-slate-900 border-b border-slate-700">
                 <tr>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">User</th>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Games</th>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Journals</th>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Reading</th>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Total Points</th>
-                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Level</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Student Name</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Email</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Total Entries</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Last Entry Date</th>
+                  <th class="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider text-xs">Last Entry Mood</th>
                 </tr>
               </thead>
               <tbody>
-                {{#each topUsers}}
+                {{#each studentJournalEntries}}
                 <tr class="border-b border-slate-700 transition hover:bg-slate-700 hover:bg-opacity-20">
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                         {{substring this.name 0 1}}
                       </div>
-                      <div>
-                        <div class="font-bold text-gray-100">{{this.name}}</div>
-                        <div class="text-xs text-slate-400">{{this.email}}</div>
-                      </div>
+                      <div class="font-bold text-gray-100">{{this.name}}</div>
                     </div>
                   </td>
                   <td class="px-6 py-4">
-                    <span class="bg-blue-900 bg-opacity-30 text-blue-300 px-3 py-1 rounded-lg font-bold border border-blue-700">{{this.gameCount}}</span>
+                    <span class="text-slate-300 text-sm">{{this.email}}</span>
                   </td>
                   <td class="px-6 py-4">
-                    <span class="bg-purple-900 bg-opacity-30 text-purple-300 px-3 py-1 rounded-lg font-bold border border-purple-700">{{this.journalCount}}</span>
+                    <span class="bg-blue-900 bg-opacity-30 text-blue-300 px-3 py-1 rounded-lg font-bold border border-blue-700">{{this.journalCount}}</span>
                   </td>
                   <td class="px-6 py-4">
-                    <span class="bg-orange-900 bg-opacity-30 text-orange-300 px-3 py-1 rounded-lg font-bold border border-orange-700">{{this.readingCount}}</span>
+                    {{#if this.lastJournalDate}}
+                    <span class="text-slate-300 text-sm">{{formatDate this.lastJournalDate}}</span>
+                    {{else}}
+                    <span class="text-slate-500 italic">No entries yet</span>
+                    {{/if}}
                   </td>
                   <td class="px-6 py-4">
-                    <span class="font-bold text-lg">
-                      <span class="text-amber-400">⭐</span>
-                      <span class="text-emerald-400">{{this.totalPoints}}</span>
+                    {{#if this.lastJournalMood}}
+                    <span class="inline-block px-3 py-1 rounded-lg font-bold border
+                      {{#if (eq this.lastJournalMood 'happy')}}bg-yellow-900 bg-opacity-30 text-yellow-300 border-yellow-700{{/if}}
+                      {{#if (eq this.lastJournalMood 'sad')}}bg-blue-900 bg-opacity-30 text-blue-300 border-blue-700{{/if}}
+                      {{#if (eq this.lastJournalMood 'angry')}}bg-red-900 bg-opacity-30 text-red-300 border-red-700{{/if}}
+                      {{#if (eq this.lastJournalMood 'anxious')}}bg-purple-900 bg-opacity-30 text-purple-300 border-purple-700{{/if}}
+                      {{#if (eq this.lastJournalMood 'neutral')}}bg-gray-700 bg-opacity-30 text-gray-300 border-gray-600{{/if}}
+                    ">
+                      {{#if (eq this.lastJournalMood 'happy')}}😊 Happy{{/if}}
+                      {{#if (eq this.lastJournalMood 'sad')}}😢 Sad{{/if}}
+                      {{#if (eq this.lastJournalMood 'angry')}}😠 Angry{{/if}}
+                      {{#if (eq this.lastJournalMood 'anxious')}}😰 Anxious{{/if}}
+                      {{#if (eq this.lastJournalMood 'neutral')}}😐 Neutral{{/if}}
                     </span>
-                  </td>
-                  <td class="px-6 py-4">
-                    <span class="bg-emerald-900 bg-opacity-30 text-emerald-200 px-3 py-1 rounded-lg font-bold border border-emerald-700">{{this.level}}</span>
+                    {{else}}
+                    <span class="text-slate-500">-</span>
+                    {{/if}}
                   </td>
                 </tr>
                 {{/each}}
@@ -513,9 +523,9 @@
           </div>
           {{else}}
           <div class="text-center py-16">
-            <div class="text-6xl mb-4">👥</div>
-            <p class="text-slate-300 text-lg font-medium">No user data available yet</p>
-            <p class="text-slate-400 text-sm mt-2">Users will appear here as they engage with the platform</p>
+            <div class="text-6xl mb-4">📔</div>
+            <p class="text-slate-300 text-lg font-medium">No student data available yet</p>
+            <p class="text-slate-400 text-sm mt-2">Journal entries will appear here as students create them</p>
           </div>
           {{/if}}
         </div>

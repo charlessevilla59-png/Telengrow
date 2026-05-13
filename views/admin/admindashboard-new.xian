@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Telengrow Admin</title>
+  <title>{{title}} - Tell 'n Grow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -108,8 +108,8 @@
     <!-- Logo -->
     <div class="p-6 border-b border-gray-200">
       <div class="flex items-center gap-3 mb-3">
-        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
-        <h1 class="text-2xl font-bold text-green-600">Telengrow</h1>
+        <img src="/images/logo.jpg" alt="Tell 'n Grow" class="h-10 w-10">
+        <h1 class="text-2xl font-bold text-green-600">Tell 'n Grow</h1>
       </div>
       <p class="text-green-700 text-xs font-semibold text-center">Admin Panel</p>
     </div>

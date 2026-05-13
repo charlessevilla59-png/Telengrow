@@ -24,7 +24,7 @@ export const Notification = sequelize.define("Notification", {
   },
   conversationId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Allow null for mood_alert type
     references: {
       model: 'conversations',
       key: 'id'
@@ -32,7 +32,7 @@ export const Notification = sequelize.define("Notification", {
   },
   messageId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Allow null for mood_alert type
     references: {
       model: 'messages',
       key: 'id'
@@ -40,7 +40,7 @@ export const Notification = sequelize.define("Notification", {
   },
   senderId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Allow null for system-generated mood_alert
     references: {
       model: 'users',
       key: 'id'
@@ -55,7 +55,7 @@ export const Notification = sequelize.define("Notification", {
     allowNull: false
   },
   notificationType: {
-    type: DataTypes.ENUM('new_message', 'conversation_started'),
+    type: DataTypes.ENUM('new_message', 'conversation_started', 'mood_alert'),
     defaultValue: 'new_message'
   },
   isRead: {

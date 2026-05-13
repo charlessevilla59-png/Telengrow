@@ -32,6 +32,7 @@ import session from "express-session";
 import flash from "connect-flash";
 import router from "./routes/index.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import exportRoutes from "./routes/exportRoutes.js";
 import fs from 'fs';
 import hbs from "hbs";
 import { fileURLToPath } from "url";
@@ -147,11 +148,17 @@ app.engine("xian", async (filePath, options, callback) => {
       return Math.ceil(words / wordsPerMinute);
     });
 
-    hbs.handlebars.registerHelper('gt', function(a, b) {
+    hbs.handlebars.registerHelper('gt', function(a, b, options) {
+      if (options && typeof options.fn === 'function') {
+        return a > b ? options.fn(this) : options.inverse(this);
+      }
       return a > b;
     });
 
-    hbs.handlebars.registerHelper('lt', function(a, b) {
+    hbs.handlebars.registerHelper('lt', function(a, b, options) {
+      if (options && typeof options.fn === 'function') {
+        return a < b ? options.fn(this) : options.inverse(this);
+      }
       return a < b;
     });
 
@@ -428,6 +435,7 @@ try {
 
 // Mount messageRoutes BEFORE main router so it catches /conversations first
 app.use("/", messageRoutes);
+app.use("/", exportRoutes);
 app.use("/", router);
 
 export default app;
@@ -442,15 +450,8 @@ async function startServer() {
     await sequelize.sync({ alter: false, force: false });
     console.log("✅ Database synchronized successfully");
     
-    // Initialize face-api models (download and cache them)
-    console.log("\n🤖 Initializing face-api models...");
-    const modelsReady = await downloadFaceApiModels();
-    
-    if (modelsReady) {
-      console.log("✅ Face-API models ready for use");
-    } else {
-      console.warn("⚠️  Models not fully downloaded - will attempt CDN fallback");
-    }
+    // Face recognition disabled - using manual mood selection instead
+    console.log("\n📱 Manual mood tracking enabled (Face recognition disabled)");
     
     if (!process.env.ELECTRON) {
       // Create HTTP server for Socket.io compatibility

@@ -169,57 +169,9 @@ const uploadVideo = multer({
 });
 
 // ==================== DIAGNOSTIC ROUTES ====================
-// Check face-api models status
-router.get("/api/models/status", (req, res) => {
-  const status = getModelFileInfo();
-  res.json(status);
-});
-
-// Download face-api models on demand
-router.post("/api/models/download", async (req, res) => {
-  try {
-    console.log("📥 Manual model download triggered");
-    
-    // Check current status
-    let status = getModelFileInfo();
-    
-    if (status.ready) {
-      return res.json({
-        success: true,
-        message: "All models already downloaded",
-        status
-      });
-    }
-
-    // Start download
-    const downloadStartTime = Date.now();
-    const success = await downloadFaceApiModels((progress) => {
-      if (progress.error) {
-        console.error("Download progress error:", progress.error);
-      } else {
-        console.log(`Download progress: ${progress.downloaded}/${progress.total}`);
-      }
-    });
-
-    const downloadTime = ((Date.now() - downloadStartTime) / 1000).toFixed(2);
-    status = getModelFileInfo();
-
-    res.json({
-      success,
-      message: success ? "Models downloaded successfully" : "Download completed with some errors",
-      downloadTime: `${downloadTime}s`,
-      status
-    });
-
-  } catch (error) {
-    console.error("Download error:", error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-      status: getModelFileInfo()
-    });
-  }
-});
+// Face-api routes disabled - using manual mood selection instead
+// router.get("/api/models/status", (req, res) => { ... });
+// router.post("/api/models/download", async (req, res) => { ... });
 
 // ==================== PUBLIC ROUTES ====================
 router.get("/", (req, res) => {
@@ -488,6 +440,7 @@ router.get("/journal/new", isAuthenticated, (req, res) => {
 router.post("/journal/new", isAuthenticated, async (req, res) => {
   try {
     const { JournalEntry } = await import('../models/index.js');
+    const { analyzeJournalEmotion } = await import('../utils/sentimentAnalysis.js');
     const { title, mood, content } = req.body;
     
     if (!title || !content) {
@@ -498,11 +451,36 @@ router.post("/journal/new", isAuthenticated, async (req, res) => {
       });
     }
     
+    // ✅ AI Emotion Analysis
+    const emotionAnalysis = analyzeJournalEmotion(content);
+    
+    // Count words
+    const wordCount = content.trim().split(/\s+/).length;
+    
+    // ✅ Map AI emotion to valid mood values (handle 'angry' → 'stressed')
+    const emotionMoodMap = {
+      'angry': 'stressed',
+      'happy': 'happy',
+      'sad': 'sad',
+      'anxious': 'anxious',
+      'calm': 'calm',
+      'neutral': 'neutral',
+      'stressed': 'stressed'
+    };
+    const finalMood = mood || emotionMoodMap[emotionAnalysis.primaryEmotion] || 'neutral';
+    
     await JournalEntry.create({
       userId: req.session.userId,
       title,
-      mood: mood || 'neutral',
-      content
+      mood: finalMood,
+      content,
+      wordCount,
+      // ✅ Store AI analysis results
+      detectedEmotion: emotionAnalysis.primaryEmotion,
+      emotionConfidence: emotionAnalysis.confidence,
+      sentimentScore: emotionAnalysis.sentimentScore,
+      emotionScores: emotionAnalysis.emotionScores,
+      sentimentAnalysis: emotionAnalysis.analysis
     });
     
     // Render the form again with success message instead of redirecting
@@ -566,6 +544,7 @@ router.get("/journal/edit/:id", isAuthenticated, async (req, res) => {
 router.post("/journal/edit/:id", isAuthenticated, async (req, res) => {
   try {
     const { JournalEntry } = await import('../models/index.js');
+    const { analyzeJournalEmotion } = await import('../utils/sentimentAnalysis.js');
     const { title, mood, content } = req.body;
     
     const entry = await JournalEntry.findOne({
@@ -588,10 +567,35 @@ router.post("/journal/edit/:id", isAuthenticated, async (req, res) => {
       });
     }
     
+    // ✅ AI Emotion Analysis on update
+    const emotionAnalysis = analyzeJournalEmotion(content);
+    
+    // Count words
+    const wordCount = content.trim().split(/\s+/).length;
+    
+    // ✅ Map AI emotion to valid mood values (handle 'angry' → 'stressed')
+    const emotionMoodMap = {
+      'angry': 'stressed',
+      'happy': 'happy',
+      'sad': 'sad',
+      'anxious': 'anxious',
+      'calm': 'calm',
+      'neutral': 'neutral',
+      'stressed': 'stressed'
+    };
+    const finalMood = mood || emotionMoodMap[emotionAnalysis.primaryEmotion] || 'neutral';
+    
     await entry.update({
       title,
-      mood: mood || 'neutral',
-      content
+      mood: finalMood,
+      content,
+      wordCount,
+      // ✅ Update AI analysis results
+      detectedEmotion: emotionAnalysis.primaryEmotion,
+      emotionConfidence: emotionAnalysis.confidence,
+      sentimentScore: emotionAnalysis.sentimentScore,
+      emotionScores: emotionAnalysis.emotionScores,
+      sentimentAnalysis: emotionAnalysis.analysis
     });
     
     res.redirect(`/journal/${entry.id}`);
@@ -623,6 +627,134 @@ router.post("/journal/delete/:id", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Journal delete error:', error);
     res.redirect('/journal');
+  }
+});
+
+// 🔧 TEST ENDPOINT (no auth needed) - for debugging emotion analysis
+router.post("/api/test/emotion-analysis", async (req, res) => {
+  try {
+    const { content } = req.body;
+    
+    if (!content) {
+      return res.json({ error: 'No content provided' });
+    }
+    
+    console.log('\n🔧 [TEST] Emotion analysis test with:', content);
+    
+    // Import and run analysis
+    const { analyzeJournalEmotion } = await import('../utils/sentimentAnalysis.js');
+    const analysis = analyzeJournalEmotion(content);
+    
+    console.log('🔧 [TEST] Result:', analysis);
+    
+    res.json(analysis);
+  } catch (error) {
+    console.error('🔧 [TEST] Error:', error);
+    res.json({ error: error.message });
+  }
+});
+
+// ✅ NEW: API endpoint for real-time emotion analysis
+router.post("/api/journal/analyze-emotion", isAuthenticated, async (req, res) => {
+  try {
+    const { content } = req.body;
+    
+    if (!content || content.trim().length < 3) {
+      console.log('📊 [EMOTION API] Content too short, returning neutral');
+      return res.json({
+        primaryEmotion: 'neutral',
+        confidence: 0,
+        emotionScores: { happy: 0, sad: 0, anxious: 0, angry: 0, calm: 0, neutral: 100 },
+        sentiment: 'neutral',
+        sentimentScore: 0,
+        analysis: 'Keep typing to see emotion analysis',
+        language: 'unknown',
+        emoji: '😐'
+      });
+    }
+    
+    // Import named exports
+    const { analyzeJournalEmotion, getEmotionEmoji } = await import('../utils/sentimentAnalysis.js');
+    
+    if (!analyzeJournalEmotion) {
+      throw new Error('analyzeJournalEmotion function not found');
+    }
+    
+    console.log('📊 [EMOTION API] Starting analysis for:', content.substring(0, 50));
+    
+    // Run analysis
+    const analysis = analyzeJournalEmotion(content);
+    
+    console.log('📊 [EMOTION API] ✅ Analysis complete:');
+    console.log('   - Emotion:', analysis.primaryEmotion);
+    console.log('   - Confidence:', analysis.confidence + '%');
+    console.log('   - Scores:', analysis.emotionScores);
+    console.log('   - Language:', analysis.language);
+    
+    // Return complete analysis
+    res.json({
+      primaryEmotion: analysis.primaryEmotion,
+      confidence: analysis.confidence,
+      emotionScores: analysis.emotionScores,
+      sentiment: analysis.sentiment,
+      sentimentScore: analysis.sentimentScore,
+      analysis: analysis.analysis,
+      language: analysis.language,
+      emoji: getEmotionEmoji(analysis.primaryEmotion)
+    });
+    
+  } catch (error) {
+    console.error('❌ [EMOTION API] ERROR:', error.message);
+    console.error('❌ Stack:', error.stack?.split('\n')[0]);
+    
+    // Return neutral response
+    res.json({
+      primaryEmotion: 'neutral',
+      confidence: 50,
+      emotionScores: { happy: 20, sad: 20, anxious: 20, angry: 10, calm: 20, neutral: 10 },
+      sentiment: 'neutral',
+      sentimentScore: 0,
+      analysis: 'Analyzing emotions...',
+      language: 'unknown',
+      emoji: '😐'
+    });
+  }
+});
+
+// ✅ NEW: API endpoint for Tagalog text enhancement
+router.post("/api/journal/enhance-tagalog", isAuthenticated, async (req, res) => {
+  try {
+    const { content } = req.body;
+    
+    if (!content || content.trim().length === 0) {
+      return res.json({
+        enhanced: content,
+        suggestions: [],
+        improvements: [],
+        tips: [],
+        prompts: []
+      });
+    }
+    
+    const { enhanceTagalogText, getTagalogWritingTips, getWritingPrompts } = await import('../utils/tagalogEnhancer.js');
+    const { analyzeJournalEmotion } = await import('../utils/sentimentAnalysis.js');
+    
+    const enhancement = enhanceTagalogText(content);
+    const analysis = analyzeJournalEmotion(content);
+    const tips = getTagalogWritingTips(content);
+    const prompts = getWritingPrompts(analysis.primaryEmotion, 'tagalog');
+    
+    res.json({
+      enhanced: enhancement.enhanced,
+      suggestions: enhancement.suggestions,
+      improvements: enhancement.improvements,
+      tips,
+      prompts,
+      stats: enhancement.stats
+    });
+  } catch (error) {
+    console.error('Tagalog enhancement error:', error);
+    res.status(500).json({ error: 'Failed to enhance text' });
   }
 });
 
@@ -1008,6 +1140,7 @@ router.get("/reading/:slug", isAuthenticated, async (req, res) => {
       title: material.title, 
       user: req.user,
       userId: req.session.userId,
+      isFitnessGuide: material.category === 'Fitness',
       material: {
         ...material.toJSON(),
         htmlContent,
@@ -1876,7 +2009,8 @@ router.get("/counselor/students", isAuthenticated, async (req, res) => {
       students,
       totalStudents,
       uniqueCourses,
-      averageYear
+      averageYear,
+      currentDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     });
   } catch (error) {
     console.error('Counselor students list error:', error);
@@ -1920,6 +2054,194 @@ router.get("/counselor/students/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// ==================== EXPORT STUDENT TO WORD ====================
+router.post("/api/export-student-word", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+
+    const { studentId } = req.body;
+    
+    const { User } = await import("../models/index.js");
+    const student = await User.findByPk(studentId);
+    
+    if (!student || student.role !== 'user') {
+      return res.status(404).json({ error: "Student Not Found" });
+    }
+
+    const { Document, Packer, Table, TableCell, TableRow, Paragraph, TextRun, AlignmentType, BorderStyle } = await import("docx");
+
+    // Format helper
+    const formatDate = (date) => {
+      if (!date) return 'N/A';
+      return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    };
+
+    const createCell = (text, bold = false) => {
+      return new TableCell({
+        children: [new Paragraph({
+          text: text || 'N/A',
+          bold: bold,
+          size: 20,
+          font: "Arial"
+        })],
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+          bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+          left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+          right: { style: BorderStyle.SINGLE, size: 1, color: "000000" }
+        }
+      });
+    };
+
+    // Build document content
+    const sections = [];
+
+    // Title
+    sections.push(
+      new Paragraph({
+        text: "STUDENT INFORMATION RECORD",
+        bold: true,
+        size: 28,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 }
+      })
+    );
+
+    sections.push(
+      new Paragraph({
+        text: "TELL 'N GROW - Mindoro State University",
+        size: 22,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 }
+      })
+    );
+
+    // Personal Information Section
+    sections.push(
+      new Paragraph({
+        text: "PERSONAL INFORMATION",
+        bold: true,
+        size: 24,
+        spacing: { before: 200, after: 200 }
+      })
+    );
+
+    sections.push(
+      new Table({
+        rows: [
+          new TableRow({
+            children: [createCell("Full Name", true), createCell(student.name)]
+          }),
+          new TableRow({
+            children: [createCell("Email", true), createCell(student.email)]
+          }),
+          new TableRow({
+            children: [createCell("User ID", true), createCell(student.id.toString())]
+          }),
+          new TableRow({
+            children: [createCell("Account Status", true), createCell(student.accountStatus || "Active")]
+          }),
+          new TableRow({
+            children: [createCell("Date Registered", true), createCell(formatDate(student.createdAt))]
+          }),
+          new TableRow({
+            children: [createCell("Last Updated", true), createCell(formatDate(student.updatedAt))]
+          })
+        ]
+      }),
+      new Paragraph({ text: "", spacing: { after: 200 } })
+    );
+
+    // Academic Information Section
+    sections.push(
+      new Paragraph({
+        text: "ACADEMIC INFORMATION",
+        bold: true,
+        size: 24,
+        spacing: { before: 200, after: 200 }
+      })
+    );
+
+    sections.push(
+      new Table({
+        rows: [
+          new TableRow({
+            children: [createCell("Course", true), createCell(student.course || "N/A")]
+          }),
+          new TableRow({
+            children: [createCell("Year", true), createCell(student.year || "N/A")]
+          }),
+          new TableRow({
+            children: [createCell("Section", true), createCell(student.section || "N/A")]
+          }),
+          new TableRow({
+            children: [createCell("Student ID", true), createCell(student.studentId || "N/A")]
+          })
+        ]
+      }),
+      new Paragraph({ text: "", spacing: { after: 200 } })
+    );
+
+    // Contact Information Section
+    sections.push(
+      new Paragraph({
+        text: "CONTACT INFORMATION",
+        bold: true,
+        size: 24,
+        spacing: { before: 200, after: 200 }
+      })
+    );
+
+    sections.push(
+      new Table({
+        rows: [
+          new TableRow({
+            children: [createCell("Contact Number", true), createCell(student.contactNumber || "N/A")]
+          }),
+          new TableRow({
+            children: [createCell("Address", true), createCell(student.address || "N/A")]
+          }),
+          new TableRow({
+            children: [createCell("Emergency Contact", true), createCell(student.emergencyContact || "N/A")]
+          })
+        ]
+      }),
+      new Paragraph({ text: "", spacing: { after: 200 } })
+    );
+
+    // Footer
+    sections.push(
+      new Paragraph({
+        text: "This is a confidential document for authorized counselor use only.",
+        size: 18,
+        italics: true,
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 400 }
+      })
+    );
+
+    // Create document
+    const doc = new Document({
+      sections: [{
+        children: sections
+      }]
+    });
+
+    // Generate and send
+    const buffer = await Packer.toBuffer(doc);
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', `attachment; filename="${student.name.replace(/\s+/g, '_')}_Profile.docx"`);
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Export to Word error:', error);
+    res.status(500).json({ error: "Failed to export document" });
+  }
+});
+
 // ==================== STUDENT ACTIVITY ROUTES ====================
 
 // View all student activities list
@@ -1929,7 +2251,8 @@ router.get("/counselor/student-activity", isAuthenticated, async (req, res) => {
       return res.status(403).render("403", { title: "Access Denied" });
     }
 
-    const { User, JournalEntry, GameSession, ReadingSession, ReadingMaterialComment, ReadingMaterialReaction } = await import("../models/index.js");
+    const { User, JournalEntry, GameSession, ReadingSession, ReadingMaterialComment, ReadingMaterialReaction, MoodEntry } = await import("../models/index.js");
+    const { Op } = await import("sequelize");
 
     // Get all students
     const students = await User.findAll({
@@ -1956,6 +2279,56 @@ router.get("/counselor/student-activity", isAuthenticated, async (req, res) => {
         const commentCount = await ReadingMaterialComment.count({ where: { userId: student.id } });
         const reactionCount = await ReadingMaterialReaction.count({ where: { userId: student.id } });
 
+        // Get mood tracker data (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const moodCount = await MoodEntry.count({ 
+          where: { 
+            userId: student.id,
+            createdAt: { [Op.gte]: thirtyDaysAgo }
+          }
+        });
+
+        // Get mood statistics
+        let moodStats = {
+          total: 0,
+          dominant: 'neutral',
+          avgConfidence: 0
+        };
+
+        if (moodCount > 0) {
+          const moods = await MoodEntry.findAll({
+            where: {
+              userId: student.id,
+              createdAt: { [Op.gte]: thirtyDaysAgo }
+            }
+          });
+
+          const moodCounts = {};
+          let totalConfidence = 0;
+
+          moods.forEach(mood => {
+            moodCounts[mood.detectedEmotion] = (moodCounts[mood.detectedEmotion] || 0) + 1;
+            totalConfidence += mood.emotionConfidence;
+          });
+
+          let dominantMood = 'neutral';
+          let maxCount = 0;
+          for (const [emotion, count] of Object.entries(moodCounts)) {
+            if (count > maxCount) {
+              maxCount = count;
+              dominantMood = emotion;
+            }
+          }
+
+          moodStats = {
+            total: moodCount,
+            dominant: dominantMood,
+            avgConfidence: Math.round(totalConfidence / moodCount)
+          };
+        }
+
         // Get last activity date
         const lastJournal = await JournalEntry.findOne({
           where: { userId: student.id },
@@ -1978,13 +2351,18 @@ router.get("/counselor/student-activity", isAuthenticated, async (req, res) => {
           where: { userId: student.id },
           order: [['createdAt', 'DESC']]
         });
+        const lastMood = await MoodEntry.findOne({
+          where: { userId: student.id },
+          order: [['createdAt', 'DESC']]
+        });
 
         const dates = [
           lastJournal?.createdAt,
           lastGame?.createdAt,
           lastReading?.createdAt,
           lastComment?.createdAt,
-          lastReaction?.createdAt
+          lastReaction?.createdAt,
+          lastMood?.createdAt
         ].filter(d => d);
         
         const lastActivityDate = dates.length > 0 ? new Date(Math.max(...dates.map(d => new Date(d)))) : null;
@@ -2003,7 +2381,9 @@ router.get("/counselor/student-activity", isAuthenticated, async (req, res) => {
           videoWatches: videoCount || 0,
           comments: commentCount || 0,
           reactions: reactionCount || 0,
-          totalActivities: journalCount + gameCount + readingCount + videoCount + commentCount + reactionCount,
+          moodEntries: moodCount || 0,
+          moodStats: moodStats,
+          totalActivities: journalCount + gameCount + readingCount + videoCount + commentCount + reactionCount + moodCount,
           lastActivityDate,
           streak: 0 // Calculate if needed
         };
@@ -2049,7 +2429,7 @@ router.get("/counselor/student-activity/:id", isAuthenticated, async (req, res) 
       return res.status(403).render("403", { title: "Access Denied" });
     }
 
-    const { User, JournalEntry, GameSession, ReadingSession, ReadingMaterialComment, ReadingMaterialReaction } = await import("../models/index.js");
+    const { User, JournalEntry, GameSession, ReadingSession, ReadingMaterialComment, ReadingMaterialReaction, MoodEntry } = await import("../models/index.js");
 
     // Get student info
     const student = await User.findByPk(req.params.id);
@@ -2089,15 +2469,68 @@ router.get("/counselor/student-activity/:id", isAuthenticated, async (req, res) 
       limit: 100
     });
 
+    // Get mood tracker data (last 30 days)
+    const { Op } = await import("sequelize");
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const moodEntries = await MoodEntry.findAll({
+      where: {
+        userId: student.id,
+        createdAt: { [Op.gte]: thirtyDaysAgo }
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 50
+    });
+
+    // Calculate mood statistics
+    let moodStats = {
+      totalEntries: 0,
+      averageConfidence: 0,
+      dominantMood: null,
+      confirmationRate: 0,
+      moodBreakdown: {}
+    };
+
+    if (moodEntries.length > 0) {
+      const moodCounts = {};
+      let totalConfidence = 0;
+      let confirmedCount = 0;
+
+      moodEntries.forEach(mood => {
+        moodCounts[mood.detectedEmotion] = (moodCounts[mood.detectedEmotion] || 0) + 1;
+        totalConfidence += mood.emotionConfidence;
+        if (mood.userConfirmed) confirmedCount++;
+      });
+
+      let dominantMood = null;
+      let maxCount = 0;
+      for (const [emotion, count] of Object.entries(moodCounts)) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantMood = emotion;
+        }
+      }
+
+      moodStats = {
+        totalEntries: moodEntries.length,
+        averageConfidence: (totalConfidence / moodEntries.length).toFixed(1),
+        dominantMood: dominantMood,
+        confirmationRate: ((confirmedCount / moodEntries.length) * 100).toFixed(1),
+        moodBreakdown: moodCounts
+      };
+    }
+
     // Calculate stats
-    const totalActivities = journalEntries.length + gameSessions.length + readingSessions.length + comments.length + reactions.length;
+    const totalActivities = journalEntries.length + gameSessions.length + readingSessions.length + comments.length + reactions.length + moodEntries.length;
     
     const allDates = [
       ...journalEntries.map(j => new Date(j.createdAt)),
       ...gameSessions.map(g => new Date(g.createdAt)),
       ...readingSessions.map(r => new Date(r.createdAt)),
       ...comments.map(c => new Date(c.createdAt)),
-      ...reactions.map(r => new Date(r.createdAt))
+      ...reactions.map(r => new Date(r.createdAt)),
+      ...moodEntries.map(m => new Date(m.createdAt))
     ].sort((a, b) => b - a);
 
     const lastActivityDate = allDates.length > 0 ? allDates[0] : null;
@@ -2113,6 +2546,8 @@ router.get("/counselor/student-activity/:id", isAuthenticated, async (req, res) 
       readingSessions: readingSessions.length > 0 ? readingSessions : null,
       comments: comments.length > 0 ? comments : null,
       reactions: reactions.length > 0 ? reactions : null,
+      moodEntries: moodEntries.length > 0 ? moodEntries : null,
+      moodStats: moodStats,
       totalActivities,
       lastActivityDate,
       memberSince,
@@ -2407,6 +2842,7 @@ router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
 router.get("/admin/analytics", isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { User, GameSession, JournalEntry, ReadingSession, UserProgress } = await import('../models/index.js');
+    const { Sequelize } = await import('sequelize');
     
     // Get all game sessions with user data
     const allGameSessions = await GameSession.findAll({
@@ -2416,17 +2852,26 @@ router.get("/admin/analytics", isAuthenticated, isAdmin, async (req, res) => {
       }]
     });
     
-    // Get all journal entries
-    const allJournals = await JournalEntry.findAll();
+    // Get all journal entries with user data
+    const allJournals = await JournalEntry.findAll({
+      include: [{
+        model: User,
+        attributes: ['id', 'name', 'email']
+      }]
+    });
     
     // Get all reading sessions
     const allReadings = await ReadingSession.findAll();
     
+    // ===== NEW METRICS =====
+    // Times games played - total number of game sessions
+    const timesGamesPlayed = allGameSessions.length;
+    
+    // Calculate ties - games where result equals 'tie' or where winnerUserId is null
+    const tiesCount = allGameSessions.filter(g => g.result === 'tie' || g.result === 'tie' || (g.winnerUserId === null && g.completed === true)).length;
+    
     // Calculate game statistics
     const totalGameDuration = allGameSessions.reduce((sum, session) => sum + (session.duration || 0), 0);
-    const avgGameScore = allGameSessions.length > 0 
-      ? Math.round(allGameSessions.reduce((sum, session) => sum + (session.score || 0), 0) / allGameSessions.length)
-      : 0;
     const avgGameDuration = allGameSessions.length > 0 
       ? Math.round(totalGameDuration / allGameSessions.length)
       : 0;
@@ -2465,35 +2910,35 @@ router.get("/admin/analytics", isAuthenticated, isAdmin, async (req, res) => {
       avgDuration: game.count > 0 ? Math.round(game.totalDuration / game.count) : 0
     }));
     
-    // Get top engaged users
-    const allUsers = await User.findAll({
+    // ===== GET ALL STUDENTS JOURNAL ENTRIES =====
+    const allStudents = await User.findAll({
       where: { role: 'user' },
-      include: [{
-        model: UserProgress,
-        as: 'progress'
-      }]
+      attributes: ['id', 'name', 'email']
     });
     
-    const topUsers = await Promise.all(allUsers.map(async (user) => {
-      const gameCount = await GameSession.count({ where: { userId: user.id } });
-      const journalCount = await JournalEntry.count({ where: { userId: user.id } });
-      const readingCount = await ReadingSession.count({ where: { userId: user.id } });
+    const studentJournalEntries = await Promise.all(allStudents.map(async (student) => {
+      const journalCount = await JournalEntry.count({ where: { userId: student.id } });
+      const recentJournal = await JournalEntry.findOne({
+        where: { userId: student.id },
+        order: [['createdAt', 'DESC']]
+      });
       
       return {
-        name: user.name,
-        email: user.email,
-        gameCount,
+        id: student.id,
+        name: student.name,
+        email: student.email,
         journalCount,
-        readingCount,
-        totalPoints: user.progress?.totalPoints || 0,
-        level: user.progress?.level || 'beginner'
+        lastJournalDate: recentJournal?.createdAt || null,
+        lastJournalMood: recentJournal?.mood || 'neutral'
       };
     }));
     
-    // Sort and get top 10
-    const topEngagedUsers = topUsers
-      .sort((a, b) => (b.gameCount + b.journalCount + b.readingCount) - (a.gameCount + a.journalCount + a.readingCount))
-      .slice(0, 10);
+    // Sort by most recent journal entry
+    const sortedStudentJournals = studentJournalEntries.sort((a, b) => {
+      const dateA = a.lastJournalDate ? new Date(a.lastJournalDate) : new Date(0);
+      const dateB = b.lastJournalDate ? new Date(b.lastJournalDate) : new Date(0);
+      return dateB - dateA;
+    });
     
     // Activity stats
     const activityStats = {
@@ -2505,26 +2950,28 @@ router.get("/admin/analytics", isAuthenticated, isAdmin, async (req, res) => {
     res.render("admin/analytics", { 
       title: "Analytics", 
       user: req.user,
-      avgGameScore,
+      timesGamesPlayed,
+      tiesCount,
       avgGameDuration,
       completionRate,
       engagementRate,
       gameStats: gameStatsWithCompletion,
       activityStats,
-      topUsers: topEngagedUsers
+      studentJournalEntries: sortedStudentJournals
     });
   } catch (error) {
     console.error('Admin analytics error:', error);
     res.render("admin/analytics", { 
       title: "Analytics", 
       user: req.user,
-      avgGameScore: 0,
+      timesGamesPlayed: 0,
+      tiesCount: 0,
       avgGameDuration: 0,
       completionRate: 0,
       engagementRate: 0,
       gameStats: [],
       activityStats: { games: 0, journals: 0, reading: 0 },
-      topUsers: []
+      studentJournalEntries: []
     });
   }
 });
@@ -3253,7 +3700,8 @@ router.get("/fitness-guide", isAuthenticated, async (req, res) => {
       user: req.user,
       materials,
       totalViews,
-      pageDescription: "Watch fitness and exercise videos for stress relief and wellness."
+      pageDescription: "Watch fitness and exercise videos for stress relief and wellness.",
+      isFitnessGuide: true
     });
   } catch (error) {
     console.error('Fitness guide error:', error);
@@ -3261,7 +3709,8 @@ router.get("/fitness-guide", isAuthenticated, async (req, res) => {
       title: "Fitness Guide", 
       user: req.user,
       materials: [],
-      totalViews: 0
+      totalViews: 0,
+      isFitnessGuide: true
     });
   }
 });
@@ -3282,6 +3731,27 @@ router.get("/user/mood/statistics", isAuthenticated, moodController.getMoodStats
 
 // API: Update mood entry
 router.put("/user/mood/:moodId", isAuthenticated, moodController.updateMood);
+
+// API: Get mood greeting for dashboard
+router.get("/api/user/mood/greeting", isAuthenticated, moodController.getMoodGreeting);
+
+// API: Get mood trend and check for decline
+router.get("/api/user/mood/trend", isAuthenticated, moodController.checkMoodTrendAndNotify);
+
+// API: Get mood dashboard data (greeting + trend + stats)
+router.get("/api/user/mood/dashboard", isAuthenticated, moodController.getMoodDashboardData);
+
+// API: Get mood insights (AI analysis)
+router.get("/api/user/mood/insights", isAuthenticated, moodController.getMoodInsights);
+
+// API: Link mood to journal entry
+router.post("/api/mood/link-journal", isAuthenticated, moodController.linkMoodToJournal);
+
+// API: Counselor - Get specific student's mood data
+router.get("/api/counselor/student/:studentId/moods", isAuthenticated, moodController.getStudentMoodByCounselor);
+
+// API: Counselor - Get mood trends for student
+router.get("/api/counselor/student/:studentId/mood-trends", isAuthenticated, moodController.getMoodTrendsForCounselor);
 
 // ==================== READING MATERIAL COMMENTS ====================
 // Get all comments for a material

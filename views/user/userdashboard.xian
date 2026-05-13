@@ -317,7 +317,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <img src="/images/logo.jpg" alt="Tell 'n Grow" class="h-10 w-10">
         <h1 class="text-2xl font-bold text-green-600">Tellngrow</h1>
       </div>
 
@@ -339,6 +339,55 @@
         <div class="relative z-10">
           <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-2">Welcome, <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 animate-pulse">{{user.name}}</span></h1>
           <p class="text-lg text-gray-600">Track your wellness progress and access your mental health resources</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mood Greeting Card -->
+    <div id="mood-greeting-card" class="mb-8 animate-fade-in-up" style="animation-delay: 0.05s;">
+      <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 rounded-xl shadow-md border-2 border-emerald-200 p-8">
+        <div class="flex items-start gap-6 flex-col md:flex-row">
+          <!-- Greeting Emoji -->
+          <div class="text-5xl flex-shrink-0" id="mood-emoji">👋</div>
+          
+          <!-- Greeting Content -->
+          <div class="flex-grow">
+            <div id="mood-greeting-text" class="text-xl font-semibold text-gray-800 mb-3 leading-relaxed">
+              Loading your mood greeting...
+            </div>
+            
+            <!-- Mood Status/Alert -->
+            <div id="mood-alert" class="hidden mb-4 p-3 rounded-lg bg-white border-l-4 border-emerald-500">
+              <p id="mood-alert-message" class="text-sm text-gray-700 font-medium"></p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="flex flex-wrap gap-3 pt-2">
+              <a 
+                href="/user/mood-tracker"
+                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition transform hover:scale-105 active:scale-95"
+              >
+                <span>📱</span> Check My Mood
+              </a>
+              <a 
+                href="/journal"
+                class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition transform hover:scale-105 active:scale-95"
+              >
+                <span>📝</span> Journal Today
+              </a>
+            </div>
+          </div>
+
+          <!-- Close Button -->
+          <button 
+            onclick="document.getElementById('mood-greeting-card').style.display='none';"
+            class="text-gray-400 hover:text-gray-600 flex-shrink-0"
+            title="Close greeting"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -1394,6 +1443,63 @@
       }
     `;
     document.head.appendChild(style);
+
+    // ===== LOAD MOOD GREETING ON DASHBOARD =====
+    async function loadMoodGreetingOnDashboard() {
+      try {
+        const response = await fetch('/api/user/mood/dashboard');
+        const data = await response.json();
+        
+        if (data.success) {
+          // Update greeting message
+          const greetingText = document.getElementById('mood-greeting-text');
+          if (greetingText && data.greeting) {
+            greetingText.innerHTML = data.greeting
+              .split('\n')
+              .map(line => line.replace(/Hello Student/g, 'Hello') + '<br>')
+              .join('')
+              .slice(0, -4); // Remove last <br>
+          }
+
+          // Check for mood alerts
+          if (data.moodData && data.moodData.trend) {
+            const trend = data.moodData.trend;
+            
+            if (trend.isDeclining) {
+              const moodAlert = document.getElementById('mood-alert');
+              const moodAlertMessage = document.getElementById('mood-alert-message');
+              
+              if (moodAlert && moodAlertMessage) {
+                moodAlertMessage.innerHTML = `
+                  <span class="text-yellow-700 font-bold">⚠️ Mood Trend Alert:</span><br>
+                  Your mood has been trending lower recently (Score: ${trend.averageScore}/100).
+                  We recommend talking to your counselor or trying some wellness activities.
+                `;
+                moodAlert.classList.remove('hidden');
+                moodAlert.classList.add('bg-yellow-50', 'border-yellow-500');
+              }
+            } else if (trend.trend === 'improving') {
+              const moodAlert = document.getElementById('mood-alert');
+              const moodAlertMessage = document.getElementById('mood-alert-message');
+              
+              if (moodAlert && moodAlertMessage) {
+                moodAlertMessage.innerHTML = `
+                  <span class="text-green-700 font-bold">✨ Great Progress:</span><br>
+                  Your mood has been improving! Keep up the great work!
+                `;
+                moodAlert.classList.remove('hidden');
+                moodAlert.classList.add('bg-green-50', 'border-green-500');
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading mood greeting:', error);
+      }
+    }
+
+    // Load mood greeting when page loads
+    document.addEventListener('DOMContentLoaded', loadMoodGreetingOnDashboard);
   </script>
 </body>
 </html>

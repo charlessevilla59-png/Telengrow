@@ -499,6 +499,152 @@
       </ul>
       {{/if}}
 
+      <!-- Mood Tracker Results -->
+      {{#if moodEntries}}
+      <h2 class="section-header">😊 MOOD TRACKER RESULTS</h2>
+      
+      <!-- Mood Statistics -->
+      {{#if moodStats}}
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Total Mood Entries</div>
+          <div class="info-value">{{moodStats.totalEntries}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Dominant Mood</div>
+          <div class="info-value" style="text-transform: capitalize;">{{moodStats.dominantMood}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Average Confidence</div>
+          <div class="info-value">{{moodStats.averageConfidence}}%</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Confirmation Rate</div>
+          <div class="info-value">{{moodStats.confirmationRate}}%</div>
+        </div>
+      </div>
+      {{/if}}
+
+      <!-- Mood Breakdown Chart -->
+      {{#if moodStats.moodBreakdown}}
+      <h3 style="margin-top: 20px; margin-bottom: 15px; font-size: 13px; font-weight: 600; color: #10b981;">Mood Distribution</h3>
+      <div class="info-grid full">
+        {{#each moodStats.moodBreakdown}}
+        <div class="info-item">
+          <div class="activity-detail" style="display: flex; align-items: center; gap: 8px;">
+            <strong style="text-transform: capitalize; flex: 0 0 80px;">{{@key}}:</strong>
+            <div style="flex: 1; height: 20px; background: #e0e7ff; border-radius: 4px; position: relative;">
+              <div style="height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 4px; width: {{this}}%;"></div>
+            </div>
+            <span style="font-weight: 600; color: #059669; min-width: 40px; text-align: right;">{{this}}</span>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+
+      <!-- Recent Moods List with Enhanced View -->
+      <h3 style="margin-top: 20px; margin-bottom: 15px; font-size: 13px; font-weight: 600; color: #10b981;">📋 Recent Mood Entries (Last 30 Days)</h3>
+      
+      <!-- Mood Filter Buttons -->
+      <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px;">
+        <button onclick="filterMoodEntries('all')" class="mood-filter-btn active" data-filter="all" style="padding: 6px 12px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">All ({{moodStats.totalEntries}})</button>
+        {{#if moodStats.moodBreakdown.happy}}<button onclick="filterMoodEntries('happy')" class="mood-filter-btn" data-filter="happy" style="padding: 6px 12px; border: 2px solid #f093fb; background: white; color: #f093fb; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😊 Happy ({{moodStats.moodBreakdown.happy}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.sad}}<button onclick="filterMoodEntries('sad')" class="mood-filter-btn" data-filter="sad" style="padding: 6px 12px; border: 2px solid #4facfe; background: white; color: #4facfe; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😢 Sad ({{moodStats.moodBreakdown.sad}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.angry}}<button onclick="filterMoodEntries('angry')" class="mood-filter-btn" data-filter="angry" style="padding: 6px 12px; border: 2px solid #fa709a; background: white; color: #fa709a; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😠 Angry ({{moodStats.moodBreakdown.angry}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.neutral}}<button onclick="filterMoodEntries('neutral')" class="mood-filter-btn" data-filter="neutral" style="padding: 6px 12px; border: 2px solid #a8edea; background: white; color: #333; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😐 Neutral ({{moodStats.moodBreakdown.neutral}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.fearful}}<button onclick="filterMoodEntries('fearful')" class="mood-filter-btn" data-filter="fearful" style="padding: 6px 12px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😨 Fearful ({{moodStats.moodBreakdown.fearful}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.disgusted}}<button onclick="filterMoodEntries('disgusted')" class="mood-filter-btn" data-filter="disgusted" style="padding: 6px 12px; border: 2px solid #f5576c; background: white; color: #f5576c; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">🤢 Disgusted ({{moodStats.moodBreakdown.disgusted}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.surprised}}<button onclick="filterMoodEntries('surprised')" class="mood-filter-btn" data-filter="surprised" style="padding: 6px 12px; border: 2px solid #ffa751; background: white; color: #ffa751; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😮 Surprised ({{moodStats.moodBreakdown.surprised}})</button>{{/if}}
+        {{#if moodStats.moodBreakdown.anxious}}<button onclick="filterMoodEntries('anxious')" class="mood-filter-btn" data-filter="anxious" style="padding: 6px 12px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease;">😰 Anxious ({{moodStats.moodBreakdown.anxious}})</button>{{/if}}
+      </div>
+
+      <!-- Mood Entries List -->
+      <div id="moodEntriesContainer">
+        {{#each moodEntries}}
+        <div class="mood-entry-card" data-emotion="{{this.detectedEmotion}}" data-mood-id="{{this.id}}" style="background: #ffffff; border-left: 5px solid #10b981; padding: 16px; margin-bottom: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #e0f2f1;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1;">
+              <!-- Emotion Badge -->
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                <span class="mood-emotion-badge" style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 6px 12px;
+                  border-radius: 20px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  {{#eq this.detectedEmotion 'happy'}}background: #f093fb; color: white;{{else eq this.detectedEmotion 'sad'}}background: #4facfe; color: white;{{else eq this.detectedEmotion 'angry'}}background: #fa709a; color: white;{{else eq this.detectedEmotion 'neutral'}}background: #a8edea; color: #333;{{else eq this.detectedEmotion 'fearful'}}background: #667eea; color: white;{{else eq this.detectedEmotion 'disgusted'}}background: #f5576c; color: white;{{else eq this.detectedEmotion 'surprised'}}background: #ffa751; color: white;{{else eq this.detectedEmotion 'anxious'}}background: #667eea; color: white;{{else}}background: #d1d5db; color: #333;{{/eq}}
+                ">
+                  <span style="font-size: 16px;">
+                    {{#eq this.detectedEmotion 'happy'}}😊{{else eq this.detectedEmotion 'sad'}}😢{{else eq this.detectedEmotion 'angry'}}😠{{else eq this.detectedEmotion 'neutral'}}😐{{else eq this.detectedEmotion 'fearful'}}😨{{else eq this.detectedEmotion 'disgusted'}}🤢{{else eq this.detectedEmotion 'surprised'}}😮{{else eq this.detectedEmotion 'anxious'}}😰{{else}}📊{{/eq}}
+                  </span>
+                  <span style="text-transform: capitalize;">{{this.detectedEmotion}}</span>
+                </span>
+
+                <!-- Confidence Indicator -->
+                <div style="display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #f0fdf4; border-radius: 6px;">
+                  <span style="font-size: 11px; font-weight: 600; color: #059669;">Confidence</span>
+                  <div style="width: 60px; height: 6px; background: #d1fae5; border-radius: 3px; position: relative; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, #10b981, #059669); width: {{this.emotionConfidence}}%; border-radius: 3px;"></div>
+                  </div>
+                  <span style="font-size: 11px; font-weight: 600; color: #059669;">{{this.emotionConfidence}}%</span>
+                </div>
+
+                {{#if this.userConfirmed}}
+                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #d1fae5; border-radius: 6px; font-size: 11px; font-weight: 600; color: #059669;">✓ Confirmed</span>
+                {{/if}}
+              </div>
+
+              <!-- Date & Time -->
+              <div style="font-size: 12px; color: #10b981; font-weight: 500; margin-bottom: 8px;">
+                📅 {{formatDate this.createdAt}}
+              </div>
+
+              <!-- User Notes -->
+              {{#if this.userNote}}
+              <div style="background: #fef7ee; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #f97316;">
+                <strong style="font-size: 11px; color: #666;">Student Notes:</strong>
+                <p style="font-size: 12px; color: #555; margin-top: 4px; margin-bottom: 0;">{{this.userNote}}</p>
+              </div>
+              {{/if}}
+
+              <!-- Additional Details (Expandable) -->
+              <div class="mood-details-expand" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+                {{#if this.sentimentScore}}
+                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">
+                  <strong>Sentiment Score:</strong> 
+                  <span style="{{#if (gt this.sentimentScore 0)}}color: #10b981;{{else if (lt this.sentimentScore 0)}}color: #ef4444;{{else}}color: #666;{{/if}} font-weight: 600;">{{this.sentimentScore}}</span>
+                </div>
+                {{/if}}
+                {{#if this.activitiesSuggested}}
+                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">
+                  <strong>Suggested Activities:</strong> {{this.activitiesSuggested}}
+                </div>
+                {{/if}}
+                {{#if this.emotionCategories}}
+                <div style="font-size: 11px; color: #666;">
+                  <strong>Emotion Categories:</strong> {{this.emotionCategories}}
+                </div>
+                {{/if}}
+              </div>
+
+              <!-- Expand Button -->
+              <button onclick="toggleMoodDetails(event, this)" class="expand-btn" style="margin-top: 8px; padding: 4px 10px; background: #f0fdf4; color: #10b981; border: 1px solid #d1fae5; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">View Details ↓</button>
+            </div>
+
+            <!-- Right Column - Quick Stats -->
+            <div style="text-align: right; font-size: 12px; min-width: 100px;">
+              <div style="font-weight: 600; color: #334155; margin-bottom: 4px;">Entry #</div>
+              <div style="color: #10b981; font-weight: 600; font-size: 16px;">{{@index}}</div>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+
       <!-- Activity Summary Stats -->
       <h2 class="section-header">📊 ACTIVITY SUMMARY</h2>
       <div class="info-grid">
@@ -528,5 +674,123 @@
       {{/if}}
     </div>
   </div>
+
+  <script>
+    // Mood filter functionality
+    function filterMoodEntries(emotion) {
+      const entries = document.querySelectorAll('.mood-entry-card');
+      const buttons = document.querySelectorAll('.mood-filter-btn');
+      
+      // Update button states
+      buttons.forEach(btn => {
+        btn.style.background = btn.getAttribute('data-filter') === emotion ? 
+          (emotion === 'all' ? '#10b981' : btn.style.borderColor) : 'white';
+        btn.style.color = btn.getAttribute('data-filter') === emotion ? 
+          (emotion === 'all' ? 'white' : btn.style.borderColor) : btn.style.borderColor;
+        btn.classList.toggle('active', btn.getAttribute('data-filter') === emotion);
+      });
+
+      // Filter entries
+      let visibleCount = 0;
+      entries.forEach(entry => {
+        const entryEmotion = entry.getAttribute('data-emotion');
+        if (emotion === 'all' || entryEmotion === emotion) {
+          entry.style.display = 'block';
+          entry.style.animation = 'fadeIn 0.3s ease';
+          visibleCount++;
+        } else {
+          entry.style.display = 'none';
+        }
+      });
+
+      // Show no results message if needed
+      const container = document.getElementById('moodEntriesContainer');
+      let noResults = container.querySelector('.mood-no-results');
+      if (visibleCount === 0 && !noResults) {
+        noResults = document.createElement('div');
+        noResults.className = 'mood-no-results';
+        noResults.style.cssText = 'text-align: center; padding: 20px; color: #999; font-style: italic;';
+        noResults.textContent = 'No mood entries found for this emotion filter.';
+        container.appendChild(noResults);
+      } else if (noResults && visibleCount > 0) {
+        noResults.remove();
+      }
+    }
+
+    // Toggle mood entry details
+    function toggleMoodDetails(event, button) {
+      event.preventDefault();
+      const card = button.closest('.mood-entry-card');
+      const detailsDiv = card.querySelector('.mood-details-expand');
+      
+      if (detailsDiv) {
+        if (detailsDiv.style.display === 'none') {
+          detailsDiv.style.display = 'block';
+          button.textContent = 'Hide Details ↑';
+          button.style.background = '#ecfdf5';
+          button.style.color = '#059669';
+        } else {
+          detailsDiv.style.display = 'none';
+          button.textContent = 'View Details ↓';
+          button.style.background = '#f0fdf4';
+          button.style.color = '#10b981';
+        }
+      }
+    }
+
+    // Add fade-in animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .mood-filter-btn {
+        transition: all 0.3s ease;
+      }
+      
+      .mood-filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .mood-filter-btn.active {
+        font-weight: 700;
+      }
+      
+      .mood-entry-card {
+        animation: fadeIn 0.3s ease;
+      }
+      
+      .mood-entry-card:hover {
+        box-shadow: 0 8px 16px rgba(16, 185, 129, 0.15);
+        border-left-color: #059669;
+        transform: translateY(-2px);
+      }
+      
+      .expand-btn:hover {
+        background: #ecfdf5 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize filter buttons with click handlers
+    document.querySelectorAll('.mood-filter-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const filter = this.getAttribute('data-filter');
+        filterMoodEntries(filter);
+      });
+    });
+  </script>
 </body>
 </html>

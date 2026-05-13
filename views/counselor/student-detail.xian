@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
+  <title>{{title}} - Student Details</title>
   <style>
     * {
       margin: 0;
@@ -12,116 +12,99 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      background: #f8fafc;
-      color: #334155;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
       min-height: 100vh;
+      padding: 20px;
     }
 
     html {
       scroll-behavior: smooth;
     }
 
-    /* Navigation */
-    .navbar {
-      background: #ffffff;
-      padding: 16px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      border-bottom: 2px solid #10b981;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .navbar-brand {
-      font-size: 20px;
-      font-weight: 600;
-      color: #10b981;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .back-button {
-      background: #10b981;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
-    }
-
-    .back-button:hover {
-      background: #059669;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      transform: translateY(-1px);
-    }
-
-    /* Main profile container */
+    /* Main container */
     .profile-page {
       background: white;
-      max-width: 1100px;
-      margin: 25px auto;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
+      max-width: 850px;
+      margin: 0 auto;
+      border: 2px solid #000;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    /* Profile Header */
-    .profile-header {
+    /* Header */
+    .form-header {
       display: flex;
+      justify-content: space-between;
       align-items: flex-start;
-      gap: 30px;
-      padding: 30px;
-      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-      border-bottom: 3px solid #10b981;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #000;
     }
 
     .header-left {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
     }
 
-    .profile-title {
-      font-size: 18px;
-      font-weight: 600;
+    .organization-title {
+      font-size: 12px;
+      font-weight: bold;
       letter-spacing: 0.5px;
-      color: #059669;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
+      color: #333;
+      text-transform: uppercase;
     }
 
-    .profile-subtitle {
-      font-size: 13px;
-      color: #10b981;
-      font-weight: 400;
+    .form-title {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #000;
+      margin-bottom: 2px;
+      text-transform: uppercase;
     }
 
+    .form-subtitle {
+      font-size: 10px;
+      color: #777;
+      letter-spacing: 0.3px;
+    }
+
+    /* Logo styling */
+    .logo {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+
+    .logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Picture box */
     .picture-box {
       width: 140px;
       height: 140px;
-      border: 3px solid #10b981;
+      border: 2px solid #000;
       background: white;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      position: relative;
       overflow: hidden;
-      border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .picture-box:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
     .picture-box img {
@@ -132,614 +115,875 @@
 
     .picture-placeholder {
       text-align: center;
-      color: #10b981;
-      font-size: 60px;
-      font-weight: bold;
+      color: #999;
+      font-size: 11px;
+      font-weight: normal;
     }
 
-    /* Profile content */
-    .profile-content {
-      padding: 30px;
+    /* Form content */
+    .form-content {
+      padding: 0;
     }
 
     /* Section header */
     .section-header {
-      font-size: 14px;
-      font-weight: 600;
-      color: #10b981;
-      margin-top: 28px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #d1fae5;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #000;
+      letter-spacing: 0.5px;
     }
 
     .section-header:first-child {
       margin-top: 0;
     }
 
-    /* Info grid */
-    .info-grid {
+    /* Form row */
+    .form-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-bottom: 14px;
     }
 
-    .info-grid.full {
+    .form-row.full {
       grid-template-columns: 1fr;
     }
 
-    .info-item {
-      background: #ffffff;
-      padding: 14px 16px;
-      border-left: 4px solid #10b981;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-      border: 1px solid #e0f2f1;
+    .form-row.two-col {
+      grid-template-columns: repeat(2, 1fr);
     }
 
-    .info-item:hover {
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
-      transform: translateY(-2px);
+    .form-row.three-col {
+      grid-template-columns: repeat(3, 1fr);
     }
 
-    .info-label {
-      font-size: 11600;
-      color: #10b981;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .form-group {
+      display: flex;
+      flex-direction: column;
     }
 
-    .info-value {
-      font-size: 13px;
-      color: #33415513px;
+    .form-group label {
+      font-size: 11px;
+      font-weight: normal;
       color: #333;
-      font-weight: 500;
-      word-break: break-word;
+      margin-bottom: 4px;
+      letter-spacing: 0px;
+      display: block;
     }
 
-    .info-value.empty {
-      color: #999;
-      font-style: italic;
-      font-weight: 400;
+    /* Display fields */
+    .form-group .display-value {
+      padding: 6px 0;
+      border-bottom: 1.5px solid #333;
+      font-size: 11px;
+      color: #333;
+      min-height: 20px;
+      background-color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .form-group .display-value:hover {
+      background-color: #fafafa;
     }
 
     /* Table styling */
-    .education-table {
+    .info-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 15px 0;
-      font-size: 13px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      border-radius: 6px;
-      overflow: hidden;
+      margin: 12px 0;
+      font-size: 11px;
     }
 
-    .education-table th,
-    .education-table td {
-      border: 1px solid #e0f2f1;
-      padding: 12px 14px;
+    .info-table th,
+    .info-table td {
+      border: 1px solid #000;
+      padding: 8px;
       text-align: left;
     }
 
-    .education-tab#f0fdf4;
-      font-weight: 600;
-      color: #10b981;
-      border-color: #d1fae500;
-      color: #059669;
+    .info-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      color: #000;
+      border-bottom: 2px solid #000;
     }
 
-    .education-table tbody tr:hover {
-      background: #f0fdf4;
-    }
-
-    .empty-state {
-      background: #f0fdf4;
-      padding: 16px;
-      text-align: center;
-      color: #999;
-      font-style: italic;
-      font-size: 13px;
-      border-left: 4px solid #10b981;
-      border-radius: 6px;
-    }
-
-    /* Badge styling */
-    .badge {#f0fdf4;
-      color: #10b981;
-      border: 1px solid #d1fae5;
+    /* Back button */
+    .back-button {
+      display: inline-block;
+      margin-bottom: 15px;
+      padding: 10px 20px;
+      background: #000;
+      color: white;
+      text-decoration: none;
       font-size: 11px;
-      font-weight: 6;
-      border: 1px solid #10b981;
-      font-size: 11px;
-      font-weight: 700;
-      margin-right: 6px;
-      margin-top: 5px;
-      border-radius: 4px;
+      font-weight: bold;
+      border: 1.5px solid #000;
+      border-radius: 0;
       transition: all 0.3s ease;
+      letter-spacing: 0.5px;
     }
 
-    .badge:hover {
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    .back-button:hover {
+      background: #1a1a1a;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* Action Buttons */
-    .action-buttons {
+    .back-button:active {
+      transform: translateY(1px);
+    }
+
+    /* Top action buttons */
+    .top-actions {
       display: flex;
       gap: 10px;
-      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
     }
 
-    .action-btn {
-      background: #10b981;
+    .action-btn-small {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #333;
       color: white;
-      padding: 10px 18px;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1.5px solid #333;
+      border-radius: 0;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+      letter-spacing: 0.3px;
     }
 
-    .action-btn:hover {
-      background: #059669;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      transform: translateY(-1px);
+    .action-btn-small:hover {
+      background: #000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .action-btn.download {
-      background: #3b82f6;
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    .action-btn-small:active {
+      transform: translateY(1px);
     }
 
-    .action-btn.download:hover {
-      background: #2563eb;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    .action-btn-small.print {
+      background: #555;
+      border-color: #555;
+    }
+
+    .action-btn-small.print:hover {
+      background: #333;
+    }
+
+    .action-btn-small.export {
+      background: #007bff;
+      border-color: #007bff;
+    }
+
+    .action-btn-small.export:hover {
+      background: #0056b3;
     }
 
     /* Print styles */
     @media print {
       body {
         background: white;
+        padding: 0;
       }
 
-      .navbar {
-        display: none;
+      .back-button,
+      .top-actions,
+      .button-group,
+      .form-footer {
+        display: none !important;
       }
 
       .profile-page {
+        max-width: 100%;
         margin: 0;
+        border: none;
+        padding: 0;
         box-shadow: none;
-        border-radius: 0;
       }
 
-      .profile-header {
+      .form-header {
         page-break-after: avoid;
-        border-bottom: 3px solid #000;
       }
 
       .section-header {
         page-break-after: avoid;
+      }
+
+      .info-table {
         page-break-inside: avoid;
       }
 
-      .info-grid,
-      .education-table {
+      table {
         page-break-inside: avoid;
-      }
-
-      .action-buttons {
-        display: none;
-      }
-
-      .profile-subtitle,
-      .back-button {
-        display: none;
-      }
-
-      @page {
-        margin: 0.5in;
       }
     }
 
+    /* Action buttons */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .action-btn,
+    .cancel-btn {
+      padding: 10px 20px;
+      border: 1.5px solid #000;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .action-btn {
+      background-color: #000;
+      color: white;
+    }
+
+    .action-btn:hover {
+      background-color: #1a1a1a;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-btn:active {
+      transform: translateY(1px);
+    }
+
+    .cancel-btn {
+      background-color: white;
+      color: #000;
+    }
+
+    .cancel-btn:hover {
+      background-color: #f0f0f0;
+      border-color: #333;
+    }
+
+    .cancel-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Footer */
+    .form-footer {
+      padding: 15px 0;
+      margin-top: 25px;
+      border-top: 2px solid #000;
+      text-align: center;
+      font-size: 10px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border: 1.5px solid #000;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* Error message */
+    .alert-error {
+      background-color: #fee;
+      border: 1.5px solid #f99;
+      color: #c33;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 0;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
     @media (max-width: 768px) {
-      .profile-header {
+      .form-header {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 20px;
+        gap: 15px;
+      }
+
+      .form-row.two-col,
+      .form-row.three-col {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
       }
 
       .picture-box {
         width: 120px;
         height: 120px;
       }
-
-      .profile-page {
-        margin: 15px;
-        border-radius: 8px;
-      }
-
-      .profile-content {
-        padding: 20px;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .section-header {
-        font-size: 13px;
-        margin-top: 20px;
-        margin-bottom: 12px;
-      }
-
-      .navbar {
-        flex-direction: column;
-        gap: 12px;
-        padding: 12px 15px;
-      }
-
-      .navbar-brand {
-        font-size: 18px;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .action-btn,
-      .back-button {
-        width: 100%;
-        justify-content: center;
-      }
     }
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
-  <div class="navbar">
-    <div class="navbar-brand">🌱 Tellngrow - Student Profile</div>
-    <div class="action-buttons">
-      <button class="action-btn" id="printBtn" onclick="printStudentInfo()">🖨️ Print Info</button>
-      <button class="action-btn download" id="downloadBtn" onclick="downloadStudentInfo()">📥 Download PDF</button>
-      <a href="/counselor/students" class="back-button">← Back to Students</a>
-    </div>
+  <div class="top-actions">
+    <a href="/counselor/students" class="back-button">← Back to Students</a>
+    <button class="action-btn-small print" onclick="printProfile()">🖨️ PRINT</button>
+    <button class="action-btn-small export" onclick="exportToPDF()">📥 SAVE AS PDF</button>
+    <button class="action-btn-small export" onclick="exportToWord()">📄 SAVE AS WORD</button>
   </div>
 
-  <!-- Main Profile Container -->
-  <div class="profile-page">
-    <!-- Profile Header Section -->
-    <div class="profile-header">
-      <div class="header-left">
-        <div class="profile-title">STUDENT INFORMATION PROFILE</div>
-        <div class="profile-subtitle">Complete Student Details & Records</div>
+  <div class="profile-page" id="profilePage">
+    <!-- Header Section -->
+    <div class="form-header">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="logo">
+          <img src="/images/logo.jpg" alt="Organization Logo">
+        </div>
+        <div class="header-left">
+          <div class="organization-title">TELL 'N GROW</div>
+          <div class="form-title">STUDENT INFORMATION RECORD</div>
+          <div class="form-subtitle">Counselor View - Complete Student Profile</div>
+        </div>
       </div>
-      <div class="picture-box">
-        {{#if student.profilePicture}}
-          {{#if (eq (substring student.profilePicture 0 1) "/")}}
-            <img src="{{student.profilePicture}}" alt="{{student.name}}" />
+      <div style="text-align: right;">
+        <div class="picture-box">
+          {{#if student.profilePicture}}
+            <img src="{{student.profilePicture}}" alt="Student Photo" style="width: 100%; height: 100%; object-fit: cover;">
           {{else}}
-            <span class="picture-placeholder">{{student.profilePicture}}</span>
+            <div class="picture-placeholder"><span>2x2<br>Photo</span></div>
           {{/if}}
-        {{else}}
-          <span class="picture-placeholder">👤</span>
-        {{/if}}
+        </div>
       </div>
     </div>
 
-    <!-- Profile Content -->
-    <div class="profile-content">
-      <!-- Personal Information Section -->
-      <h2 class="section-header">📋 PERSONAL INFORMATION</h2>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Full Name</div>
-          <div class="info-value">{{student.name}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Email Address</div>
-          <div class="info-value">{{#if student.email}}{{student.email}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Nickname</div>
-          <div class="info-value">{{#if student.nickname}}{{student.nickname}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Age</div>
-          <div class="info-value">{{#if student.age}}{{student.age}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Date of Birth</div>
-          <div class="info-value">{{#if student.dateOfBirth}}{{formatDate student.dateOfBirth}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Place of Birth</div>
-          <div class="info-value">{{#if student.placeOfBirth}}{{student.placeOfBirth}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Nationality</div>
-          <div class="info-value">{{#if student.nationality}}{{student.nationality}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Sex</div>
-          <div class="info-value">{{#if student.sex}}{{capitalize student.sex}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Civil Status</div>
-          <div class="info-value">{{#if student.civilStatus}}{{capitalize student.civilStatus}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Religion</div>
-          <div class="info-value">{{#if student.religion}}{{student.religion}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+    {{#if error_msg}}
+    <div class="alert-error">
+      {{error_msg}}
+    </div>
+    {{/if}}
+
+    <!-- Form Content -->
+    <div class="form-content">
+      
+      <!-- Personal Information -->
+      <div class="section-header">Personal Information</div>
+      
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Name</label>
+          <div class="display-value">{{student.name}}</div>
         </div>
       </div>
 
-      <!-- Academic Information Section -->
-      <h2 class="section-header">🎓 ACADEMIC INFORMATION</h2>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Course/Program</div>
-          <div class="info-value">{{#if student.course}}<span class="badge">{{student.course}}</span>{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label>Nickname</label>
+          <div class="display-value">{{student.nickname}}</div>
         </div>
-        <div class="info-item">
-          <div class="info-label">Year Level</div>
-          <div class="info-value">{{#if student.year}}<span class="badge">{{student.year}}</span>{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        <div class="form-group">
+          <label>Age</label>
+          <div class="display-value">{{student.age}}</div>
         </div>
-        <div class="info-item">
-          <div class="info-label">Section</div>
-          <div class="info-value">{{#if student.section}}{{student.section}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <div class="display-value">{{formatDate student.dateOfBirth}}</div>
         </div>
       </div>
 
-      <!-- Contact Information Section -->
-      <h2 class="section-header">📞 CONTACT INFORMATION</h2>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Contact Number</div>
-          <div class="info-value">{{#if student.contactNumber}}{{student.contactNumber}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Place of Birth</label>
+          <div class="display-value">{{student.placeOfBirth}}</div>
         </div>
-        <div class="info-item">
-          <div class="info-label">Alternate Email</div>
-          <div class="info-value">{{#if student.emailAlternate}}{{student.emailAlternate}}{{else}}<span class="empty">(Not provided)</span>{{/if}}</div>
+        <div class="form-group">
+          <label>Nationality</label>
+          <div class="display-value">{{student.nationality}}</div>
         </div>
       </div>
 
-      <!-- Address Information Section -->
-      {{#if (or student.currentAddress student.permanentAddress)}}
-      <h2 class="section-header">🏠 ADDRESS INFORMATION</h2>
-      <div class="info-grid full">
-        {{#if student.currentAddress}}
-        <div class="info-item">
-          <div class="info-label">Current Address</div>
-          <div class="info-value">{{student.currentAddress}}</div>
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label>Sex</label>
+          <div class="display-value">{{student.sex}}</div>
         </div>
-        {{/if}}
-        {{#if student.permanentAddress}}
-        <div class="info-item">
-          <div class="info-label">Permanent Address</div>
-          <div class="info-value">{{student.permanentAddress}}</div>
+        <div class="form-group">
+          <label>Civil Status</label>
+          <div class="display-value">{{student.civilStatus}}</div>
         </div>
-        {{/if}}
+        <div class="form-group">
+          <label>Religion</label>
+          <div class="display-value">{{student.religion}}</div>
+        </div>
       </div>
-      {{/if}}
 
-      <!-- Status & Background Section -->
-      {{#if (or student.lgbtqia student.indigenousGroup student.personWithDisability)}}
-      <h2 class="section-header">ℹ️ STATUS & BACKGROUND</h2>
-      <div class="info-grid">
-        {{#if student.lgbtqia}}
-        <div class="info-item">
-          <div class="info-label">LGBTQIA+</div>
-          <div class="info-value">{{capitalize student.lgbtqia}}{{#if student.lgbtqiaSpecify}} - {{student.lgbtqiaSpecify}}{{/if}}</div>
+      <!-- Contact Information -->
+      <div class="section-header">Contact Information</div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Current Address</label>
+          <div class="display-value">{{student.currentAddress}}</div>
         </div>
-        {{/if}}
-        {{#if student.indigenousGroup}}
-        <div class="info-item">
-          <div class="info-label">Indigenous Group</div>
-          <div class="info-value">{{capitalize student.indigenousGroup}}{{#if student.indigenousGroupName}} - {{student.indigenousGroupName}}{{/if}}</div>
-        </div>
-        {{/if}}
-        {{#if student.personWithDisability}}
-        <div class="info-item">
-          <div class="info-label">Person with Disability</div>
-          <div class="info-value">{{capitalize student.personWithDisability}}{{#if student.disabilityType}} - {{student.disabilityType}}{{/if}}</div>
-        </div>
-        {{/if}}
       </div>
-      {{/if}}
 
-      <!-- Parents Information Section -->
-      {{#if (or student.fatherName student.motherName)}}
-      <h2 class="section-header">👨‍👩‍👧 PARENTS INFORMATION</h2>
-      <div class="info-grid">
-        {{#if student.fatherName}}
-        <div class="info-item">
-          <div class="info-label">Father's Name</div>
-          <div class="info-value">{{student.fatherName}}</div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Permanent Address</label>
+          <div class="display-value">{{student.permanentAddress}}</div>
         </div>
-        {{/if}}
-        {{#if student.fatherOccupation}}
-        <div class="info-item">
-          <div class="info-label">Father's Occupation</div>
-          <div class="info-value">{{student.fatherOccupation}}</div>
-        </div>
-        {{/if}}
-        {{#if student.motherName}}
-        <div class="info-item">
-          <div class="info-label">Mother's Name</div>
-          <div class="info-value">{{student.motherName}}</div>
-        </div>
-        {{/if}}
-        {{#if student.motherOccupation}}
-        <div class="info-item">
-          <div class="info-label">Mother's Occupation</div>
-          <div class="info-value">{{student.motherOccupation}}</div>
-        </div>
-        {{/if}}
       </div>
-      {{/if}}
 
-      <!-- Emergency Contact Section -->
-      {{#if (or student.emergencyContactName student.emergencyContactRelation)}}
-      <h2 class="section-header">🆘 EMERGENCY CONTACT</h2>
-      <div class="info-grid">
-        {{#if student.emergencyContactName}}
-        <div class="info-item">
-          <div class="info-label">Contact Name</div>
-          <div class="info-value">{{student.emergencyContactName}}</div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Contact Number</label>
+          <div class="display-value">{{student.contactNumber}}</div>
         </div>
-        {{/if}}
-        {{#if student.emergencyContactRelation}}
-        <div class="info-item">
-          <div class="info-label">Relationship</div>
-          <div class="info-value">{{student.emergencyContactRelation}}</div>
+        <div class="form-group">
+          <label>Email</label>
+          <div class="display-value">{{student.email}}</div>
         </div>
-        {{/if}}
-        {{#if student.emergencyContactNumber}}
-        <div class="info-item">
-          <div class="info-label">Contact Number</div>
-          <div class="info-value">{{student.emergencyContactNumber}}</div>
-        </div>
-        {{/if}}
-        {{#if student.emergencyContactEmail}}
-        <div class="info-item">
-          <div class="info-label">Email Address</div>
-          <div class="info-value">{{student.emergencyContactEmail}}</div>
-        </div>
-        {{/if}}
-        {{#if student.emergencyContactAddress}}
-        <div class="info-item full">
-          <div class="info-label">Address</div>
-          <div class="info-value">{{student.emergencyContactAddress}}</div>
-        </div>
-        {{/if}}
       </div>
-      {{/if}}
 
-      <!-- Educational Background Section -->
-      {{#if (or student.elementarySchool student.juniorHighSchool student.seniorHighSchool student.collegeName)}}
-      <h2 class="section-header">📚 EDUCATIONAL BACKGROUND</h2>
-      <table class="education-table">
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Alternate Email Address</label>
+          <div class="display-value">{{student.emailAlternate}}</div>
+        </div>
+      </div>
+
+      <!-- Academic Information -->
+      <div class="section-header">Academic Information</div>
+
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label>Course</label>
+          <div class="display-value">{{student.course}}</div>
+        </div>
+        <div class="form-group">
+          <label>Year Level</label>
+          <div class="display-value">{{student.year}}</div>
+        </div>
+        <div class="form-group">
+          <label>Section</label>
+          <div class="display-value">{{student.section}}</div>
+        </div>
+      </div>
+
+      <!-- Family Information -->
+      <div class="section-header">Family Information</div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Father's Name</label>
+          <div class="display-value">{{student.fatherName}}</div>
+        </div>
+        <div class="form-group">
+          <label>Father's Occupation</label>
+          <div class="display-value">{{student.fatherOccupation}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Mother's Name</label>
+          <div class="display-value">{{student.motherName}}</div>
+        </div>
+        <div class="form-group">
+          <label>Mother's Occupation</label>
+          <div class="display-value">{{student.motherOccupation}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Parents Status</label>
+          <div class="display-value">{{#if student.parentsStatus}}{{#each student.parentsStatus}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}</div>
+        </div>
+        <div class="form-group">
+          <label>Family Income</label>
+          <div class="display-value">{{#if student.familyIncome}}{{#each student.familyIncome}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}</div>
+        </div>
+      </div>
+
+      <!-- Emergency Contact Information -->
+      <div class="section-header">Emergency Contact Information</div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Emergency Contact Name</label>
+          <div class="display-value">{{student.emergencyContactName}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Relationship</label>
+          <div class="display-value">{{student.emergencyContactRelation}}</div>
+        </div>
+        <div class="form-group">
+          <label>Contact Number</label>
+          <div class="display-value">{{student.emergencyContactNumber}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Address</label>
+          <div class="display-value">{{student.emergencyContactAddress}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Email</label>
+          <div class="display-value">{{student.emergencyContactEmail}}</div>
+        </div>
+      </div>
+
+      <!-- Educational Background -->
+      <div class="section-header">Educational Background</div>
+
+      <table class="info-table">
         <thead>
           <tr>
             <th>Level</th>
             <th>School Attended</th>
-            <th>Dates</th>
-            <th>Honors/Scholarships</th>
+            <th>Dates Attended</th>
+            <th>Honors Received</th>
           </tr>
         </thead>
         <tbody>
-          {{#if student.elementarySchool}}
           <tr>
-            <td>Elementary</td>
+            <td><strong>Elementary</strong></td>
             <td>{{student.elementarySchool}}</td>
             <td>{{student.elementaryDates}}</td>
-            <td>{{#if student.elementaryHonors}}{{student.elementaryHonors}}{{else}}-{{/if}}</td>
+            <td>{{student.elementaryHonors}}</td>
           </tr>
-          {{/if}}
-          {{#if student.juniorHighSchool}}
           <tr>
-            <td>Junior High School</td>
+            <td><strong>Junior High</strong></td>
             <td>{{student.juniorHighSchool}}</td>
             <td>{{student.juniorDates}}</td>
-            <td>{{#if student.juniorHonors}}{{student.juniorHonors}}{{else}}-{{/if}}</td>
+            <td>{{student.juniorHonors}}</td>
           </tr>
-          {{/if}}
-          {{#if student.seniorHighSchool}}
           <tr>
-            <td>Senior High School</td>
+            <td><strong>Senior High</strong></td>
             <td>{{student.seniorHighSchool}}</td>
-            <td>{{student.seniorDates}}</td>
-            <td>{{#if student.seniorHonors}}{{student.seniorHonors}}{{else}}-{{/if}}</td>
+            <td>{{student.seniorHighDates}}</td>
+            <td>{{student.seniorHighHonors}}</td>
           </tr>
-          {{/if}}
-          {{#if student.collegeName}}
           <tr>
-            <td>College</td>
+            <td><strong>College/University</strong></td>
             <td>{{student.collegeName}}</td>
             <td>{{student.collegeDates}}</td>
-            <td>{{#if student.collegeHonors}}{{student.collegeHonors}}{{else}}-{{/if}}</td>
+            <td>{{student.collegeHonors}}</td>
           </tr>
-          {{/if}}
         </tbody>
       </table>
-      {{/if}}
 
-      <!-- Skills & Hobbies Section -->
-      {{#if student.skillsHobbies}}
-      <h2 class="section-header">🎨 SKILLS & HOBBIES</h2>
-      <div class="info-grid full">
-        <div class="info-item">
-          <div class="info-value">{{student.skillsHobbies}}</div>
+      <!-- Health Information -->
+      <div class="section-header">Health Information</div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Health Concerns</label>
+          <div class="display-value">{{#if student.healthConcerns}}{{#each student.healthConcerns}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}</div>
         </div>
       </div>
-      {{/if}}
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Vision</label>
+          <div class="display-value">{{student.vision}}</div>
+        </div>
+        <div class="form-group">
+          <label>Vision Details</label>
+          <div class="display-value">{{student.visionDetails}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Auditory (Hearing)</label>
+          <div class="display-value">{{student.hearing}}</div>
+        </div>
+        <div class="form-group">
+          <label>Hearing Details</label>
+          <div class="display-value">{{student.hearingDetails}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Medicines/Vitamins/Treatments/Special Diet</label>
+          <div class="display-value">{{student.medicines}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Accidents/Operations Experienced/Effect</label>
+          <div class="display-value">{{student.accidentsOperations}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Present Concerns/Problems</label>
+          <div class="display-value">{{student.presentConcerns}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Present Fears</label>
+          <div class="display-value">{{student.presentFears}}</div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Any Health Problem/Illness</label>
+          <div class="display-value">{{student.healthProblem}}</div>
+        </div>
+      </div>
+
+      <!-- Special Information -->
+      <div class="section-header">Special Information</div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>LGBTQIA+ Status</label>
+          <div class="display-value">{{student.lgbtqia}}</div>
+        </div>
+        <div class="form-group">
+          <label>LGBTQIA+ Specify</label>
+          <div class="display-value">{{student.lgbtqiaSpecify}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Indigenous Group Member</label>
+          <div class="display-value">{{student.indigenousGroup}}</div>
+        </div>
+        <div class="form-group">
+          <label>Indigenous Group Name</label>
+          <div class="display-value">{{student.indigenousGroupName}}</div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Person with Disability</label>
+          <div class="display-value">{{student.personWithDisability}}</div>
+        </div>
+        <div class="form-group">
+          <label>Disability Type</label>
+          <div class="display-value">{{student.disabilityType}}</div>
+        </div>
+      </div>
+
+      <!-- Account Status -->
+      <div class="section-header">Account Information</div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>User ID</label>
+          <div class="display-value">{{student.id}}</div>
+        </div>
+        <div class="form-group">
+          <label>Account Status</label>
+          <div class="display-value"><span class="status-badge">{{student.accountStatus}}</span></div>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>Member Since</label>
+          <div class="display-value">{{formatDate student.createdAt}}</div>
+        </div>
+        <div class="form-group">
+          <label>Last Updated</label>
+          <div class="display-value">{{formatDate student.updatedAt}}</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <a href="/counselor/students/{{student.id}}/edit" class="action-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">EDIT PROFILE</a>
+        <a href="/counselor/students" class="cancel-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">BACK</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="form-footer">
+      <p>Counselor Access - Confidential Student Information</p>
     </div>
   </div>
 
   <script>
-    // Print function
-    function printStudentInfo() {
+    // Function to print the profile
+    function printProfile() {
       window.print();
     }
 
-    // Download as PDF function
-    function downloadStudentInfo() {
-      try {
-        var studentName = '{{student.name}}' || 'Student';
-        var element = document.querySelector('.profile-page');
-        
-        if (!element) {
-          alert('Error: Could not find student information');
-          return;
-        }
-
-        // Load html2pdf library dynamically
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        
-        script.onload = function() {
-          var filename = studentName + '_Profile.pdf';
-          var opt = {
-            margin: 10,
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-          };
-          
-          if (typeof html2pdf !== 'undefined') {
-            html2pdf().set(opt).from(element).save();
-          } else {
-            alert('PDF library failed to load. Using print instead.');
-            window.print();
-          }
-        };
-        
-        script.onerror = function() {
-          alert('Could not load PDF library. Using print instead.');
-          window.print();
-        };
-        
-        document.head.appendChild(script);
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error generating PDF. Using print instead.');
+    // Function to export as PDF
+    function exportToPDF() {
+      const studentName = document.querySelector('[data-name]')?.textContent || 'Student_Profile';
+      
+      // Use print dialog to save as PDF
+      setTimeout(() => {
         window.print();
-      }
+      }, 100);
     }
+
+    // Function to extract clean text from profile
+    function getProfileText() {
+      const element = document.getElementById('profilePage');
+      if (!element) return '';
+      
+      const clone = element.cloneNode(true);
+      
+      // Remove buttons and unnecessary elements
+      const buttons = clone.querySelectorAll('.button-group, .top-actions, .form-footer');
+      buttons.forEach(btn => btn.remove());
+      
+      // Get all text content in organized way
+      let text = 'STUDENT INFORMATION RECORD\n\n';
+      
+      // Process sections
+      const sections = clone.querySelectorAll('.section-header');
+      sections.forEach(section => {
+        text += '\n' + section.textContent.toUpperCase() + '\n';
+        text += '='.repeat(50) + '\n';
+        
+        let currentElement = section.nextElementSibling;
+        while (currentElement && !currentElement.classList.contains('section-header')) {
+          if (currentElement.classList.contains('form-row')) {
+            const groups = currentElement.querySelectorAll('.form-group');
+            groups.forEach(group => {
+              const label = group.querySelector('label');
+              const value = group.querySelector('.display-value');
+              if (label && value) {
+                text += label.textContent + ': ' + value.textContent + '\n';
+              }
+            });
+          } else if (currentElement.classList.contains('info-table')) {
+            const rows = currentElement.querySelectorAll('tr');
+            rows.forEach(row => {
+              const cells = row.querySelectorAll('td, th');
+              text += Array.from(cells).map(cell => cell.textContent.trim()).join(' | ') + '\n';
+            });
+          }
+          currentElement = currentElement.nextElementSibling;
+        }
+      });
+      
+      return text;
+    }
+
+    // Function to export as Word (simplified and fixed)
+    function exportToWord() {
+      console.log('📄 Starting Word export...');
+      
+      // Get student ID from the page more reliably
+      let studentId = null;
+      const pageText = document.getElementById('profilePage')?.innerText || '';
+      
+      // Look for "User ID" label and get the value after it
+      const userIdMatch = pageText.match(/User ID\s+(\d+)/);
+      if (userIdMatch) {
+        studentId = userIdMatch[1];
+        console.log('✅ Found student ID from page:', studentId);
+      }
+      
+      // Fallback: try URL pattern
+      if (!studentId) {
+        const urlMatch = window.location.pathname.match(/\/(\d+)/);
+        if (urlMatch) {
+          studentId = urlMatch[1];
+          console.log('✅ Found student ID from URL:', studentId);
+        }
+      }
+      
+      if (!studentId) {
+        console.error('❌ Could not find student ID');
+        alert('Error: Unable to identify student. Please reload the page and try again.');
+        return;
+      }
+      
+      const studentName = document.querySelector('.display-value')?.textContent?.trim() || 'Student_Profile';
+      console.log('📝 Student Name:', studentName);
+      
+      // Disable button to prevent double-clicks
+      const btn = event?.target;
+      if (btn) btn.disabled = true;
+      
+      fetch('/api/export-student-word', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: parseInt(studentId),
+          studentName: studentName
+        })
+      })
+      .then(response => {
+        console.log('📨 Response status:', response.status);
+        if (!response.ok) {
+          console.error('❌ Response error:', response.statusText);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        console.log('✅ Received blob, size:', blob.size, 'bytes');
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${studentName.replace(/\s+/g, '_')}_Profile.doc`;
+        
+        console.log('📥 Downloading as:', link.download);
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          console.log('✅ Download complete');
+        }, 100);
+      })
+      .catch(error => {
+        console.error('❌ Export error:', error);
+        alert('Error downloading document. Check console for details.');
+      })
+      .finally(() => {
+        if (btn) btn.disabled = false;
+      });
+    }
+
+    // Alternative Word export using HTML table format (fallback)
+    function exportToWordAlternative() {
+      alert('Direct export not available. Please use the Print function and select "Save as PDF" or "Print to File".');
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Student detail page loaded');
+    });
   </script>
 </body>
 </html>

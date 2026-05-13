@@ -8,6 +8,7 @@
 
 import bcrypt from "bcrypt";
 import { User, UserProgress, Activity, Feedback, sequelize } from "../models/index.js";
+import { saveBase64Image, deleteImage } from "../utils/imageHandler.js";
 
 export const loginPage = (req, res) => {
   res.render("login", { 
@@ -233,51 +234,106 @@ export const loginUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   try {
     const { 
-      name, email, password, confirmPassword, isFaculty,
+      fullName, email, password, confirmPassword, photoData, isFaculty,
       nickname, age, dateOfBirth, placeOfBirth, nationality, sex, civilStatus, religion,
       course, year, section,
-      currentAddress, permanentAddress, contactNumber, emailAlternate,
-      lgbtqia, lgbtqiaSpecify, indigenousGroup, indigenousGroupName,
-      personWithDisability, disabilityType,
-      fatherName, motherName, fatherOccupation, motherOccupation, parentsStatus, familyIncome,
+      currentAddress, permanentAddress, contactNo, emailAddress,
+      lgbtqia, lgbtqia_specify, indigenous, indigenous_tribe,
+      disability, disability_specify,
+      fatherName, fatherOccupation, motherName, motherOccupation, parentsStatus, familyIncome,
       emergencyContactName, emergencyContactRelation, emergencyContactAddress, emergencyContactNumber, emergencyContactEmail,
       elementarySchool, elementaryDates, elementaryHonors,
-      juniorHighSchool, juniorDates, juniorHonors,
-      seniorHighSchool, seniorDates, seniorHonors,
-      vocationalCourse, vocationalDates, vocationalHonors,
-      collegeName, collegeDates, collegeHonors,
-      healthConcerns, vision, hearing,
-      accidentsOperations, presentConcerns, presentFears, healthProblem,
-      skillsHobbies
+      juniorHighSchool, juniorHighDates, juniorHighHonors,
+      seniorHighSchool, seniorHighDates, seniorHighHonors,
+      collegeSchool, collegeDates, collegeHonors,
+      medicines, accidents, presentConcerns, presentFears, healthProblems,
+      vision, visionDetails, hearing, hearingDetails
     } = req.body;
 
-    console.log('📝 Registration attempt:', { name, email, isFaculty });
+    console.log('📝 Registration attempt:', { fullName, email, isFaculty });
 
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).render("register", { error_msg: "All fields are required" });
+    // Store form data for re-render on error
+    const formData = {
+      fullName,
+      email,
+      nickname,
+      age,
+      dateOfBirth,
+      placeOfBirth,
+      nationality,
+      sex,
+      civilStatus,
+      religion,
+      currentAddress,
+      permanentAddress,
+      contactNo,
+      emailAddress,
+      fatherName,
+      fatherOccupation,
+      motherName,
+      motherOccupation,
+      elementarySchool,
+      elementaryDates,
+      elementaryHonors,
+      juniorHighSchool,
+      juniorHighDates,
+      juniorHighHonors,
+      seniorHighSchool,
+      seniorHighDates,
+      seniorHighHonors,
+      collegeSchool,
+      collegeDates,
+      collegeHonors,
+      medicines,
+      accidents,
+      presentConcerns,
+      presentFears,
+      healthProblems
+      // Note: NOT including photoData to avoid re-sending large image data
+    };
+
+    // Validation - Check all required fields
+    const errors = [];
+    if (!fullName || !fullName.trim()) errors.push('Full Name');
+    if (!email || !email.trim()) errors.push('Email Address');
+    if (!password || !password.trim()) errors.push('Password');
+    if (!confirmPassword || !confirmPassword.trim()) errors.push('Confirm Password');
+
+    if (errors.length > 0) {
+      return res.status(400).render("register", { 
+        error_msg: `Please fill in: ${errors.join(', ')}`, 
+        ...formData 
+      });
     }
 
-    if (!course || !year) {
-      return res.status(400).render("register", { error_msg: "Course and Year Level are required" });
-    }
-
-    if (name.trim().length < 2) {
-      return res.status(400).render("register", { error_msg: "Name must be at least 2 characters" });
+    if (fullName.trim().length < 2) {
+      return res.status(400).render("register", { 
+        error_msg: "Full Name must be at least 2 characters", 
+        ...formData 
+      });
     }
 
     if (password !== confirmPassword) {
-      return res.status(400).render("register", { error_msg: "Passwords do not match" });
+      return res.status(400).render("register", { 
+        error_msg: "Passwords do not match", 
+        ...formData 
+      });
     }
 
     if (password.length < 6) {
-      return res.status(400).render("register", { error_msg: "Password must be at least 6 characters" });
+      return res.status(400).render("register", { 
+        error_msg: "Password must be at least 6 characters", 
+        ...formData 
+      });
     }
 
     // Check if user exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).render("register", { error_msg: "Email already registered" });
+      return res.status(400).render("register", { 
+        error_msg: "Email already registered", 
+        ...formData 
+      });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -289,9 +345,16 @@ export const registerUser = async (req, res) => {
     
     console.log('👤 Creating user with:', { role, accountStatus, isFaculty, isCounselor });
     
+    // Save profile picture to disk if provided
+    let profilePicturePath = null;
+    if (photoData) {
+      profilePicturePath = saveBase64Image(photoData, email.replace(/[^a-z0-9]/gi, '_'));
+      console.log('📷 Profile picture saved:', profilePicturePath);
+    }
+    
     // Create user with all form data
     const user = await User.create({ 
-      name, 
+      name: fullName, 
       email, 
       password: hashed,
       nickname: nickname || null,
@@ -307,14 +370,15 @@ export const registerUser = async (req, res) => {
       section: section || null,
       currentAddress: currentAddress || null,
       permanentAddress: permanentAddress || null,
-      contactNumber: contactNumber || null,
-      emailAlternate: emailAlternate || null,
+      contactNumber: contactNo || null,
+      emailAlternate: emailAddress || null,
+      profilePicture: profilePicturePath,
       lgbtqia: lgbtqia || null,
-      lgbtqiaSpecify: lgbtqiaSpecify || null,
-      indigenousGroup: indigenousGroup || null,
-      indigenousGroupName: indigenousGroupName || null,
-      personWithDisability: personWithDisability || null,
-      disabilityType: disabilityType || null,
+      lgbtqiaSpecify: lgbtqia_specify || null,
+      indigenousGroup: indigenous || null,
+      indigenousGroupName: indigenous_tribe || null,
+      personWithDisability: disability || null,
+      disabilityType: disability_specify || null,
       fatherName: fatherName || null,
       motherName: motherName || null,
       fatherOccupation: fatherOccupation || null,
@@ -330,25 +394,24 @@ export const registerUser = async (req, res) => {
       elementaryDates: elementaryDates || null,
       elementaryHonors: elementaryHonors || null,
       juniorHighSchool: juniorHighSchool || null,
-      juniorDates: juniorDates || null,
-      juniorHonors: juniorHonors || null,
+      juniorDates: juniorHighDates || null,
+      juniorHonors: juniorHighHonors || null,
       seniorHighSchool: seniorHighSchool || null,
-      seniorDates: seniorDates || null,
-      seniorHonors: seniorHonors || null,
-      vocationalCourse: vocationalCourse || null,
-      vocationalDates: vocationalDates || null,
-      vocationalHonors: vocationalHonors || null,
-      collegeName: collegeName || null,
+      seniorDates: seniorHighDates || null,
+      seniorHonors: seniorHighHonors || null,
+      collegeName: collegeSchool || null,
       collegeDates: collegeDates || null,
       collegeHonors: collegeHonors || null,
-      healthConcerns: healthConcerns ? (Array.isArray(healthConcerns) ? healthConcerns : [healthConcerns]) : null,
+      healthConcerns: medicines ? (Array.isArray(medicines) ? medicines : [medicines]) : null,
       vision: vision || null,
+      visionDetails: visionDetails || null,
       hearing: hearing || null,
-      accidentsOperations: accidentsOperations || null,
+      hearingDetails: hearingDetails || null,
+      accidentsOperations: accidents || null,
       presentConcerns: presentConcerns || null,
       presentFears: presentFears || null,
-      healthProblem: healthProblem || null,
-      skillsHobbies: skillsHobbies || null,
+      healthProblem: healthProblems || null,
+      medicines: medicines || null,
       role,
       accountStatus,
       authProvider: 'local'
@@ -381,7 +444,7 @@ export const registerUser = async (req, res) => {
     await Activity.create({
       userId: user.id,
       type: 'registration',
-      description: `${name} registered as ${role}`,
+      description: `${fullName} registered as ${role}`,
       metadata: { ipAddress: req.ip, role, accountStatus }
     });
 
@@ -601,151 +664,249 @@ export const updateProfile = async (req, res) => {
       seniorHighSchool, seniorDates, seniorHonors,
       vocationalCourse, vocationalDates, vocationalHonors,
       collegeName, collegeDates, collegeHonors,
-      healthConcerns, vision, hearing,
+      healthConcerns, vision, hearing, visionDetails, hearingDetails,
       accidentsOperations, presentConcerns, presentFears, healthProblem,
       skillsHobbies
     } = req.body;
 
     let error_msg;
 
-    // Validate required fields
-    if (!name || !email) {
-      error_msg = "Name and email are required.";
-    }
-
-    if (!error_msg && (!course || !year)) {
-      error_msg = "Course and Year Level are required.";
-    }
-
-    // if email changed, make sure it's not already taken by another account
-    if (!error_msg && email && email !== user.email) {
-      const existing = await User.findOne({ where: { email } });
-      if (existing && existing.id !== user.id) {
-        error_msg = "Email is already in use by another account.";
+    // ✅ ROLE-BASED VALIDATION & UPDATE LOGIC
+    if (user.role === 'counselor') {
+      // COUNSELOR: Only allow name, password, and picture updates
+      
+      // Validate name is provided
+      if (!name) {
+        error_msg = "Name is required.";
       }
-    }
 
-    // handle password change logic
-    if (!error_msg && (newPassword || confirmPassword || currentPassword)) {
-      if (!currentPassword) {
-        error_msg = "You must enter your current password to change your password.";
-      } else if (newPassword !== confirmPassword) {
-        error_msg = "New password and confirmation do not match.";
-      } else {
-        const match = await bcrypt.compare(currentPassword, user.password);
-        if (!match) {
-          error_msg = "Current password is incorrect.";
-        } else if (newPassword && newPassword.length < 6) {
-          error_msg = "New password must be at least 6 characters long.";
-        } else if (newPassword) {
-          const hashed = await bcrypt.hash(newPassword, 10);
-          user.password = hashed;
+      // Handle password change logic for counselor
+      if (!error_msg && (newPassword || confirmPassword || currentPassword)) {
+        if (!currentPassword) {
+          error_msg = "You must enter your current password to change your password.";
+        } else if (newPassword !== confirmPassword) {
+          error_msg = "New password and confirmation do not match.";
+        } else {
+          const match = await bcrypt.compare(currentPassword, user.password);
+          if (!match) {
+            error_msg = "Current password is incorrect.";
+          } else if (newPassword && newPassword.length < 6) {
+            error_msg = "New password must be at least 6 characters long.";
+          } else if (newPassword) {
+            const hashed = await bcrypt.hash(newPassword, 10);
+            user.password = hashed;
+          }
+        }
+      }
+
+      if (!error_msg) {
+        // Update ONLY: name and picture for counselor
+        if (name) user.name = name;
+
+        // Handle profile picture upload
+        if (req.file) {
+          user.profilePicture = '/uploads/profiles/' + req.file.filename;
+        } else if (selectedAvatar) {
+          user.profilePicture = selectedAvatar;
+        }
+        
+        await user.save();
+        
+        // ✅ Refresh the user from database
+        const refreshedUser = await User.findByPk(user.id);
+        if (refreshedUser) {
+          req.user = refreshedUser;
+          req.session.userId = refreshedUser.id;
+          
+          req.session.save((err) => {
+            if (err) console.error('Session save error:', err);
+          });
+          
+          console.log('✅ Counselor profile updated:', refreshedUser.email);
+        }
+      }
+
+    } else {
+      // STUDENT: Allow all field updates (original logic)
+      
+      // Validate required fields
+      if (!name || !email) {
+        error_msg = "Name and email are required.";
+      }
+
+      if (!error_msg && (!course || !year)) {
+        error_msg = "Course and Year Level are required.";
+      }
+
+      // if email changed, make sure it's not already taken by another account
+      if (!error_msg && email && email !== user.email) {
+        const existing = await User.findOne({ where: { email } });
+        if (existing && existing.id !== user.id) {
+          error_msg = "Email is already in use by another account.";
+        }
+      }
+
+      // handle password change logic
+      if (!error_msg && (newPassword || confirmPassword || currentPassword)) {
+        if (!currentPassword) {
+          error_msg = "You must enter your current password to change your password.";
+        } else if (newPassword !== confirmPassword) {
+          error_msg = "New password and confirmation do not match.";
+        } else {
+          const match = await bcrypt.compare(currentPassword, user.password);
+          if (!match) {
+            error_msg = "Current password is incorrect.";
+          } else if (newPassword && newPassword.length < 6) {
+            error_msg = "New password must be at least 6 characters long.";
+          } else if (newPassword) {
+            const hashed = await bcrypt.hash(newPassword, 10);
+            user.password = hashed;
+          }
+        }
+      }
+
+      if (!error_msg) {
+        // Update basic fields
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (nickname) user.nickname = nickname;
+        if (age) user.age = parseInt(age);
+        if (dateOfBirth) user.dateOfBirth = dateOfBirth;
+        if (placeOfBirth) user.placeOfBirth = placeOfBirth;
+        if (nationality) user.nationality = nationality;
+        if (sex) user.sex = sex;
+        if (civilStatus) user.civilStatus = civilStatus;
+        if (religion) user.religion = religion;
+        if (course) user.course = course;
+        if (year) user.year = year;
+        if (section) user.section = section;
+
+        // Address fields
+        if (currentAddress) user.currentAddress = currentAddress;
+        if (permanentAddress) user.permanentAddress = permanentAddress;
+        if (contactNumber) user.contactNumber = contactNumber;
+        if (emailAlternate) user.emailAlternate = emailAlternate;
+
+        // Status & Background
+        if (lgbtqia) user.lgbtqia = lgbtqia;
+        if (lgbtqiaSpecify) user.lgbtqiaSpecify = lgbtqiaSpecify;
+        if (indigenousGroup) user.indigenousGroup = indigenousGroup;
+        if (indigenousGroupName) user.indigenousGroupName = indigenousGroupName;
+        if (personWithDisability) user.personWithDisability = personWithDisability;
+        if (disabilityType) user.disabilityType = disabilityType;
+
+        // Parents Information
+        if (fatherName) user.fatherName = fatherName;
+        if (motherName) user.motherName = motherName;
+        if (fatherOccupation) user.fatherOccupation = fatherOccupation;
+        if (motherOccupation) user.motherOccupation = motherOccupation;
+        
+        // Handle arrays - parentsStatus and familyIncome
+        if (parentsStatus) {
+          user.parentsStatus = Array.isArray(parentsStatus) ? parentsStatus : [parentsStatus];
+        }
+        if (familyIncome) {
+          user.familyIncome = Array.isArray(familyIncome) ? familyIncome : [familyIncome];
+        }
+
+        // Emergency Contact
+        if (emergencyContactName) user.emergencyContactName = emergencyContactName;
+        if (emergencyContactRelation) user.emergencyContactRelation = emergencyContactRelation;
+        if (emergencyContactAddress) user.emergencyContactAddress = emergencyContactAddress;
+        if (emergencyContactNumber) user.emergencyContactNumber = emergencyContactNumber;
+        if (emergencyContactEmail) user.emergencyContactEmail = emergencyContactEmail;
+
+        // Educational Background
+        if (elementarySchool) user.elementarySchool = elementarySchool;
+        if (elementaryDates) user.elementaryDates = elementaryDates;
+        if (elementaryHonors) user.elementaryHonors = elementaryHonors;
+        if (juniorHighSchool) user.juniorHighSchool = juniorHighSchool;
+        if (juniorDates) user.juniorDates = juniorDates;
+        if (juniorHonors) user.juniorHonors = juniorHonors;
+        if (seniorHighSchool) user.seniorHighSchool = seniorHighSchool;
+        if (seniorDates) user.seniorDates = seniorDates;
+        if (seniorHonors) user.seniorHonors = seniorHonors;
+        if (vocationalCourse) user.vocationalCourse = vocationalCourse;
+        if (vocationalDates) user.vocationalDates = vocationalDates;
+        if (vocationalHonors) user.vocationalHonors = vocationalHonors;
+        if (collegeName) user.collegeName = collegeName;
+        if (collegeDates) user.collegeDates = collegeDates;
+        if (collegeHonors) user.collegeHonors = collegeHonors;
+
+        // Health Information
+        if (healthConcerns) {
+          user.healthConcerns = Array.isArray(healthConcerns) ? healthConcerns : [healthConcerns];
+        }
+        if (vision) user.vision = vision;
+        if (visionDetails) user.visionDetails = visionDetails;
+        if (hearing) user.hearing = hearing;
+        if (hearingDetails) user.hearingDetails = hearingDetails;
+        if (accidentsOperations) user.accidentsOperations = accidentsOperations;
+        if (presentConcerns) user.presentConcerns = presentConcerns;
+        if (presentFears) user.presentFears = presentFears;
+        if (healthProblem) user.healthProblem = healthProblem;
+
+        // Additional Information
+        if (skillsHobbies) user.skillsHobbies = skillsHobbies;
+
+        // Handle profile picture upload
+        if (req.file) {
+          // File was uploaded
+          user.profilePicture = '/uploads/profiles/' + req.file.filename;
+        } else if (selectedAvatar) {
+          // Avatar emoji was selected
+          user.profilePicture = selectedAvatar;
+        }
+        
+        await user.save();
+        
+        // ✅ Refresh the user from database to get latest data
+        const refreshedUser = await User.findByPk(user.id);
+        if (refreshedUser) {
+          req.user = refreshedUser;
+          req.session.userId = refreshedUser.id;
+          
+          // Update user email in session if changed
+          if (refreshedUser.email !== email) {
+            req.session.userEmail = refreshedUser.email;
+          }
+          
+          // Save session to ensure changes are persisted
+          req.session.save((err) => {
+            if (err) console.error('Session save error:', err);
+          });
+          
+          console.log('✅ Profile updated and session refreshed for user:', refreshedUser.email);
         }
       }
     }
 
-    if (!error_msg) {
-      // Update basic fields
-      if (name) user.name = name;
-      if (email) user.email = email;
-      if (nickname) user.nickname = nickname;
-      if (age) user.age = parseInt(age);
-      if (dateOfBirth) user.dateOfBirth = dateOfBirth;
-      if (placeOfBirth) user.placeOfBirth = placeOfBirth;
-      if (nationality) user.nationality = nationality;
-      if (sex) user.sex = sex;
-      if (civilStatus) user.civilStatus = civilStatus;
-      if (religion) user.religion = religion;
-      if (course) user.course = course;
-      if (year) user.year = year;
-      if (section) user.section = section;
-
-      // Address fields
-      if (currentAddress) user.currentAddress = currentAddress;
-      if (permanentAddress) user.permanentAddress = permanentAddress;
-      if (contactNumber) user.contactNumber = contactNumber;
-      if (emailAlternate) user.emailAlternate = emailAlternate;
-
-      // Status & Background
-      if (lgbtqia) user.lgbtqia = lgbtqia;
-      if (lgbtqiaSpecify) user.lgbtqiaSpecify = lgbtqiaSpecify;
-      if (indigenousGroup) user.indigenousGroup = indigenousGroup;
-      if (indigenousGroupName) user.indigenousGroupName = indigenousGroupName;
-      if (personWithDisability) user.personWithDisability = personWithDisability;
-      if (disabilityType) user.disabilityType = disabilityType;
-
-      // Parents Information
-      if (fatherName) user.fatherName = fatherName;
-      if (motherName) user.motherName = motherName;
-      if (fatherOccupation) user.fatherOccupation = fatherOccupation;
-      if (motherOccupation) user.motherOccupation = motherOccupation;
-      
-      // Handle arrays - parentsStatus and familyIncome
-      if (parentsStatus) {
-        user.parentsStatus = Array.isArray(parentsStatus) ? parentsStatus : [parentsStatus];
-      }
-      if (familyIncome) {
-        user.familyIncome = Array.isArray(familyIncome) ? familyIncome : [familyIncome];
-      }
-
-      // Emergency Contact
-      if (emergencyContactName) user.emergencyContactName = emergencyContactName;
-      if (emergencyContactRelation) user.emergencyContactRelation = emergencyContactRelation;
-      if (emergencyContactAddress) user.emergencyContactAddress = emergencyContactAddress;
-      if (emergencyContactNumber) user.emergencyContactNumber = emergencyContactNumber;
-      if (emergencyContactEmail) user.emergencyContactEmail = emergencyContactEmail;
-
-      // Educational Background
-      if (elementarySchool) user.elementarySchool = elementarySchool;
-      if (elementaryDates) user.elementaryDates = elementaryDates;
-      if (elementaryHonors) user.elementaryHonors = elementaryHonors;
-      if (juniorHighSchool) user.juniorHighSchool = juniorHighSchool;
-      if (juniorDates) user.juniorDates = juniorDates;
-      if (juniorHonors) user.juniorHonors = juniorHonors;
-      if (seniorHighSchool) user.seniorHighSchool = seniorHighSchool;
-      if (seniorDates) user.seniorDates = seniorDates;
-      if (seniorHonors) user.seniorHonors = seniorHonors;
-      if (vocationalCourse) user.vocationalCourse = vocationalCourse;
-      if (vocationalDates) user.vocationalDates = vocationalDates;
-      if (vocationalHonors) user.vocationalHonors = vocationalHonors;
-      if (collegeName) user.collegeName = collegeName;
-      if (collegeDates) user.collegeDates = collegeDates;
-      if (collegeHonors) user.collegeHonors = collegeHonors;
-
-      // Health Information
-      if (healthConcerns) {
-        user.healthConcerns = Array.isArray(healthConcerns) ? healthConcerns : [healthConcerns];
-      }
-      if (vision) user.vision = vision;
-      if (hearing) user.hearing = hearing;
-      if (accidentsOperations) user.accidentsOperations = accidentsOperations;
-      if (presentConcerns) user.presentConcerns = presentConcerns;
-      if (presentFears) user.presentFears = presentFears;
-      if (healthProblem) user.healthProblem = healthProblem;
-
-      // Additional Information
-      if (skillsHobbies) user.skillsHobbies = skillsHobbies;
-
-      // Handle profile picture upload
-      if (req.file) {
-        // File was uploaded
-        user.profilePicture = '/uploads/profiles/' + req.file.filename;
-      } else if (selectedAvatar) {
-        // Avatar emoji was selected
-        user.profilePicture = selectedAvatar;
-      }
-      
-      await user.save();
-    }
-
     const success_msg = error_msg ? null : "Profile updated successfully.";
-    res.render("user/profile", { title: "My Profile", user, error_msg, success_msg });
+    
+    // Ensure we render with the latest user data
+    const latestUser = await User.findByPk(req.session.userId);
+    res.render("user/profile", { 
+      title: "My Profile", 
+      user: latestUser || user, 
+      error_msg, 
+      success_msg 
+    });
   } catch (err) {
     console.error("Profile update error:", err);
-    res.status(500).render("user/profile", {
+    
+    // Ensure user is still fetched for error response
+    let currentUser = req.user;
+    try {
+      currentUser = await User.findByPk(req.session.userId) || req.user;
+    } catch (fetchErr) {
+      console.error("Could not fetch user in error handler:", fetchErr);
+    }
+    
+    res.status(200).render("user/profile", {
       title: "My Profile",
-      user: req.user,
-      error_msg: "An error occurred while updating your profile."
+      user: currentUser,
+      error_msg: "An error occurred while updating your profile.",
+      success_msg: null
     });
   }
 };

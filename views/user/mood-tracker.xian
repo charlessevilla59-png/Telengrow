@@ -6,12 +6,6 @@
   <title>{{title}} - Tellngrow</title>
   <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABACoBAAARgAAACAgEAABACgAZQcAAEgAAABQAAAAIAAAAEAAAAABACAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Load TensorFlow (required by face-api) - must load before face-api -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
-  <!-- Load TensorFlow core module -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.11.0/dist/tf-core.min.js"></script>
-  <!-- Load face-api.js - working version -->
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-20px); }
@@ -195,7 +189,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <img src="/images/logo.svg" alt="Telengrow" class="h-10 w-10">
+        <img src="/images/logo.jpg" alt="Tell 'n Grow" class="h-10 w-10">
         <h1 class="text-2xl font-bold text-green-600">Tellngrow</h1>
       </div>
       <div class="flex items-center space-x-4">
@@ -219,183 +213,100 @@
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        <span class="font-medium">Back to Dashboard</span>
+        <span class="font-medium">Back</span>
       </a>
     </div>
 
     <!-- Header -->
-    <div class="mb-12 animate-fade-in-down">
+    <div class="mb-8 animate-fade-in-down">
       <h1 class="text-5xl md:text-5xl font-bold text-gray-900 mb-2">Mood Tracker</h1>
-      <p class="text-lg text-gray-600">Using AI-Powered Face Recognition to Detect Your Emotions</p>
     </div>
 
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Camera Section -->
+      <!-- Mood Selection Section -->
       <div class="lg:col-span-2">
         <div class="animate-fade-in-up" style="animation-delay: 0.1s;">
           <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Face Recognition Scanner</h2>
-            <p class="text-gray-600 mb-6">Position your face in the camera and click "Start Scanning" to detect your current emotion.</p>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">How are you feeling?</h2>
             
-            <!-- Camera Feed Container -->
-            <div class="relative bg-black rounded-xl overflow-hidden mb-6" style="aspect-ratio: 16/9;">
-              <video 
-                id="camera-feed" 
-                autoplay 
-                playsinline
-                muted
-                webkit-playsinline
-                style="width: 100%; height: 100%; display: block; object-fit: cover;"
-              ></video>
-              <canvas 
-                id="face-canvas" 
-                style="position: absolute; top: 0; left: 0; display: none;"
-              ></canvas>
-              
-              <!-- Loading Indicator -->
-              <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50" style="display: none;">
-                <div class="loading-spinner mb-4"></div>
-                <p id="loading-text" class="text-white text-lg font-semibold mb-4">Initializing Face Detection...</p>
-                <button 
-                  onclick="skipModelsAndUseDemoMode()"
-                  class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm"
-                >
-                  🎭 Or Use Demo Mode
-                </button>
-              </div>
-              <!-- Camera Permission Request Indicator -->
-              <div id="camera-permission-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-blue-900 bg-opacity-80" style="display: none;">
-                <div class="text-center px-6">
-                  <svg class="w-16 h-16 text-white mx-auto mb-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                  <p class="text-white text-xl font-bold mb-2">Camera Permission</p>
-                  <p class="text-blue-100">Your browser is asking for camera access</p>
-                  <p class="text-blue-100 font-semibold mt-2">👉 Click ALLOW 👈</p>
-                </div>
-              </div>
-
-              <!-- Scanning Indicator with Face Guide -->
-              <div id="scanning-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-30 backdrop-blur-sm" style="display: none;">
-                <!-- Face Placement Guide -->
-                <div class="relative flex flex-col items-center justify-center gap-8">
-                  <!-- Animated Face Rectangle -->
-                  <div class="relative w-56 h-64 border-4 border-green-400 rounded-3xl animate-pulse-ring" style="box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); position: relative;">
-                    <!-- Face Icon -->
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <svg class="w-20 h-20 text-green-400 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                      </svg>
-                    </div>
-                    <!-- Face Guide Text -->
-                    <div class="absolute top-4 left-0 right-0 text-center">
-                      <p class="text-green-400 text-xs font-bold">ALIGN FACE HERE</p>
-                    </div>
-                  </div>
-                  
-                  <!-- Scanning Text and Timer -->
-                  <div class="text-center">
-                    <p class="text-white text-lg font-bold mb-2">🎯 Scanning Your Face...</p>
-                    <div id="scan-timer" class="text-green-400 text-2xl font-bold">3-5 sec</div>
-                    <p class="text-gray-300 text-sm mt-2">Keep your face in the box and stay still</p>
-                  </div>
-
-                  <!-- Loading Spinner -->
-                  <div class="flex gap-2 items-center mt-4">
-                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Camera Permission Button -->
-            <div class="mb-6 animate-pulse">
-              <button 
-                id="request-camera-btn"
-                onclick="requestCameraPermission()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-3 shadow-lg transform hover:scale-105 active:scale-95 text-lg"
-                style="display: none;"
-              >
-                <svg class="w-6 h-6 animate-bounce" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                  <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" fill="white"/>
-                </svg>
-                <span>📷 CLICK HERE: Allow Camera Permission</span>
+            <!-- Mood Selection Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <button onclick="selectMood('happy')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-yellow-400 transition text-center" data-emotion="happy">
+                <div class="text-4xl mb-2">😊</div>
+                <span class="font-semibold text-gray-700">Happy</span>
+              </button>
+              <button onclick="selectMood('sad')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-blue-400 transition text-center" data-emotion="sad">
+                <div class="text-4xl mb-2">😢</div>
+                <span class="font-semibold text-gray-700">Sad</span>
+              </button>
+              <button onclick="selectMood('angry')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-red-400 transition text-center" data-emotion="angry">
+                <div class="text-4xl mb-2">😠</div>
+                <span class="font-semibold text-gray-700">Angry</span>
+              </button>
+              <button onclick="selectMood('anxious')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-orange-400 transition text-center" data-emotion="anxious">
+                <div class="text-4xl mb-2">😰</div>
+                <span class="font-semibold text-gray-700">Anxious</span>
+              </button>
+              <button onclick="selectMood('neutral')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-gray-400 transition text-center" data-emotion="neutral">
+                <div class="text-4xl mb-2">😐</div>
+                <span class="font-semibold text-gray-700">Neutral</span>
+              </button>
+              <button onclick="selectMood('disgusted')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-green-400 transition text-center" data-emotion="disgusted">
+                <div class="text-4xl mb-2">🤢</div>
+                <span class="font-semibold text-gray-700">Disgusted</span>
+              </button>
+              <button onclick="selectMood('fearful')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-purple-400 transition text-center" data-emotion="fearful">
+                <div class="text-4xl mb-2">😨</div>
+                <span class="font-semibold text-gray-700">Fearful</span>
+              </button>
+              <button onclick="selectMood('surprised')" class="mood-button p-6 rounded-xl border-2 border-gray-200 hover:border-pink-400 transition text-center" data-emotion="surprised">
+                <div class="text-4xl mb-2">😲</div>
+                <span class="font-semibold text-gray-700">Surprised</span>
               </button>
             </div>
 
-            <!-- Control Buttons -->
-            <div class="flex gap-4 mb-6">
-              <button 
-                id="start-scan-btn"
-                onclick="startScanning()"
-                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-                Start Scanning
-              </button>
-              <button 
-                id="stop-scan-btn"
-                onclick="stopScanning()"
-                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2"
-                style="display: none;"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 4a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2V4z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 4a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2h-4a2 2 0 01-2-2V4z"></path>
-                </svg>
-                Stop Scanning
-              </button>
+            <!-- Notes Section -->
+            <div class="mb-6">
+              <label class="block text-gray-700 font-semibold mb-2">Additional Notes (Optional)</label>
+              <textarea 
+                id="mood-notes" 
+                placeholder="What's on your mind? Share any thoughts or feelings..."
+                class="w-full p-4 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-600 resize-none"
+                rows="4"
+              ></textarea>
             </div>
 
-            <!-- Permission Alert -->
-            <div id="permission-alert" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-              <div class="flex">
-                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="ml-3 text-yellow-700">Please enable camera access to use the mood tracker.</p>
-              </div>
+            <!-- Confidence/Accuracy Slider (Optional) -->
+            <div class="mb-8">
+              <label class="block text-gray-700 font-semibold mb-2">How confident are you with this mood? <span class="text-emerald-600" id="confidence-value">75</span>%</label>
+              <input 
+                type="range" 
+                id="mood-confidence" 
+                min="0" 
+                max="100" 
+                value="75"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                oninput="document.getElementById('confidence-value').textContent = this.value"
+              >
             </div>
 
-            <!-- Model Download Section -->
-            <div id="model-download-section" class="hidden bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-              <div class="flex items-start justify-between">
-                <div class="flex items-start">
-                  <svg class="w-6 h-6 text-red-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 6v-6m0-6V9m-6 0h12M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
-                  </svg>
-                  <div class="ml-3">
-                    <p class="text-red-700 font-semibold">AI Models Not Available</p>
-                    <p class="text-red-600 text-sm mt-1">The facial recognition models need to be downloaded. This is a one-time process.</p>
-                    <div id="download-progress" class="hidden mt-3">
-                      <p class="text-sm text-red-600 mb-2">Downloading: <span id="progress-text">0/6 files</span></p>
-                      <div class="w-full bg-red-200 rounded-full h-2">
-                        <div id="progress-bar" class="bg-red-600 h-2 rounded-full transition-all" style="width: 0%"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  id="download-models-btn"
-                  onclick="downloadModels()"
-                  class="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition"
-                >
-                  Download Models
-                </button>
-              </div>
-            </div>
+            <!-- Submit Button -->
+            <button 
+              onclick="saveMoodEntry()"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2 text-lg"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Save My Mood
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
+    <!-- Recent Mood History -->
       <!-- History & Info Sidebar -->
       <div class="animate-fade-in-up" style="animation-delay: 0.2s;">
         <!-- Current Emotion Display -->
@@ -461,27 +372,27 @@
 
         <!-- Info Card -->
         <div class="bg-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
-          <h3 class="text-lg font-bold text-gray-900 mb-3">How It Works</h3>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">How to Use</h3>
           <ul class="space-y-3 text-sm text-gray-700">
             <li class="flex gap-3">
               <span class="text-blue-600 font-bold flex-shrink-0">1</span>
-              <span>Position your face clearly in the camera</span>
+              <span>Select the emotion that best matches how you're feeling</span>
             </li>
             <li class="flex gap-3">
               <span class="text-blue-600 font-bold flex-shrink-0">2</span>
-              <span>Click "Start Scanning" to begin detection</span>
+              <span>Optionally add notes about what's on your mind</span>
             </li>
             <li class="flex gap-3">
               <span class="text-blue-600 font-bold flex-shrink-0">3</span>
-              <span>System analyzes your facial expressions</span>
+              <span>Adjust your confidence level with the slider</span>
             </li>
             <li class="flex gap-3">
               <span class="text-blue-600 font-bold flex-shrink-0">4</span>
-              <span>Confirm or correct the detected emotion</span>
+              <span>Click "Save My Mood" to log your entry</span>
             </li>
             <li class="flex gap-3">
               <span class="text-blue-600 font-bold flex-shrink-0">5</span>
-              <span>Receive personalized mental wellness suggestions</span>
+              <span>Track your mood patterns over time</span>
             </li>
           </ul>
         </div>
@@ -502,27 +413,10 @@
     </div>
   </div>
 
-  <!-- SINGLE UNIFIED MOOD TRACKER SCRIPT - NO CONFLICTS -->
-  <script defer src="/js/mood-tracker-working.js"></script>
+  <!-- Script: Manual Mood Tracker (No Face Recognition) - External File -->
+  <script src="/js/mood-tracker-v2.js?v=2"></script>
   <script>
-    // Enhanced showAlert function
-    function showAlert(message, type = 'info') {
-      const alertDiv = document.createElement('div');
-      const bgColor = type === 'success' ? 'bg-green-50' : type === 'error' ? 'bg-red-50' : 'bg-blue-50';
-      const borderColor = type === 'success' ? 'border-green-400' : type === 'error' ? 'border-red-400' : 'border-blue-400';
-      const textColor = type === 'success' ? 'text-green-700' : type === 'error' ? 'text-red-700' : 'text-blue-700';
-      
-      alertDiv.className = `fixed top-6 right-6 ${bgColor} border-l-4 ${borderColor} p-4 rounded-lg shadow-lg z-50 max-w-md`;
-      alertDiv.innerHTML = `<p class="${textColor} font-medium">${message}</p>`;
-      document.body.appendChild(alertDiv);
-      
-      console.log(`[${type.toUpperCase()}] ${message}`);
-      setTimeout(() => alertDiv.remove(), 5000);
-    }
-    
-    // Export showAlert to window globally
-    window.showAlert = showAlert;
-    
+    // Sidebar functions
     function openSidebar() {
       document.getElementById('sidebar').classList.add('open');
       document.getElementById('overlay').classList.add('show');
@@ -536,7 +430,6 @@
     // Auto-open sidebar when cursor moves to left edge
     let sidebarOpenTimeout;
     document.addEventListener('mousemove', function(e) {
-      // If cursor is within 30px from left edge, open sidebar
       if (e.clientX < 30) {
         if (!sidebarOpenTimeout) {
           sidebarOpenTimeout = setTimeout(() => {
@@ -544,16 +437,16 @@
             if (sidebar && !sidebar.classList.contains('open')) {
               openSidebar();
             }
-          }, 300); // 300ms delay to prevent accidental triggers
+          }, 300);
         }
       } else {
-        // Clear timeout if cursor moves away
         if (sidebarOpenTimeout) {
           clearTimeout(sidebarOpenTimeout);
           sidebarOpenTimeout = null;
         }
       }
     });
+
   </script>
 </body>
 </html>

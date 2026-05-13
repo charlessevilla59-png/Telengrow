@@ -5,19 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    
+    .emotion-score-bar {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      height: 6px;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen">
   {{> sidebar}}
   
-  <nav class="bg-white shadow-md p-4">
+  <nav class="bg-white shadow-md p-4 sticky top-0 z-20">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-4">
-        <button onclick="openSidebar()" class="text-gray-700 hover:text-purple-600 focus:outline-none">
+        <button onclick="openSidebar()" class="text-gray-700 hover:text-blue-600 focus:outline-none">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <h1 class="text-2xl font-bold text-purple-600">🌱 Tellngrow</h1>
+        <h1 class="text-2xl font-bold text-blue-600">🌱 Tellngrow</h1>
       </div>
     </div>
   </nav>
@@ -34,70 +46,384 @@
     </div>
     
     {{#if success_msg}}
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 animate-fade-in">
         {{success_msg}}
       </div>
     {{/if}}
     {{#if error_msg}}
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 animate-fade-in">
         {{error_msg}}
       </div>
     {{/if}}
     
-    <div class="bg-white rounded-xl shadow-md p-8">
+    <div class="bg-white rounded-xl shadow-lg p-8">
       <form action="/journal/edit/{{entry.id}}" method="POST">
+        <!-- Title Input -->
         <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Title</label>
+          <label class="block text-gray-700 font-semibold mb-2">📌 Title</label>
           <input type="text" name="title" required value="{{entry.title}}"
-                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                  placeholder="Give your entry a title...">
         </div>
 
+        <!-- AI Emotion Detection Display -->
+        <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 animate-fade-in">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800 flex items-center">
+              🤖 AI Emotion Analysis
+              <span class="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded-full">Real-time</span>
+            </h3>
+            <div id="aiEmojiDisplay" class="text-4xl">😐</div>
+          </div>
+          
+          <div id="aiAnalysisBox" class="mb-4">
+            <p class="text-gray-600 text-sm">AI is analyzing your thoughts...</p>
+          </div>
+          
+          <!-- Emotion Scores Display -->
+          <div id="emotionScoresDisplay" class="space-y-2 hidden">
+            <p class="text-xs font-semibold text-gray-600 mb-3">Detected Emotions:</p>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-xs font-medium text-gray-700">😊 Happy</span>
+                  <span id="score-happy" class="text-xs font-bold text-green-600">0%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div id="bar-happy" class="emotion-score-bar w-0"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-xs font-medium text-gray-700">😢 Sad</span>
+                  <span id="score-sad" class="text-xs font-bold text-blue-600">0%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div id="bar-sad" class="emotion-score-bar w-0"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-xs font-medium text-gray-700">😰 Anxious</span>
+                  <span id="score-anxious" class="text-xs font-bold text-orange-600">0%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div id="bar-anxious" class="emotion-score-bar w-0"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-xs font-medium text-gray-700">😌 Calm</span>
+                  <span id="score-calm" class="text-xs font-bold text-emerald-600">0%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div id="bar-calm" class="emotion-score-bar w-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual Mood Selection -->
         <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">How are you feeling?</label>
-          <div class="flex gap-4">
-            <label class="cursor-pointer">
+          <label class="block text-gray-700 font-semibold mb-3">😊 How are you feeling? (Optional)</label>
+          <div class="grid grid-cols-5 gap-3">
+            <label class="cursor-pointer text-center p-4 rounded-lg border-2 border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 transition">
               <input type="radio" name="mood" value="happy" class="hidden peer" {{#ifEquals entry.mood "happy"}}checked{{/ifEquals}}>
-              <div class="text-4xl peer-checked:scale-125 transition">😊</div>
+              <div class="text-4xl mb-2 peer-checked:scale-125 transition">😊</div>
+              <p class="text-xs text-gray-600 peer-checked:font-bold">Happy</p>
             </label>
-            <label class="cursor-pointer">
+            <label class="cursor-pointer text-center p-4 rounded-lg border-2 border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition">
               <input type="radio" name="mood" value="calm" class="hidden peer" {{#ifEquals entry.mood "calm"}}checked{{/ifEquals}}>
-              <div class="text-4xl peer-checked:scale-125 transition">😌</div>
+              <div class="text-4xl mb-2 peer-checked:scale-125 transition">😌</div>
+              <p class="text-xs text-gray-600 peer-checked:font-bold">Calm</p>
             </label>
-            <label class="cursor-pointer">
+            <label class="cursor-pointer text-center p-4 rounded-lg border-2 border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition">
               <input type="radio" name="mood" value="neutral" class="hidden peer" {{#ifEquals entry.mood "neutral"}}checked{{/ifEquals}}>
-              <div class="text-4xl peer-checked:scale-125 transition">😐</div>
+              <div class="text-4xl mb-2 peer-checked:scale-125 transition">😐</div>
+              <p class="text-xs text-gray-600 peer-checked:font-bold">Neutral</p>
             </label>
-            <label class="cursor-pointer">
+            <label class="cursor-pointer text-center p-4 rounded-lg border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 transition">
               <input type="radio" name="mood" value="anxious" class="hidden peer" {{#ifEquals entry.mood "anxious"}}checked{{/ifEquals}}>
-              <div class="text-4xl peer-checked:scale-125 transition">😰</div>
+              <div class="text-4xl mb-2 peer-checked:scale-125 transition">😰</div>
+              <p class="text-xs text-gray-600 peer-checked:font-bold">Anxious</p>
             </label>
-            <label class="cursor-pointer">
+            <label class="cursor-pointer text-center p-4 rounded-lg border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition">
               <input type="radio" name="mood" value="sad" class="hidden peer" {{#ifEquals entry.mood "sad"}}checked{{/ifEquals}}>
-              <div class="text-4xl peer-checked:scale-125 transition">😢</div>
+              <div class="text-4xl mb-2 peer-checked:scale-125 transition">😢</div>
+              <p class="text-xs text-gray-600 peer-checked:font-bold">Sad</p>
             </label>
           </div>
         </div>
 
+        <!-- Content Textarea -->
         <div class="mb-6">
-          <label class="block text-gray-700 font-semibold mb-2">Your Thoughts</label>
-          <textarea name="content" required rows="10"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Write your thoughts here...">{{entry.content}}</textarea>
+          <label class="block text-gray-700 font-semibold mb-2">💭 Your Thoughts</label>
+          <div class="relative">
+            <textarea id="contentInput" name="content" required rows="10"
+                      class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                      placeholder="Write your thoughts, feelings, and experiences here...">{{entry.content}}</textarea>
+            <div id="wordCountDisplay" class="absolute bottom-3 right-3 text-xs text-gray-500 bg-white px-2 py-1 rounded">
+              {{wordCount entry.content}} words
+            </div>
+          </div>
+
+          <!-- Language & Enhancement Section -->
+          <div id="tagalogEnhancementBox" class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg hidden">
+            <div class="flex items-start justify-between mb-3">
+              <h4 class="font-bold text-blue-900 flex items-center">
+                🇵🇭 Tagalog Text Enhancement
+                <span class="ml-2 text-xs bg-blue-200 text-blue-900 px-2 py-1 rounded-full">AI-Powered</span>
+              </h4>
+              <button type="button" onclick="toggleEnhancement()" class="text-xs text-blue-600 hover:text-blue-800">
+                {{#if showEnhancement}}Hide{{else}}Show{{/if}}
+              </button>
+            </div>
+
+            <!-- Suggestions -->
+            <div id="enhancementSuggestions" class="space-y-2 hidden">
+              <div class="bg-white rounded p-3 border border-blue-200">
+                <p class="text-xs font-semibold text-gray-700 mb-2">💡 Suggestions:</p>
+                <ul id="suggestionsList" class="space-y-1 text-sm text-gray-700">
+                  <li class="text-gray-500">Analyzing your text...</li>
+                </ul>
+              </div>
+
+              <!-- Improvements -->
+              <div class="bg-white rounded p-3 border border-blue-200">
+                <p class="text-xs font-semibold text-gray-700 mb-2">✨ Improvements:</p>
+                <ul id="improvementsList" class="space-y-1 text-sm text-gray-700">
+                  <li class="text-gray-500">No suggestions yet</li>
+                </ul>
+              </div>
+
+              <!-- Writing Tips -->
+              <div class="bg-white rounded p-3 border border-blue-200">
+                <p class="text-xs font-semibold text-gray-700 mb-2">🎓 Writing Tips:</p>
+                <ul id="tipsList" class="space-y-1 text-sm text-gray-700">
+                  <li class="text-gray-500">Tips will appear as you write</li>
+                </ul>
+              </div>
+
+              <!-- Writing Prompts -->
+              <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded p-3 border border-purple-200">
+                <p class="text-xs font-semibold text-purple-900 mb-2">📝 Reflection Prompts:</p>
+                <ul id="promptsList" class="space-y-1 text-sm text-gray-700">
+                  <li class="text-gray-500">Prompts based on emotion will appear</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
+        <!-- Buttons -->
         <div class="flex gap-4">
           <button type="submit" 
-                  class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-            Save Changes
+                  class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl">
+            ✅ Save Changes
           </button>
           <a href="/journal/{{entry.id}}" 
              class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-center">
-            Cancel
+            ❌ Cancel
           </a>
-          <button type="button" onclick="confirmDelete()"
-                  class="px-6 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
-            Delete
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const contentInput = document.getElementById('contentInput');
+    const aiAnalysisBox = document.getElementById('aiAnalysisBox');
+    const aiEmojiDisplay = document.getElementById('aiEmojiDisplay');
+    const emotionScoresDisplay = document.getElementById('emotionScoresDisplay');
+    const wordCountDisplay = document.getElementById('wordCountDisplay');
+    const tagalogEnhancementBox = document.getElementById('tagalogEnhancementBox');
+    let analysisTimeout;
+    let isTagalog = false;
+    let showEnhancement = false;
+
+    // Initialize with current content
+    setTimeout(() => analyzeEmotionRealTime(), 500);
+
+    // Real-time emotion analysis as user types
+    contentInput.addEventListener('input', () => {
+      // Update word count
+      const words = contentInput.value.trim().split(/\s+/).filter(w => w).length;
+      wordCountDisplay.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+
+      // Debounce analysis
+      clearTimeout(analysisTimeout);
+      analysisTimeout = setTimeout(() => {
+        analyzeEmotionRealTime();
+      }, 300);
+    });
+
+    async function analyzeEmotionRealTime() {
+      const content = contentInput.value;
+      
+      if (!content || content.trim().length === 0) {
+        aiAnalysisBox.innerHTML = '<p class="text-gray-600 text-sm">Start typing to see updated AI emotion analysis...</p>';
+        emotionScoresDisplay.classList.add('hidden');
+        aiEmojiDisplay.textContent = '😐';
+        tagalogEnhancementBox.classList.add('hidden');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/journal/analyze-emotion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Validate response data
+        if (!data || !data.emotionScores) {
+          throw new Error('Invalid response data');
+        }
+        
+        // Update emoji
+        aiEmojiDisplay.textContent = data.emoji || '😐';
+        
+        // Update analysis text
+        const analysisText = data.analysis || 'Analyzing your emotions...';
+        aiAnalysisBox.innerHTML = `<p class="text-gray-700 text-sm font-medium">✨ ${analysisText}</p>`;
+        
+        // Update emotion scores
+        emotionScoresDisplay.classList.remove('hidden');
+        updateEmotionScores(data.emotionScores);
+        
+        // Check if Tagalog and load enhancements
+        isTagalog = data.language === 'tagalog' || data.language === 'mixed';
+        if (isTagalog && content.trim().length > 10) {
+          loadTagalogEnhancements(content);
+        } else {
+          tagalogEnhancementBox.classList.add('hidden');
+        }
+        
+      } catch (error) {
+        console.error('Analysis error:', error);
+        aiAnalysisBox.innerHTML = '<p class="text-blue-600 text-sm">🤖 Analyzing your emotions...</p>';
+        // Don't show error to user - just show neutral state
+        aiEmojiDisplay.textContent = '😐';
+        emotionScoresDisplay.classList.add('hidden');
+      }
+    }
+
+    async function loadTagalogEnhancements(content) {
+      try {
+        tagalogEnhancementBox.classList.remove('hidden');
+        
+        const response = await fetch('/api/journal/enhance-tagalog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) throw new Error('Enhancement failed');
+        
+        const data = await response.json();
+        
+        // Update suggestions
+        const suggestionsList = document.getElementById('suggestionsList');
+        if (data.suggestions && data.suggestions.length > 0) {
+          suggestionsList.innerHTML = data.suggestions
+            .map(s => `<li class="text-sm">• ${s}</li>`)
+            .join('');
+        } else {
+          suggestionsList.innerHTML = '<li class="text-gray-500">No suggestions at this moment</li>';
+        }
+
+        // Update improvements
+        const improvementsList = document.getElementById('improvementsList');
+        if (data.improvements && data.improvements.length > 0) {
+          improvementsList.innerHTML = data.improvements
+            .map(i => `<li class="text-sm">• ${i}</li>`)
+            .join('');
+        } else {
+          improvementsList.innerHTML = '<li class="text-gray-500">Write more to see suggestions</li>';
+        }
+
+        // Update tips
+        const tipsList = document.getElementById('tipsList');
+        if (data.tips && data.tips.length > 0) {
+          tipsList.innerHTML = data.tips
+            .map(t => `<li class="text-sm">• ${t}</li>`)
+            .join('');
+        } else {
+          tipsList.innerHTML = '<li class="text-gray-500">Tips will appear as you write</li>';
+        }
+
+        // Update prompts
+        const promptsList = document.getElementById('promptsList');
+        if (data.prompts && data.prompts.length > 0) {
+          promptsList.innerHTML = data.prompts
+            .map(p => `<li class="text-sm">💭 ${p}</li>`)
+            .join('');
+        } else {
+          promptsList.innerHTML = '<li class="text-gray-500">Reflection prompts will appear</li>';
+        }
+
+        // Show enhancement suggestions
+        document.getElementById('enhancementSuggestions').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Enhancement error:', error);
+      }
+    }
+
+    function toggleEnhancement() {
+      showEnhancement = !showEnhancement;
+      const box = document.getElementById('enhancementSuggestions');
+      if (showEnhancement) {
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function updateEmotionScores(scores) {
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'angry', 'neutral'];
+      emotions.forEach(emotion => {
+        const score = scores[emotion] || 0;
+        const scoreEl = document.getElementById(`score-${emotion}`);
+        const barEl = document.getElementById(`bar-${emotion}`);
+        
+        if (scoreEl) scoreEl.textContent = `${score}%`;
+        if (barEl) barEl.style.width = `${score}%`;
+      });
+    }
+
+    // Allow emotion selection via click
+    document.querySelectorAll('input[name="mood"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.emotion-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        event.target.closest('.emotion-card').classList.add('active');
+      });
+    });
+  </script>
+        const scoreEl = document.getElementById(`score-${emotion}`);
+        const barEl = document.getElementById(`bar-${emotion}`);
+        
+        if (scoreEl) scoreEl.textContent = `${score}%`;
+        if (barEl) barEl.style.width = `${score}%`;
+      });
+    }
+
+    // Helper function to count words (matches handlebars helper)
+    function wordCount(text) {
+      return text.trim().split(/\s+/).filter(w => w).length;
+    }
+  </script>
+</body>
+</html>
           </button>
         </div>
       </form>

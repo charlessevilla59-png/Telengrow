@@ -246,7 +246,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <h1>Reading Materials</h1>
+        <h1>{{#if isFitnessGuide}}Fitness Guide{{else}}Reading Materials{{/if}}</h1>
       </div>
     </div>
   </nav>
@@ -254,12 +254,17 @@
   <!-- Main Content -->
   <div class="container py-8">
     <!-- Back Button -->
-    <a href="/user/dashboard" class="back-link">← Back to Dashboard</a>
+    <a href="/user/dashboard" class="back-link">← Back</a>
 
     <!-- Header -->
     <div class="header">
+      {{#if isFitnessGuide}}
+      <h1>💪 Fitness & Exercise Videos</h1>
+      <p>Discover fitness and exercise videos for stress relief and wellness</p>
+      {{else}}
       <h1>Mental Wellness Library</h1>
       <p>Discover articles and guidance to support your mental health journey</p>
+      {{/if}}
     </div>
 
     <!-- Search & Filter Section -->

@@ -94,6 +94,52 @@
       border-color: #4f46e5;
     }
 
+    .mood-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.4rem 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 6px;
+      margin-top: 4px;
+      border: 2px solid #764ba2;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .mood-emoji {
+      font-size: 1.1rem;
+    }
+
+    .mood-status-happy { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-color: #f5576c; }
+    .mood-status-sad { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-color: #00f2fe; }
+    .mood-status-angry { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-color: #fee140; }
+    .mood-status-neutral { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border-color: #fed6e3; }
+    .mood-status-fearful { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #764ba2; }
+    .mood-status-disgusted { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-color: #f5576c; }
+    .mood-status-surprised { background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%); border-color: #ffe259; }
+    .mood-status-anxious { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #764ba2; }
+
+    .mood-stats {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.3rem 0.8rem;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: #374151;
+      margin-left: 8px;
+    }
+
+    .mood-count {
+      font-weight: 600;
+      color: #667eea;
+    }
+
     .search-input {
       padding: 0.75rem 1rem;
       border: 1px solid #d1d5db;
@@ -187,6 +233,12 @@
         </button>
         <h1 class="text-2xl font-bold text-green-600">🌱 Tellngrow</h1>
       </div>
+      <a href="/counselor/dashboard" class="flex items-center space-x-2 text-green-600 hover:text-green-700 font-semibold transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span>Back</span>
+      </a>
     </div>
   </nav>
 
@@ -333,6 +385,70 @@
                 {{/if}}
               </div>
             </div>
+
+            <!-- Mood Tracker Badge -->
+            {{#if this.moodStats}}
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-700 mb-2">😊 Mood Tracking:</p>
+              <div class="flex flex-wrap gap-2 items-center">
+                {{#eq this.moodStats.dominant "happy"}}
+                  <span class="mood-badge mood-status-happy">
+                    <span class="mood-emoji">😊</span>
+                    <span>Happy</span>
+                  </span>
+                {{else eq this.moodStats.dominant "sad"}}
+                  <span class="mood-badge mood-status-sad">
+                    <span class="mood-emoji">😢</span>
+                    <span>Sad</span>
+                  </span>
+                {{else eq this.moodStats.dominant "angry"}}
+                  <span class="mood-badge mood-status-angry">
+                    <span class="mood-emoji">😠</span>
+                    <span>Angry</span>
+                  </span>
+                {{else eq this.moodStats.dominant "neutral"}}
+                  <span class="mood-badge mood-status-neutral">
+                    <span class="mood-emoji">😐</span>
+                    <span>Neutral</span>
+                  </span>
+                {{else eq this.moodStats.dominant "fearful"}}
+                  <span class="mood-badge mood-status-fearful">
+                    <span class="mood-emoji">😨</span>
+                    <span>Fearful</span>
+                  </span>
+                {{else eq this.moodStats.dominant "disgusted"}}
+                  <span class="mood-badge mood-status-disgusted">
+                    <span class="mood-emoji">🤢</span>
+                    <span>Disgusted</span>
+                  </span>
+                {{else eq this.moodStats.dominant "surprised"}}
+                  <span class="mood-badge mood-status-surprised">
+                    <span class="mood-emoji">😮</span>
+                    <span>Surprised</span>
+                  </span>
+                {{else eq this.moodStats.dominant "anxious"}}
+                  <span class="mood-badge mood-status-anxious">
+                    <span class="mood-emoji">😰</span>
+                    <span>Anxious</span>
+                  </span>
+                {{else}}
+                  <span class="mood-badge mood-status-neutral">
+                    <span class="mood-emoji">📊</span>
+                    <span>{{capitalize this.moodStats.dominant}}</span>
+                  </span>
+                {{/eq}}
+                
+                {{#if this.moodStats.total}}
+                  <span class="mood-stats">
+                    <span class="mood-count">{{this.moodStats.total}}</span>
+                    <span>entries</span>
+                    <span>|</span>
+                    <span>{{this.moodStats.avgConfidence}}% confidence</span>
+                  </span>
+                {{/if}}
+              </div>
+            </div>
+            {{/if}}
 
             <!-- Activity Stats -->
             <div class="activity-stats">
