@@ -5,8 +5,10 @@
     Mindoro State University - Philippines
 
     AI Sentiment Analysis - Analyzes journal entries to detect emotions and sentiment
-    Now with Tagalog language support!
+    Now with Tagalog language support and comprehensive emotion vocabulary!
 */
+
+import { emotionVocabulary, intensityModifiers, negationWords, getIntensityModifier, isNegation } from './emotionVocabulary.js';
 
 /**
  * Detect text language (English or Tagalog)
@@ -14,10 +16,19 @@
  * @returns {string} 'tagalog', 'english', or 'mixed'
  */
 const detectLanguage = (text) => {
-  // Tagalog emotion words - more comprehensive list
-  const tagalogEmotionWords = ['malungkot', 'lungkot', 'masaya', 'saya', 'ligaya', 'galit', 'takot', 'alala', 'kalmado', 'tahimik'];
-  const tagalogIndicators = ['ako', 'ikaw', 'siya', 'kami', 'kayo', 'sila', 'ang', 'ng', 'sa', 'ay', 'nang', 'na', 'pa', 'rin', 'talaga', 'daw', 'kasi', 'dahil', 'pero', 'kaya', 'bago', 'pagkatapos', 'habang', 'kung', 'kapag', ...tagalogEmotionWords];
-  const englishIndicators = ['the', 'is', 'are', 'was', 'were', 'be', 'have', 'has', 'do', 'does', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'sad', 'happy', 'anxious', 'angry', 'calm'];
+  // Get all Tagalog emotion words from vocabulary
+  const allTagalogEmotions = [];
+  const allEnglishEmotions = [];
+  
+  for (const emotion of Object.values(emotionVocabulary)) {
+    allTagalogEmotions.push(...emotion.tagalog);
+    allEnglishEmotions.push(...emotion.english);
+  }
+  
+  const tagalogEmotionWords = [...new Set(allTagalogEmotions)];
+  const englishEmotionWords = [...new Set(allEnglishEmotions)];
+  const tagalogIndicators = ['ako', 'ikay', 'siya', 'kami', 'kayo', 'sila', 'ang', 'ng', 'sa', 'ay', 'nang', 'na', 'pa', 'rin', 'talaga', 'daw', 'kasi', 'dahil', 'pero', 'kaya', 'bago', 'pagkatapos', 'habang', 'kung', 'kapag', ...tagalogEmotionWords];
+  const englishIndicators = ['the', 'is', 'are', 'was', 'were', 'be', 'have', 'has', 'do', 'does', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', ...englishEmotionWords];
   
   const lowerText = text.toLowerCase();
   const words = lowerText.split(/\s+/).map(w => w.replace(/[.,!?;:()'"—\-]/g, '')).filter(w => w.length > 0);
@@ -56,85 +67,39 @@ const detectLanguage = (text) => {
 };
 
 /**
- * Sentiment keywords mapping for emotion detection
- * English version with full support
+/**
+ * Build emotion keywords from comprehensive vocabulary
  */
-const englishEmotionKeywords = {
-  happy: {
-    keywords: ['happy', 'joy', 'joyful', 'excited', 'wonderful', 'amazing', 'great', 'good', 'love', 'proud', 'grateful', 'blessed', 'fantastic', 'delighted', 'thrilled', 'gleeful', 'cheerful', 'glad', 'excellent', 'awesome'],
-    weight: 1.5
-  },
-  sad: {
-    keywords: ['sad', 'sadness', 'depressed', 'depression', 'unhappy', 'miserable', 'down', 'disappointed', 'hopeless', 'heartbroken', 'grief', 'losing', 'lost', 'crying', 'tears', 'lonely', 'gloomy', 'despair'],
-    weight: 1.4
-  },
-  anxious: {
-    keywords: ['anxious', 'anxiety', 'worried', 'worry', 'nervous', 'stressed', 'panic', 'afraid', 'fear', 'scared', 'terrified', 'dread', 'unease', 'uneasy', 'apprehensive', 'tension'],
-    weight: 1.3
-  },
-  angry: {
-    keywords: ['angry', 'anger', 'furious', 'rage', 'mad', 'irritated', 'frustrated', 'annoyed', 'hate', 'despise', 'disgusted', 'disgusting', 'offended', 'resentful', 'bitter', 'enraged'],
-    weight: 1.3
-  },
-  calm: {
-    keywords: ['calm', 'peaceful', 'peace', 'relaxed', 'serene', 'tranquil', 'at ease', 'content', 'satisfied', 'meditate', 'meditation', 'mindful', 'balanced', 'composed', 'quiet', 'still'],
-    weight: 1.2
-  },
-  neutral: {
-    keywords: ['okay', 'fine', 'alright', 'normal', 'regular', 'ordinary', 'usual', 'average', 'so-so', 'so so', 'neither', 'both', 'maybe'],
-    weight: 0.8
+const buildEmotionKeywords = (language = 'english') => {
+  const keywords = {};
+  
+  for (const [emotion, data] of Object.entries(emotionVocabulary)) {
+    keywords[emotion] = {
+      keywords: language === 'tagalog' ? data.tagalog : data.english,
+      weight: data.weight
+    };
   }
+  
+  return keywords;
+};
+
+// Emotion keywords using comprehensive vocabulary
+const englishEmotionKeywords = buildEmotionKeywords('english');
+const tagalogEmotionKeywords = buildEmotionKeywords('tagalog');
+
+/**
+ * Get intensifier value from comprehensive modifiers
+ */
+const getIntensifierValue = (word, language = 'english') => {
+  return getIntensityModifier(word, language);
 };
 
 /**
- * Sentiment keywords for Tagalog with full support
+ * Check if word is a negation from comprehensive list
  */
-const tagalogEmotionKeywords = {
-  happy: {
-    keywords: ['masaya', 'saya', 'ligaya', 'tuwing', 'tuwa', 'kasiyahan', 'aliw', 'aliwa', 'maginhawa', 'ginhawa', 'luntian', 'malusog', 'vibrant', 'excited', 'napakasaya', 'sobrang saya', 'tuwang tuwa', 'napakaganda', 'lubos na masaya', 'masayang', 'kasiyahang'],
-    weight: 1.5
-  },
-  sad: {
-    keywords: ['malungkot', 'lungkot', 'maiwan', 'mapahirap', 'mahirap', 'malansang', 'nagsisisi', 'pagsisisi', 'gutom sa tibok', 'gutom sa asa', 'walang pag-asa', 'nag-aasa', 'asa', 'pagdurusa', 'suffering', 'naghihintay', 'naglalakbay', 'nag-iisa', 'nababago', 'nawakang', 'dumusa', 'malungkot na', 'na malungkot', 'napakadungot', 'sobrang lungkot'],
-    weight: 1.4
-  },
-  anxious: {
-    keywords: ['nervous', 'kinilala', 'alala', 'bawang', 'stress', 'stressed', 'pagaalinlangan', 'nag-aalangan', 'natatakot', 'takot', 'paranoid', 'insecure', 'kawalan ng ginhawa', 'hindang hintay', 'inaaksiyuhan', 'nag-aaksay', 'nag-aalala', 'anxious', 'worried', 'concern'],
-    weight: 1.3
-  },
-  angry: {
-    keywords: ['galit', 'nagagalit', 'lakas ng loob', 'mainit ang ulo', 'gutom sa tagumpay', 'nasasama', 'samahan', 'disgusted', 'nasamantalahin', 'nilason', 'takutan', 'tinera', 'matalas na usapan', 'kaaliwan', 'galit na', 'na galit', 'sobrang galit', 'napakagalit'],
-    weight: 1.3
-  },
-  calm: {
-    keywords: ['tahimik', 'kalmado', 'payapa', 'pinagsasama', 'saklaw', 'katarungan', 'katahimikan', 'ginhawa', 'beses', 'balanseng', 'nakatuon', 'komportable', 'walang alala', 'walang stress', 'peaceful', 'relaxed', 'kalmadong'],
-    weight: 1.2
-  },
-  neutral: {
-    keywords: ['okay', 'fine', 'normal', 'karaniwan', 'ordinaryong', 'regular', 'ganoon lang', 'basta', 'parang ganoon', 'hindi alam', 'parang walang', 'tilantilas', 'kundi', 'okey', 'okay lang'],
-    weight: 0.8
-  }
+const isNegationWord = (word, language = 'english') => {
+  return isNegation(word, language);
 };
-
-/**
- * Intensifier words for both languages
- */
-const intensifiers = {
-  // English
-  'very': 1.3, 'really': 1.3, 'extremely': 1.5, 'absolutely': 1.5, 'totally': 1.3, 'completely': 1.3, 'so': 1.2, 'such': 1.2, 'just': 1.1, 'incredibly': 1.5, 'deeply': 1.3, 'profoundly': 1.3,
-  // Tagalog
-  'napaka': 1.5, 'sobrang': 1.5, 'muito': 1.4, 'talaga': 1.3, 'talagang': 1.3, 'tunay': 1.3, 'tunay na': 1.3, 'lagi': 1.2, 'palagi': 1.2, 'mabuti': 1.2, 'siyang': 1.2, 'kadali': 1.1
-};
-
-/**
- * Negation words for both languages
- */
-const negations = [
-  // English
-  'not', 'never', 'no', 'none', 'neither', 'nobody', 'nothing', 'nowhere', 'cannot', 'cant', 'didnt', "didn't", 'dont', "don't", 'wont', "won't",
-  // Tagalog
-  'hindi', 'hindi ko', 'hindot', 'wala', 'walang', 'ayaw', 'ayaw ko', 'basta', 'huwag', 'meron', 'walang', 'wala nang', 'd', 'di', 'hindi na'
-];
 
 /**
  * Analyze journal entry text and detect emotions (Supports English & Tagalog)
@@ -189,21 +154,22 @@ export const analyzeJournalEmotion = (text) => {
   for (let i = 0; i < words.length; i++) {
     const currentWord = words[i];
     
-    // Check for intensifier from previous word
+    // Check for intensifier from previous word (using comprehensive modifiers)
     let intensifier = 1;
     if (i > 0) {
       const prevWord = words[i - 1];
-      if (intensifiers[prevWord]) {
-        intensifier = intensifiers[prevWord];
+      const modifierValue = getIntensifierValue(prevWord, language);
+      if (modifierValue !== 1.0) {
+        intensifier = modifierValue;
         console.log(`    🔥 Intensifier: "${prevWord}" (×${intensifier})`);
       }
     }
 
-    // Check for negation from previous word
+    // Check for negation from previous word (using comprehensive negations)
     let negationFactor = 1;
     if (i > 0) {
       const prevWord = words[i - 1];
-      if (negations.includes(prevWord)) {
+      if (isNegationWord(prevWord, language)) {
         negationFactor = 0.3;
         console.log(`    ❌ Negation: "${prevWord}"`);
       }
