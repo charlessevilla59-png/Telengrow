@@ -216,31 +216,21 @@ export const analyzeJournalEmotion = (text) => {
   };
 
   if (maxScore > 0) {
-    // An emotion was detected - make it dominant (70-95%)
-    const primaryPercent = Math.min(95, Math.max(70, Math.round((maxScore / (maxScore + 2)) * 100)));
-    normalizedScores[primaryEmotion] = primaryPercent;
+    // Calculate total score from all emotions
+    const totalScore = Object.values(emotionScores).reduce((sum, score) => sum + score, 0);
     
-    // Distribute remaining percentage to other detected emotions
-    const remaining = 100 - primaryPercent;
-    let otherEmotions = [];
-    
+    // Normalize scores proportionally based on their actual weights
     for (const [emotion, score] of Object.entries(emotionScores)) {
-      if (emotion !== primaryEmotion && score > 0) {
-        otherEmotions.push({ emotion, score });
+      if (score > 0) {
+        // Proportional distribution based on actual scores
+        normalizedScores[emotion] = Math.round((score / totalScore) * 100);
       }
     }
     
-    if (otherEmotions.length > 0) {
-      const totalOtherScore = otherEmotions.reduce((sum, e) => sum + e.score, 0);
-      for (const { emotion, score } of otherEmotions) {
-        normalizedScores[emotion] = Math.round((score / totalOtherScore) * remaining);
-      }
-    }
-    
-    // Fill remaining to reach 100%
-    const currentTotal = Object.values(normalizedScores).reduce((a, b) => a + b, 0);
-    if (currentTotal < 100) {
-      normalizedScores[primaryEmotion] += (100 - currentTotal);
+    // Ensure total is exactly 100% by adjusting primary emotion if needed
+    const calculatedTotal = Object.values(normalizedScores).reduce((a, b) => a + b, 0);
+    if (calculatedTotal !== 100) {
+      normalizedScores[primaryEmotion] += (100 - calculatedTotal);
     }
   } else {
     // No emotion detected - all neutral
