@@ -32,7 +32,11 @@ export const emotionVocabulary = {
       'tunay na masaya', 'tunay na saya', 'totoo na saya', 'literal na masaya',
       // Positive feelings
       'positibo', 'positive', 'optimista', 'optimistic', 'hopeful', 'may pag-asa',
-      'may liyag', 'maliwanag', 'maliwanag na', 'mataas ang puso', 'mataas ang loob'
+      'may liyag', 'maliwanag', 'maliwanag na', 'mataas ang puso', 'mataas ang loob',
+      // Laughter patterns
+      'haha', 'hehe', 'hihi', 'huhu', 'hehehe', 'hahaha', 'hihihi',
+      'lol', 'lmao', 'lmfao', 'rofl', 'hahaha hahaha',
+      'laughing', 'laugh', 'laughter', 'funny', 'hilarious', 'hilarity'
     ],
     english: [
       // Primary words
@@ -50,7 +54,10 @@ export const emotionVocabulary = {
       'uplifted', 'inspired', 'motivated', 'energized', 'invigorated',
       // Love & connection
       'love', 'loved', 'beloved', 'cherished', 'affectionate', 'tender',
-      'warm hearted', 'caring', 'compassionate', 'empathetic'
+      'warm hearted', 'caring', 'compassionate', 'empathetic',
+      // Laughter
+      'haha', 'hehe', 'hihi', 'lol', 'lmao', 'rofl',
+      'laughing', 'laugh', 'laughter', 'funny', 'hilarious'
     ],
     weight: 1.5
   },
@@ -78,7 +85,11 @@ export const emotionVocabulary = {
       'dumudugo ang puso', 'nagsisiksik ang puso', 'nangangaluluwa',
       // Despair
       'walang pag-asa', 'walang asa na', 'desperate', 'desperation',
-      'desperate na', 'katapusan', 'huli na', 'lubos na huli na'
+      'desperate na', 'katapusan', 'huli na', 'lubos na huli na',
+      // Don't want to / rejection
+      'ayaw ko', 'ayaw ko na', 'ayaw na', 'ayaw', 'hindi ko gusto',
+      'hindi gusto', 'ayaw nang', 'ayaw ko nang', 'wala nang lasa',
+      'wala nang pag-asa', 'ayoko na'
     ],
     english: [
       // Primary words
@@ -98,7 +109,9 @@ export const emotionVocabulary = {
       'doomed', 'cursed', 'damned', 'lost', 'broken', 'shattered',
       // Crying related
       'cry', 'crying', 'tears', 'tearful', 'weeping', 'sobbing',
-      'mournful', 'mourn', 'lament', 'lamentation'
+      'mournful', 'mourn', 'lament', 'lamentation',
+      // Rejection
+      'don\'t want', 'don\'t care', 'don\'t like', 'i hate', 'i despise'
     ],
     weight: 1.4
   },
@@ -112,12 +125,15 @@ export const emotionVocabulary = {
       // Stress related
       'stress', 'stressed', 'stressed na', 'napaka stressed',
       'pressured', 'pressure', 'under pressure', 'presyurado',
+      'napaka stressed', 'sobrang stressed', 'lubos na stressed',
       // Worry related
       'inaalala', 'iniisip', 'iniisip ang masakit', 'iniisip ang problema',
       'nag-iisip ng masama', 'nag-iisip ng hindi maganda',
+      'nag-aalala ng', 'nag-aalala tungkol sa',
       // Fear related
       'takot sa', 'takut ko', 'takot akong', 'natatakot na',
       'natatakot akong', 'natatakutan', 'takut na takut',
+      'takot talaga', 'takot akong',
       // Uncertainty
       'hindi sigurado', 'hindi alam', 'walang sigurado', 'pag-aalinlangan',
       'nag-aalinlangan', 'nag-aalinlangan ako', 'nag-aalinlangang',
@@ -127,7 +143,8 @@ export const emotionVocabulary = {
       'nervousness', 'nerbiyoso', 'nerbiyoso ang', 'napaka nerbiyoso',
       // Restlessness
       'hindi makakatalog', 'hindi makahiga', 'hindi makaturog',
-      'walang tulog', 'walang katahimikan', 'walang peace'
+      'walang tulog', 'walang katahimikan', 'walang peace',
+      'uneasy', 'uneasy na'
     ],
     english: [
       // Primary words
@@ -161,23 +178,27 @@ export const emotionVocabulary = {
       // Fury related
       'puno ng galit', 'labas ng galit', 'galit na galit', 'galit talaga',
       'tunay na galit', 'totong galit', 'literal na galit',
-      // Irritation
+      // Irritation / Annoyance
       'nasasama', 'nasama', 'nasasama ang loob', 'nasama ang loob',
       'nasayang ang puso', 'nawawalan ng tiwala', 'umaaray', 'umaray',
       'nasasari', 'nasisira', 'napapagod', 'napagod na',
+      'nakakainis', 'nakakabwisit', 'nakakasigla', 'napaka annoying',
+      'nakakainis talaga', 'nakakabwisit na', 'kinikilabutan',
       // Frustration
       'frustrated', 'frustration', 'frustrated na', 'napaka frustrated',
       'pagod', 'pagod na', 'napagod na', 'pagod na pagod', 'sobrang pagod',
-      // Annoyance
-      'nasisigang', 'nakasigang', 'irritated', 'irritating', 'annoyed',
-      'annoying', 'annoying na', 'napaka annoying', 'nakakasiga',
-      // Hate & resentment
+      'napapagod na', 'pagod na ako', 'pagod na talaga',
+      // Annoyance specific
+      'bwisit', 'bwisit na bwisit', 'nakabwisit', 'bwisit talaga',
+      'gago', 'tanga', 'bobo', 'sira', 'sirang', 'sirang loob',
+      // Resentment
       'kaibigan', 'kinakalaban', 'laban', 'labanan', 'nakakalaban',
       'nilayon', 'ninyayamang', 'niyayari', 'niyari', 'niyari ang',
       'resent', 'resentment', 'resenting', 'resentful', 'vengeful', 'revenge',
       // Disgust
       'kakaiba', 'iba', 'kailanman', 'kailanman nang', 'di na', 'hindi na',
-      'disgusted', 'disgust', 'disgusting', 'repulsive', 'repulsion'
+      'disgusted', 'disgust', 'disgusting', 'repulsive', 'repulsion',
+      'mukhang nababagsak ang mundo', 'walang katumbas na galit'
     ],
     english: [
       // Primary words

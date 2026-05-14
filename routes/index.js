@@ -3723,6 +3723,9 @@ router.get("/user/mood-tracker", isAuthenticated, moodController.moodTrackerPage
 // API: Save detected emotion
 router.post("/user/mood/save", isAuthenticated, moodController.saveMood);
 
+// API: Save detected emotion (alternative endpoint for dashboard)
+router.post("/api/mood/save", isAuthenticated, moodController.saveMood);
+
 // API: Get mood history
 router.get("/user/mood/history", isAuthenticated, moodController.getMoodHistory);
 
@@ -3746,6 +3749,9 @@ router.get("/api/user/mood/insights", isAuthenticated, moodController.getMoodIns
 
 // API: Link mood to journal entry
 router.post("/api/mood/link-journal", isAuthenticated, moodController.linkMoodToJournal);
+
+// API: Get mood suggestions based on emotion (for dashboard)
+router.post("/api/mood/suggestions", isAuthenticated, moodController.getMoodSuggestions);
 
 // API: Counselor - Get specific student's mood data
 router.get("/api/counselor/student/:studentId/moods", isAuthenticated, moodController.getStudentMoodByCounselor);

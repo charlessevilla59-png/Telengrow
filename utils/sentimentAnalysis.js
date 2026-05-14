@@ -6,9 +6,138 @@
 
     AI Sentiment Analysis - Analyzes journal entries to detect emotions and sentiment
     Now with Tagalog language support and comprehensive emotion vocabulary!
+    INCLUDES: Crisis Detection & Mental Health Safety Features
 */
 
 import { emotionVocabulary, intensityModifiers, negationWords, getIntensityModifier, isNegation } from './emotionVocabulary.js';
+
+/**
+ * Get crisis message based on severity
+ */
+const getCrisisMessage = (severity) => {
+  const messages = {
+    high: '🚨 URGENT: We detected concerning thoughts in your entry. Please chat with a counselor immediately. Your safety matters. You\'re not alone in this.',
+    medium: '⚠️ IMPORTANT: We notice you may be struggling. Please consider chatting with a counselor to talk about what you\'re feeling. Help is available.',
+    low: '💙 We care about you. If you\'re feeling down, our counselors are here to listen and support you.'
+  };
+  return messages[severity] || messages.medium;
+};
+
+/**
+ * MENTAL HEALTH SAFETY: Detect crisis/harmful phrases
+ * Checks for self-harm, suicide, or concerning mental health indicators
+ * @param {string} text - Text to analyze
+ * @returns {Object} Crisis detection result
+ */
+export const detectCrisisKeywords = (text) => {
+  const lowerText = text.toLowerCase();
+  
+  // ==================== SELF-HARM / SUICIDE KEYWORDS (English) ====================
+  const selfHarmKeywords = [
+    'kill myself', 'kill me', 'want to die', 'wanna die', 'want die',
+    'end it all', 'end it', 'end my life', 'end my suffering',
+    'hurt myself', 'harm myself', 'cut myself', 'cut me',
+    'i want to kill', 'i want to hurt', 'i want to harm',
+    'suicide', 'suicidal', 'suicidal thoughts', 'suicidal ideation',
+    'no point living', 'no point to live', 'better off dead',
+    'everyone would be better off without me', 'better without me',
+    'overdose', 'poison myself', 'jump', 'hang myself', 'hanging',
+    'self harm', 'self-harm', 'self destructive', 'self destruction',
+    'despair', 'hopeless', 'hopelessness', 'lost cause',
+    'not worth living', 'don\'t deserve to live', 'should be dead'
+  ];
+  
+  // ==================== SELF-HARM / SUICIDE KEYWORDS (Tagalog) ====================
+  const tagalogCrisisKeywords = [
+    'gusto ko maging patay', 'gusto ko mamamatay', 'nais ko mamamatay',
+    'ayaw ko nang buhay', 'ayaw ko na ng buhay', 'ayaw ko buhay',
+    'nais ko maging alaala', 'gusto ko maging alaala', 'nais ko magsama', 'gusto ko mawala',
+    'takot ko sa buhay', 'hindi na kaya', 'pagod na', 'pagod na talaga',
+    'walang point', 'walang punto', 'walang pag-asa', 'desperate',
+    'sakit na', 'hindi na', 'huli na', 'wala nang hope',
+    'gusto ko ng pumatay', 'gusto ko patay', 'gusto ko matapos',
+    'magsama sa', 'magsama', 'sumama', 'sumama na',
+    'iwanan na kayo', 'iwan na', 'bagakin na',
+    'walang halaga', 'walang silbi', 'walang kwenta',
+    'mas maganda kung wala ako', 'mas maganda kung patay ako',
+    'lahat mas maganda kung wala ako', 'burden', 'problema',
+    'kasalanan', 'sisi', 'nagsisisi', 'hindi dapat nandito',
+    'dapat wala akong buhay', 'dapat patay na ako'
+  ];
+  
+  // ==================== SELF-HARM / SUICIDE KEYWORDS (Taglish Mixed) ====================
+  const taglishCrisisKeywords = [
+    'i want to kill myself', 'i want to die', 'i want to end it',
+    'gusto ko mag-kill', 'gusto ko mag-die', 'gusto ko mag-end',
+    'want ko maging patay', 'want ko mawala', 'can\'t do this anymore',
+    'hindi ko na kaya', 'hindi na ako kaya', 'kaya ko na',
+    'parang hindi na', 'feeling ko hindi na', 'para sa akin tapos na'
+  ];
+  
+  // Combine all crisis keywords
+  const allCrisisKeywords = [
+    ...selfHarmKeywords,
+    ...tagalogCrisisKeywords,
+    ...taglishCrisisKeywords
+  ];
+  
+  // Check for crisis keywords
+  const detectedCrisisKeywords = allCrisisKeywords.filter(keyword => {
+    // For multi-word phrases, use simple substring matching
+    if (keyword.includes(' ')) {
+      return lowerText.includes(keyword);
+    }
+    // For single words, use word boundary regex
+    const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    return pattern.test(lowerText);
+  });
+  
+  // ==================== SEVERITY LEVELS ====================
+  const HIGH_SEVERITY = [
+    'kill myself', 'kill me', 'suicide', 'suicidal', 'want to die',
+    'end my life', 'end it all', 'end it', 'gusto ko mamamatay', 'gusto ko patay',
+    'i want to kill', 'nais ko mamamatay', 'hurt myself', 'harm myself'
+  ];
+  
+  const MEDIUM_SEVERITY = [
+    'hurt myself', 'harm myself', 'cut myself', 'no point living',
+    'better off dead', 'ayaw ko nang buhay', 'walang pag-asa',
+    'desperate', 'hopeless', 'i want to end'
+  ];
+  
+  const hasSeverity = {
+    high: detectedCrisisKeywords.some(kw => 
+      HIGH_SEVERITY.some(sk => kw.toLowerCase().includes(sk.toLowerCase()))
+    ),
+    medium: detectedCrisisKeywords.some(kw => 
+      MEDIUM_SEVERITY.some(sk => kw.toLowerCase().includes(sk.toLowerCase()))
+    )
+  };
+  
+  const severityLevel = hasSeverity.high ? 'high' : (hasSeverity.medium ? 'medium' : 'low');
+  
+  if (detectedCrisisKeywords.length > 0) {
+    console.log(`🚨 [CRISIS DETECTION] ${detectedCrisisKeywords.length} crisis keyword(s) detected!`);
+    console.log(`   Keywords: ${detectedCrisisKeywords.join(', ')}`);
+    console.log(`   Severity: ${severityLevel.toUpperCase()}`);
+    
+    return {
+      hasCrisisKeywords: true,
+      keywords: detectedCrisisKeywords,
+      severity: severityLevel,
+      recommendation: 'IMMEDIATE COUNSELOR CHAT RECOMMENDED',
+      message: getCrisisMessage(severityLevel)
+    };
+  }
+  
+  return {
+    hasCrisisKeywords: false,
+    keywords: [],
+    severity: 'none',
+    recommendation: null,
+    message: null
+  };
+};
 
 /**
  * Detect text language (English or Tagalog)
@@ -102,6 +231,172 @@ const isNegationWord = (word, language = 'english') => {
 };
 
 /**
+ * Analyze context clues when no direct emotion keywords are found
+ * Uses punctuation, sentence structure, and common words to infer emotion
+ * @param {string} text - Text to analyze
+ * @param {string} language - Text language
+ * @returns {Object} Context-detected emotion with confidence
+ */
+const analyzeContext = (text, language) => {
+  const lowerText = text.toLowerCase();
+  
+  // ==================== LAUGHTER DETECTION ====================
+  // Detect laughter patterns (haha, hehe, hihihi, lol, lmao, etc.)
+  const laughterPatterns = [
+    /\bhaha+\b/gi,        // haha, hahaha, hahahaha
+    /\bhehe+\b/gi,        // hehe, hehehe
+    /\bhihi+\b/gi,        // hihi, hihihi
+    /\bhuhu+\b/gi,        // huhu, huhuh
+    /\blol+\b/gi,         // lol, lolol
+    /\blmao\b/gi,         // lmao
+    /\brofl\b/gi,         // rofl
+    /\blmfao\b/gi         // lmfao
+  ];
+  
+  const laughterCount = laughterPatterns.reduce((count, pattern) => {
+    const matches = lowerText.match(pattern);
+    return count + (matches ? matches.length : 0);
+  }, 0);
+  
+  if (laughterCount > 0) {
+    const confidence = Math.min(50 + (laughterCount * 15), 95);
+    console.log(`😂 [CONTEXT] Detected ${laughterCount} laughter patterns - Happy emotion (${confidence}%)`);
+    return { detectedEmotion: 'happy', confidence };
+  }
+  
+  // ==================== TAGALOG/TAGLISH REJECTION DETECTION ====================
+  // Detect "ayaw ko" and similar rejection patterns in Tagalog
+  const tagalogRejectionPatterns = [
+    /\bayaw\s*ko\b/gi,              // ayaw ko
+    /\bayaw\s*ko\s*na\b/gi,         // ayaw ko na
+    /\bayaw\s*nang\b/gi,            // ayaw nang
+    /\baywain\b/gi,                 // aywain
+    /\baywain\s*na\b/gi,            // aywain na
+    /\bwala\s*nang\s*pag.asa\b/gi,  // wala nang pag-asa
+    /\bwala\s*nang\s*lasa\b/gi,     // wala nang lasa
+    /\bwala\s*na\b/gi,              // wala na (context dependent)
+    /\bsawa\s*na\b/gi,              // sawa na
+    /\btired\s*na\b/gi              // tired na
+  ];
+  
+  const tagalogRejectionCount = tagalogRejectionPatterns.reduce((count, pattern) => {
+    const matches = lowerText.match(pattern);
+    return count + (matches ? matches.length : 0);
+  }, 0);
+  
+  if (tagalogRejectionCount > 0) {
+    const confidence = 55 + (tagalogRejectionCount * 10);
+    console.log(`😢 [CONTEXT] Detected ${tagalogRejectionCount} Tagalog rejection patterns - Sad emotion (${confidence}%)`);
+    return { detectedEmotion: 'sad', confidence: Math.min(confidence, 90) };
+  }
+  
+  // ==================== TAGALOG ANNOYANCE/IRRITATION DETECTION ====================
+  // Detect Tagalog words for annoyance/irritation
+  const tagalogAnnoyancePatterns = [
+    /\bnakakainis\b/gi,              // nakakainis
+    /\bnakakabwisit\b/gi,            // nakakabwisit
+    /\bbwisit\b/gi,                  // bwisit
+    /\bkinikilabutan\b/gi,           // kinikilabutan
+    /\bsirang\s*loob\b/gi,           // sirang loob
+    /\bgago\b/gi,                    // gago (can be anger/annoyance)
+    /\btanga\b/gi,                   // tanga (can indicate annoyance)
+    /\bbobo\b/gi,                    // bobo
+    /\bnasasama\s*ang\s*loob\b/gi,   // nasasama ang loob
+    /\bnasama\s*ang\s*loob\b/gi,     // nasama ang loob
+    /\bnag.*galit\b/gi,              // nag-galit, nagagalit
+    /\bgalit\b/gi                    // galit
+  ];
+  
+  const tagalogAnnoyanceCount = tagalogAnnoyancePatterns.reduce((count, pattern) => {
+    const matches = lowerText.match(pattern);
+    return count + (matches ? matches.length : 0);
+  }, 0);
+  
+  if (tagalogAnnoyanceCount > 0) {
+    const confidence = 55 + (tagalogAnnoyanceCount * 10);
+    console.log(`😠 [CONTEXT] Detected ${tagalogAnnoyanceCount} Tagalog annoyance patterns - Angry emotion (${confidence}%)`);
+    return { detectedEmotion: 'angry', confidence: Math.min(confidence, 90) };
+  }
+  
+  // ==================== PUNCTUATION ANALYSIS ====================
+  // Check for exclamation marks (usually positive energy)
+  const exclamationCount = (lowerText.match(/!/g) || []).length;
+  if (exclamationCount >= 2) {
+    const confidence = 45 + Math.min(exclamationCount * 8, 25);
+    console.log(`😊 [CONTEXT] Detected ${exclamationCount} exclamation marks - Happy emotion (${confidence}%)`);
+    return { detectedEmotion: 'happy', confidence };
+  }
+  
+  // Check for question marks (often indicates curiosity or anxiety)
+  const questionCount = (lowerText.match(/\?/g) || []).length;
+  if (questionCount >= 3) {
+    const confidence = 40 + Math.min(questionCount * 5, 20);
+    console.log(`😰 [CONTEXT] Detected ${questionCount} question marks - Anxious emotion (${confidence}%)`);
+    return { detectedEmotion: 'anxious', confidence };
+  }
+  
+  // Check for ellipses (often indicates hesitation or trailing thoughts - calm/neutral)
+  if (lowerText.includes('...')) {
+    console.log(`😌 [CONTEXT] Detected ellipsis - Calm emotion (35%)`);
+    return { detectedEmotion: 'calm', confidence: 35 };
+  }
+  
+  // ==================== POSITIVE KEYWORD DETECTION ====================
+  // Check for common positive words
+  const positiveWords = [
+    'wonderful', 'amazing', 'great', 'love', 'perfect', 'best', 'awesome', 
+    'fun', 'enjoy', 'excited', 'thrilled', 'delighted',
+    'maganda', 'ganap', 'perpekto', 'espesyal', 'kahanga-hanga',
+    'napakasaya', 'sobrang saya', 'tuwang-tuwa'
+  ];
+  const hasPositive = positiveWords.some(word => lowerText.includes(word));
+  if (hasPositive) {
+    console.log(`😊 [CONTEXT] Detected positive word - Happy emotion (50%)`);
+    return { detectedEmotion: 'happy', confidence: 50 };
+  }
+  
+  // ==================== NEGATIVE KEYWORD DETECTION ====================
+  // Check for common negative words
+  const negativeWords = [
+    'hate', 'terrible', 'worst', 'awful', 'horrible', 'disgusting', 
+    'disappointing', 'bad', 'evil', 'ugly',
+    'pangit', 'nakakayamot', 'nakakatuwa ng masakit'
+  ];
+  const hasNegative = negativeWords.some(word => lowerText.includes(word));
+  if (hasNegative) {
+    console.log(`😢 [CONTEXT] Detected negative word - Sad emotion (50%)`);
+    return { detectedEmotion: 'sad', confidence: 50 };
+  }
+  
+  // ==================== REPETITION DETECTION ====================
+  // Check for word/character repetition (usually indicates strong feeling)
+  const words = lowerText.split(/\s+/);
+  const wordCounts = {};
+  for (const word of words) {
+    if (word.length > 3) {
+      wordCounts[word] = (wordCounts[word] || 0) + 1;
+    }
+  }
+  const repeatedWord = Object.entries(wordCounts).find(([word, count]) => count >= 3);
+  if (repeatedWord) {
+    console.log(`😰 [CONTEXT] Detected repeated word "${repeatedWord[0]}" - Anxious emotion (40%)`);
+    return { detectedEmotion: 'anxious', confidence: 40 };
+  }
+  
+  // ==================== CHARACTER ELONGATION DETECTION ====================
+  // Detect elongated characters (e.g., "noooooo", "aaaah", "whyyyy")
+  if (/[a-z]{2,}(.)\1{2,}/gi.test(lowerText)) {
+    console.log(`😭 [CONTEXT] Detected character elongation - Sad/Anxious emotion (45%)`);
+    return { detectedEmotion: 'sad', confidence: 45 };
+  }
+  
+  // ==================== DEFAULT NEUTRAL ====================
+  // Default: truly neutral when no emotion indicators found
+  console.log(`😐 [CONTEXT] No emotion patterns detected - Truly Neutral (0%)`);
+  return { detectedEmotion: 'neutral', confidence: 0 };
+};
+
+/**
  * Analyze journal entry text and detect emotions (Supports English & Tagalog)
  * @param {string} text - Journal entry content
  * @returns {Object} Analysis results with emotion, confidence, and detailed scores
@@ -123,7 +418,47 @@ export const analyzeJournalEmotion = (text) => {
       sentimentScore: 0,
       analysis: 'No text provided for analysis',
       language: 'unknown',
-      details: {}
+      details: {},
+      crisis: {
+        isCrisis: false,
+        keywords: [],
+        severity: 'none'
+      }
+    };
+  }
+
+  // 🚨 MENTAL HEALTH SAFETY CHECK: Detect crisis keywords FIRST (highest priority)
+  const crisisCheck = detectCrisisKeywords(text);
+  
+  if (crisisCheck.hasCrisisKeywords) {
+    console.log(`\n🚨🚨🚨 [CRITICAL] CRISIS KEYWORDS DETECTED 🚨🚨🚨`);
+    return {
+      primaryEmotion: 'crisis',
+      confidence: 100,
+      emotionScores: {
+        happy: 0,
+        sad: 0,
+        anxious: 0,
+        angry: 0,
+        calm: 0,
+        neutral: 0
+      },
+      sentiment: 'critical',
+      sentimentScore: -100,
+      analysis: crisisCheck.message,
+      language: detectLanguage(text),
+      details: {
+        detectedCrisisKeywords: crisisCheck.keywords,
+        crisisType: 'self-harm/suicide-related',
+        urgency: crisisCheck.severity === 'high' ? 'IMMEDIATE' : 'HIGH'
+      },
+      crisis: {
+        isCrisis: true,
+        keywords: crisisCheck.keywords,
+        severity: crisisCheck.severity,
+        recommendation: crisisCheck.recommendation,
+        message: crisisCheck.message
+      }
     };
   }
 
@@ -233,8 +568,21 @@ export const analyzeJournalEmotion = (text) => {
       normalizedScores[primaryEmotion] += (100 - calculatedTotal);
     }
   } else {
-    // No emotion detected - all neutral
-    normalizedScores.neutral = 100;
+    // No emotion detected - use contextual analysis to determine most likely emotion
+    const contextAnalysis = analyzeContext(text, language);
+    
+    if (contextAnalysis.detectedEmotion && contextAnalysis.confidence > 0) {
+      primaryEmotion = contextAnalysis.detectedEmotion;
+      normalizedScores[contextAnalysis.detectedEmotion] = contextAnalysis.confidence;
+      for (const emotion of Object.keys(normalizedScores)) {
+        if (emotion !== contextAnalysis.detectedEmotion) {
+          normalizedScores[emotion] = Math.round((100 - contextAnalysis.confidence) / 5);
+        }
+      }
+    } else {
+      // True neutral when no emotion indicators found
+      normalizedScores.neutral = 100;
+    }
   }
 
   console.log('📊 [SENTIMENT] Normalized scores:', normalizedScores);
@@ -258,6 +606,13 @@ export const analyzeJournalEmotion = (text) => {
       foundEmotions,
       wordCount: words.length,
       processedWords: maxScore > 0
+    },
+    crisis: {
+      isCrisis: false,
+      keywords: [],
+      severity: 'none',
+      recommendation: null,
+      message: null
     }
   };
 };
@@ -311,22 +666,23 @@ const generateAnalysisText = (emotion, confidence, emotionScores, foundEmotions,
   const isTagalog = language === 'tagalog' || language === 'mixed';
   const labels = isTagalog ? emotionLabels.tagalog : emotionLabels.english;
 
-  if (isTagalog) {
-    if (confidence < 30) {
-      analysis = "🤔 Pinagsasaluhang emosyon. Maraming iba't ibang damdamin ang nakita sa iyong entry.";
-    } else if (confidence >= 30 && confidence < 60) {
-      analysis = `😌 Malinaw na ${labels[emotion].toLowerCase()} na damdamin. Ang iyong entry ay nagpapakita ng ${labels[emotion].toLowerCase()} na sentimyento.`;
+  if (confidence < 30) {
+    if (isTagalog) {
+      analysis = "🤔 Pinagsasaluhang emosyon. Maraming iba't ibang damdamin ang nakita sa iyong entry. Ang iyong damdamang ito ay kompleks at may maraming layer.";
     } else {
-      analysis = `😊 Malakas na ${labels[emotion].toLowerCase()} na emosyon (${confidence}%). Ang iyong entry ay strongly nagpapahayag ng ${labels[emotion].toLowerCase()} na damdamin.`;
+      analysis = '🤔 Mixed emotions detected. Your entry contains a blend of different feelings. Your emotional state appears layered and complex.';
+    }
+  } else if (confidence >= 30 && confidence < 60) {
+    if (isTagalog) {
+      analysis = `😌 Malinaw na ${labels[emotion].toLowerCase()} na damdamin. Ang iyong entry ay nagpapakita ng ${labels[emotion].toLowerCase()} na sentimyento. Ito ay magandang emosyon na pag-aralan.`;
+    } else {
+      analysis = `😌 Moderate ${emotion} emotion detected. Your entry shows clear ${emotion} feelings. This is valuable for understanding yourself.`;
     }
   } else {
-    // English version
-    if (confidence < 30) {
-      analysis = '🤔 Mixed emotions detected. Your entry contains a blend of different feelings.';
-    } else if (confidence >= 30 && confidence < 60) {
-      analysis = `😌 Moderate ${emotion} emotion detected. Your entry shows clear ${emotion} feelings.`;
+    if (isTagalog) {
+      analysis = `😊 Malakas na ${labels[emotion].toLowerCase()} na emosyon (${confidence}%). Ang iyong entry ay strongly nagpapahayag ng ${labels[emotion].toLowerCase()} na damdamin. Malinaw na nararamdaman mo ito.`;
     } else {
-      analysis = `😊 Strong ${emotion} emotion detected (${confidence}% confidence). Your entry strongly expresses ${emotion} sentiments.`;
+      analysis = `😊 Strong ${emotion} emotion detected (${confidence}% confidence). Your entry clearly expresses ${emotion} sentiments. Your feelings are prominent and significant.`;
     }
   }
 
@@ -337,9 +693,9 @@ const generateAnalysisText = (emotion, confidence, emotionScores, foundEmotions,
 
   if (sortedEmotions.length > 0 && sortedEmotions[0][1] > 20) {
     if (isTagalog) {
-      analysis += ` May ${sortedEmotions[0][0]} na elemento rin.`;
+      analysis += ` May ${sortedEmotions[0][0]} na elemento rin (${Math.round(sortedEmotions[0][1])}%). Kumplikado ang iyong emosyon.`;
     } else {
-      analysis += ` Also contains ${sortedEmotions[0][0]} elements.`;
+      analysis += ` There are also ${sortedEmotions[0][0]} elements present (${Math.round(sortedEmotions[0][1])}%). Your emotional landscape is nuanced.`;
     }
   }
 

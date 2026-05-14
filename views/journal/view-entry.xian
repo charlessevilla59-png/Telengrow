@@ -105,7 +105,7 @@
             <p class="text-sm font-semibold text-gray-700 mb-3">Detected Emotion:</p>
             <div class="flex gap-3 items-center flex-wrap">
               <span class="emotion-badge emotion-{{entry.detectedEmotion}}">
-                {{#ifEquals entry.detectedEmotion "happy"}}😊 Happy ({{entry.emotionConfidence}}%){{/ifEquals}}
+                {{#ifEquals entry.detectedEmotion "happy"}}� Happy ({{entry.emotionConfidence}}%){{/ifEquals}}
                 {{#ifEquals entry.detectedEmotion "sad"}}😢 Sad ({{entry.emotionConfidence}}%){{/ifEquals}}
                 {{#ifEquals entry.detectedEmotion "anxious"}}😰 Anxious ({{entry.emotionConfidence}}%){{/ifEquals}}
                 {{#ifEquals entry.detectedEmotion "angry"}}😠 Angry ({{entry.emotionConfidence}}%){{/ifEquals}}
@@ -166,7 +166,7 @@
               </div>
               <div>
                 <div class="flex justify-between mb-2">
-                  <span class="text-sm font-medium text-gray-700">😠 Angry</span>
+                  <span class="text-sm font-medium text-gray-700">� Angry</span>
                   <span class="text-sm font-bold text-red-600">{{entry.emotionScores.angry}}%</span>
                 </div>
                 <div class="h-3 bg-gray-200 rounded-full overflow-hidden">

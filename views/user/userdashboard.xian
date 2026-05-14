@@ -297,6 +297,146 @@
       opacity: 1 !important;
       pointer-events: auto !important;
     }
+
+    /* ===== MOOD PICKER STYLES ===== */
+    .emotion-picker {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .emotion-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 32px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .emotion-btn:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 12px 30px rgba(22, 163, 74, 0.2);
+      border-color: #16a34a;
+    }
+
+    .emotion-btn.selected {
+      border-color: #16a34a;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      color: #16a34a;
+      box-shadow: 0 12px 30px rgba(22, 163, 74, 0.3);
+    }
+
+    .emotion-label {
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.2;
+      color: inherit;
+    }
+
+    .suggestions-container {
+      margin-top: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 2px solid #86efac;
+      border-radius: 12px;
+      display: none;
+      animation: slideInUp 0.5s ease-out;
+    }
+
+    .suggestions-container.show {
+      display: block;
+    }
+
+    .suggestion-item {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 4px solid #16a34a;
+      transition: all 0.3s ease;
+    }
+
+    .suggestion-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .suggestion-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.15);
+    }
+
+    .suggestion-title {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .suggestion-desc {
+      font-size: 0.875rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    .suggestion-link {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #16a34a;
+      color: white;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-link:hover {
+      background: #15803d;
+      transform: scale(1.05);
+    }
+
+    .mood-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #16a34a;
+      font-weight: 600;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #e5e7eb;
+      border-top: 2px solid #16a34a;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -387,6 +527,90 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 Emotion Picker Section - Select Your Mood! -->
+    <div id="mood-picker-section" class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
+      <div class="bg-white rounded-xl shadow-md border-2 border-blue-200 p-8">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <span class="text-3xl">🧠</span> How's Your Day?
+          </h2>
+          <p class="text-gray-600">Pick an emoji to tell us how you're feeling right now</p>
+        </div>
+
+        <!-- Emotion Picker Grid -->
+        <div class="emotion-picker" id="emotion-picker">
+          <button class="emotion-btn" data-emotion="happy" onclick="selectEmotion('happy', this)" title="Happy">
+            <span>😊</span>
+            <span class="emotion-label">Happy</span>
+          </button>
+          <button class="emotion-btn" data-emotion="sad" onclick="selectEmotion('sad', this)" title="Sad">
+            <span>😢</span>
+            <span class="emotion-label">Sad</span>
+          </button>
+          <button class="emotion-btn" data-emotion="angry" onclick="selectEmotion('angry', this)" title="Angry">
+            <span>😠</span>
+            <span class="emotion-label">Angry</span>
+          </button>
+          <button class="emotion-btn" data-emotion="fearful" onclick="selectEmotion('fearful', this)" title="Anxious">
+            <span>😨</span>
+            <span class="emotion-label">Anxious</span>
+          </button>
+          <button class="emotion-btn" data-emotion="neutral" onclick="selectEmotion('neutral', this)" title="Neutral">
+            <span>😐</span>
+            <span class="emotion-label">Neutral</span>
+          </button>
+          <button class="emotion-btn" data-emotion="disgusted" onclick="selectEmotion('disgusted', this)" title="Disgusted">
+            <span>🤢</span>
+            <span class="emotion-label">Disgusted</span>
+          </button>
+          <button class="emotion-btn" data-emotion="surprised" onclick="selectEmotion('surprised', this)" title="Surprised">
+            <span>😮</span>
+            <span class="emotion-label">Surprised</span>
+          </button>
+          <button class="emotion-btn" data-emotion="anxious" onclick="selectEmotion('anxious', this)" title="Anxious">
+            <span>😰</span>
+            <span class="emotion-label">Worried</span>
+          </button>
+        </div>
+
+        <!-- System Suggestions Container -->
+        <div id="suggestions-container" class="suggestions-container">
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <span id="suggestion-emoji">💡</span> System Suggestions for You
+            </h3>
+            <p class="text-sm text-gray-600" id="suggestion-intro"></p>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loading-state" class="mood-loading" style="display: none;">
+            <span class="spinner"></span>
+            <span>Loading suggestions...</span>
+          </div>
+
+          <!-- Suggestions List -->
+          <div id="suggestions-list"></div>
+        </div>
+
+        <!-- Save Mood Button - Always Visible -->
+        <div class="mt-6 flex gap-3">
+          <button 
+            id="save-mood-btn"
+            onclick="saveMoodEntry()"
+            class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+          >
+            <span>✅</span> Save My Mood
+          </button>
+          <button 
+            onclick="clearMoodSelection()"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-lg transition"
+          >
+            ✕ Clear
           </button>
         </div>
       </div>
@@ -865,6 +1089,18 @@
   </div>
 
   <script>
+    // ===== EMOTION TO EMOJI MAPPING - GLOBAL =====
+    const emotionEmojis = {
+      'happy': '😊',
+      'sad': '😢',
+      'angry': '😠',
+      'fearful': '😨',
+      'neutral': '😐',
+      'disgusted': '🤢',
+      'surprised': '😮',
+      'anxious': '😰'
+    };
+
     // Info Modal Functions
     function openInfoModal(section = 'how-works') {
       const modal = document.getElementById('infoModal');
@@ -933,6 +1169,9 @@
     // Initialize modal event listeners when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOMContentLoaded - Setting up modal listeners');
+      
+      // Load mood greeting on dashboard
+      loadMoodGreetingOnDashboard();
       
       const infoModal = document.getElementById('infoModal');
       if (infoModal) {
@@ -1447,8 +1686,15 @@
     // ===== LOAD MOOD GREETING ON DASHBOARD =====
     async function loadMoodGreetingOnDashboard() {
       try {
+        console.log('📊 Loading mood greeting data...');
         const response = await fetch('/api/user/mood/dashboard');
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('📊 Mood greeting data received:', data);
         
         if (data.success) {
           // Update greeting message
@@ -1461,45 +1707,500 @@
               .slice(0, -4); // Remove last <br>
           }
 
-          // Check for mood alerts
+          // Get DOM elements
+          const moodEmojiElement = document.getElementById('mood-emoji');
+          const moodAlert = document.getElementById('mood-alert');
+          const moodAlertMessage = document.getElementById('mood-alert-message');
+          
+          console.log('🔍 DOM Elements found:', { moodEmojiElement: !!moodEmojiElement, moodAlert: !!moodAlert, moodAlertMessage: !!moodAlertMessage });
+          
           if (data.moodData && data.moodData.trend) {
-            const trend = data.moodData.trend;
+            const moodData = data.moodData;
+            const lastEmotion = moodData.trend?.lastEmotion; // Get last mood entry emotion from trend
+            const trend = moodData.trend;
             
-            if (trend.isDeclining) {
-              const moodAlert = document.getElementById('mood-alert');
-              const moodAlertMessage = document.getElementById('mood-alert-message');
+            console.log('📈 Mood data:', { lastEmotion, trend });
+            
+            // ===== UPDATE: Display emoji from last mood entry =====
+            if (moodEmojiElement) {
+              if (lastEmotion) {
+                // We have a mood entry - show it
+                const emoji = emotionEmojis[lastEmotion] || '😐';
+                moodEmojiElement.textContent = emoji;
+                moodEmojiElement.style.cursor = 'pointer';
+                moodEmojiElement.style.transition = 'transform 0.3s ease, filter 0.3s ease';
+                moodEmojiElement.title = `Your last mood: ${lastEmotion} - Click to view details`;
+                
+                // Add click handler to view mood entry details
+                moodEmojiElement.onclick = function() {
+                  showLastMoodEntryModal(lastEmotion, trend);
+                };
+                
+                // Add hover effect
+                moodEmojiElement.onmouseenter = function() {
+                  this.style.transform = 'scale(1.2) rotate(10deg)';
+                  this.style.filter = 'drop-shadow(0 4px 8px rgba(22, 163, 74, 0.3))';
+                };
+                
+                moodEmojiElement.onmouseleave = function() {
+                  this.style.transform = 'scale(1)';
+                  this.style.filter = 'none';
+                };
+                
+                console.log('✅ Mood emoji displayed:', emoji);
+              } else {
+                // No mood entry yet - show default and add click to record mood
+                moodEmojiElement.textContent = '🎯';
+                moodEmojiElement.style.cursor = 'pointer';
+                moodEmojiElement.title = 'Click to record your first mood';
+                moodEmojiElement.onclick = function() {
+                  document.querySelector('#mood-picker-section')?.scrollIntoView({ behavior: 'smooth' });
+                };
+                console.log('ℹ️ No mood data yet - showing default emoji');
+              }
+            }
+            
+            // ===== Display mood trend alert =====
+            if (moodAlert && moodAlertMessage) {
+              // Define emotion-specific messages WITH EMOJI
+              const emotionMessages = {
+                'happy': { 
+                  msg: '<span class="text-2xl mr-2 inline-block">😊</span> 💪 Keep it up! You\'re doing amazing! Your positive energy is inspiring.',
+                  color: 'bg-green-50 border-green-500'
+                },
+                'surprised': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😮</span> ✨ That\'s exciting! Embrace this new experience with openness!',
+                  color: 'bg-green-50 border-green-500'
+                },
+                'neutral': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😐</span> 🎯 Take a moment to reflect on what might lift your mood today.',
+                  color: 'bg-blue-50 border-blue-500'
+                },
+                'sad': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😢</span> 💙 We\'re here for you. Talk to your counselor or try some activities to feel better.',
+                  color: 'bg-yellow-50 border-yellow-500'
+                },
+                'angry': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😠</span> 🔥 Your feelings are valid. Talk to your counselor or do activities to channel this energy.',
+                  color: 'bg-yellow-50 border-yellow-500'
+                },
+                'fearful': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😨</span> 🤝 Remember, you\'re not alone. Talk to your counselor for support.',
+                  color: 'bg-yellow-50 border-yellow-500'
+                },
+                'anxious': {
+                  msg: '<span class="text-2xl mr-2 inline-block">😰</span> 🌊 Let\'s ease that anxiety. Talk to your counselor or try calming activities.',
+                  color: 'bg-yellow-50 border-yellow-500'
+                },
+                'disgusted': {
+                  msg: '<span class="text-2xl mr-2 inline-block">🤢</span> 💚 Process these feelings with support. Talk to your counselor or do helpful activities.',
+                  color: 'bg-yellow-50 border-yellow-500'
+                }
+              };
               
-              if (moodAlert && moodAlertMessage) {
-                moodAlertMessage.innerHTML = `
+              let alertMessage = '';
+              let alertClass = '';
+              
+              // If there's a last mood entry, show that emotion's message WITH EMOJI
+              if (lastEmotion && emotionMessages[lastEmotion]) {
+                alertMessage = emotionMessages[lastEmotion].msg;
+                alertClass = emotionMessages[lastEmotion].color;
+                console.log('📌 Showing mood alert for emotion:', lastEmotion);
+              } else if (trend && trend.isDeclining) {
+                // Fallback to trend-based message if no last emotion
+                alertMessage = `
                   <span class="text-yellow-700 font-bold">⚠️ Mood Trend Alert:</span><br>
                   Your mood has been trending lower recently (Score: ${trend.averageScore}/100).
                   We recommend talking to your counselor or trying some wellness activities.
                 `;
-                moodAlert.classList.remove('hidden');
-                moodAlert.classList.add('bg-yellow-50', 'border-yellow-500');
-              }
-            } else if (trend.trend === 'improving') {
-              const moodAlert = document.getElementById('mood-alert');
-              const moodAlertMessage = document.getElementById('mood-alert-message');
-              
-              if (moodAlert && moodAlertMessage) {
-                moodAlertMessage.innerHTML = `
+                alertClass = 'bg-yellow-50 border-yellow-500';
+                console.log('📌 Showing trend alert - declining');
+              } else if (trend && trend.trend === 'improving') {
+                alertMessage = `
                   <span class="text-green-700 font-bold">✨ Great Progress:</span><br>
                   Your mood has been improving! Keep up the great work!
                 `;
-                moodAlert.classList.remove('hidden');
-                moodAlert.classList.add('bg-green-50', 'border-green-500');
+                alertClass = 'bg-green-50 border-green-500';
+                console.log('📌 Showing trend alert - improving');
+              } else if (trend && trend.trend === 'stable') {
+                alertMessage = `
+                  <span class="text-blue-700 font-bold">😌 Mood Status:</span><br>
+                  Your mood has been stable. Keep taking care of yourself!
+                `;
+                alertClass = 'bg-blue-50 border-blue-500';
+                console.log('📌 Showing trend alert - stable');
+              }
+              
+              if (alertMessage) {
+                moodAlertMessage.innerHTML = alertMessage;
+                moodAlert.classList.remove('hidden', 'bg-yellow-50', 'border-yellow-500', 'bg-green-50', 'border-green-500', 'bg-blue-50', 'border-blue-500', 'bg-emerald-50', 'border-emerald-500');
+                
+                // Apply appropriate styling
+                alertClass.split(' ').forEach(cls => {
+                  if (cls) moodAlert.classList.add(cls);
+                });
+                console.log('✅ Mood alert displayed');
+              } else {
+                console.log('⚠️ No alert message to display - may be first time');
+                moodAlert.classList.add('hidden');
               }
             }
+          } else {
+            console.log('⚠️ No moodData in API response or trend missing');
+            // Ensure elements are visible but indicate no data
+            if (moodEmojiElement) {
+              moodEmojiElement.textContent = '👋';
+              console.log('ℹ️ Showing default greeting emoji');
+            }
           }
+        } else {
+          console.error('❌ API returned success: false', data);
         }
       } catch (error) {
-        console.error('Error loading mood greeting:', error);
+        console.error('❌ Error loading mood greeting:', error);
+        // Fallback: show default emoji
+        const moodEmojiElement = document.getElementById('mood-emoji');
+        if (moodEmojiElement) {
+          moodEmojiElement.textContent = '👋';
+        }
       }
+    }
+
+    // ===== SHOW LAST MOOD ENTRY MODAL =====
+    function showLastMoodEntryModal(emotion, trendData) {
+      console.log('📊 Showing mood entry modal for:', emotion);
+      
+      const emotionEmoji = emotionEmojis[emotion] || '😐';
+      const emotionLabel = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+      const confidence = trendData?.emotionConfidence || 0;
+      const entryDate = trendData?.lastEntryDate ? new Date(trendData.lastEntryDate).toLocaleDateString() : 'Recently';
+      
+      // Create and show modal
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm';
+      modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
+          <!-- Modal Header -->
+          <div class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white p-8 flex justify-between items-start gap-4">
+            <div class="flex-1">
+              <div class="text-6xl mb-4">${emotionEmoji}</div>
+              <h2 class="text-3xl font-bold">Your Last Mood Entry</h2>
+              <p class="mt-2 text-emerald-50 text-sm">Emotion: <strong>${emotionLabel}</strong></p>
+            </div>
+            <button onclick="this.closest('.fixed').remove();" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-2 transition flex-shrink-0 hover:scale-110">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Content -->
+          <div class="p-8 space-y-6">
+            <!-- Emotion Details -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Emotion</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-2">${emotionLabel}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Confidence</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-2">${Math.round(confidence)}%</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entry Date -->
+            <div class="border-l-4 border-green-600 bg-green-50 p-4 rounded-r-lg">
+              <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Recorded</p>
+              <p class="text-sm text-gray-700 font-medium">${entryDate}</p>
+            </div>
+
+            <!-- Helpful Tips -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4">
+              <p class="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="text-lg">💡</span> Recommended Actions
+              </p>
+              <ul class="space-y-2 text-sm text-gray-700">
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold flex-shrink-0 mt-0.5">→</span>
+                  <span>Track your mood regularly to understand patterns</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold flex-shrink-0 mt-0.5">→</span>
+                  <span>Try therapeutic games to support your wellness</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-green-600 font-bold flex-shrink-0 mt-0.5">→</span>
+                  <span>Journal your feelings for deeper insights</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="bg-gradient-to-r from-gray-50 to-gray-100 border-t-2 border-gray-200 p-6 flex justify-end gap-3">
+            <a href="/user/mood-tracker" class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition font-semibold shadow-md hover:shadow-lg">
+              View Mood Tracker
+            </a>
+            <button onclick="this.closest('.fixed').remove();" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Close modal when clicking outside
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.remove();
+        }
+      });
+      
+      document.body.appendChild(modal);
+    }
+
+    // ===== MOOD PICKER FUNCTIONS =====
+    let selectedEmotion = null;
+
+    function selectEmotion(emotion, buttonElement) {
+      console.log('🧠 Selected emotion:', emotion);
+      
+      // Update UI - highlight selected button ONLY
+      document.querySelectorAll('.emotion-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      buttonElement.classList.add('selected');
+      selectedEmotion = emotion;
+      
+      // Hide suggestions container - will show after save
+      const suggestionsContainer = document.getElementById('suggestions-container');
+      suggestionsContainer.classList.remove('show');
+      
+      console.log('✨ Emotion selected:', emotion, '- Click Save to see suggestions');
+    }
+
+    function clearMoodSelection() {
+      console.log('🗑️ Clearing mood selection');
+      
+      // Reset UI
+      document.querySelectorAll('.emotion-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      
+      const suggestionsContainer = document.getElementById('suggestions-container');
+      suggestionsContainer.classList.remove('show');
+      
+      selectedEmotion = null;
+    }
+
+    async function saveMoodEntry() {
+      if (!selectedEmotion) {
+        alert('Please select an emotion first!');
+        return;
+      }
+
+      console.log('💾 Saving mood entry:', selectedEmotion);
+
+      const saveBtn = document.getElementById('save-mood-btn');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+      try {
+        const response = await fetch('/api/mood/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            detectedEmotion: selectedEmotion,
+            emotionConfidence: 95,
+            userResponse: 'yes',
+            userConfirmed: true,
+            userNote: 'Selected from dashboard'
+          })
+        });
+
+        console.log('📡 API Response Status:', response.status, response.statusText);
+        
+        const data = await response.json();
+        console.log('📦 API Response Data:', data);
+
+        // Check if response is ok (status 200-299)
+        if (!response.ok) {
+          throw new Error(data.message || data.error || `Server error: ${response.statusText}`);
+        }
+
+        if (data.success) {
+          console.log('✅ Mood saved successfully!', data);
+          
+          // Show success message
+          saveBtn.innerHTML = '✅ Mood Saved!';
+          saveBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+          
+          // NOW fetch and show suggestions
+          await displaySuggestionsAfterSave(selectedEmotion);
+          
+          // Update greeting card with emotion-based message
+          await updateGreetingCardAfterMoodSave(selectedEmotion);
+          
+          // Reset after 3 seconds
+          setTimeout(() => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalText;
+            saveBtn.style.background = '';
+            
+            // Show success notification
+            showMoodNotification(`Your ${selectedEmotion} mood has been recorded! 🎉`, 'success');
+          }, 3000);
+        } else {
+          throw new Error(data.error || 'Failed to save mood');
+        }
+      } catch (error) {
+        console.error('❌ Error saving mood:', error);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        showMoodNotification(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function displaySuggestionsAfterSave(emotion) {
+      const suggestionsContainer = document.getElementById('suggestions-container');
+      const loadingState = document.getElementById('loading-state');
+      const suggestionsList = document.getElementById('suggestions-list');
+      
+      // Show suggestions container with loading
+      suggestionsContainer.classList.add('show');
+      loadingState.style.display = 'flex';
+      suggestionsList.innerHTML = '';
+
+      try {
+        const response = await fetch('/api/mood/suggestions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ emotion: emotion })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch suggestions');
+        }
+
+        const data = await response.json();
+        console.log('💡 Suggestions received:', data);
+
+        loadingState.style.display = 'none';
+
+        // Update suggestion intro message based on emotion
+        const introMessages = {
+          'happy': '🌟 Keep riding this wave of positivity!',
+          'sad': '💙 We\'re here to support you. Try one of these activities.',
+          'angry': '🔥 Channel that energy into something constructive.',
+          'fearful': '💜 Take a moment to calm yourself. These activities can help.',
+          'anxious': '🌊 Let\'s ease that anxiety with some calming activities.',
+          'neutral': '😐 Take a moment to reflect or try something new.',
+          'disgusted': '🤢 Process these feelings with helpful activities.',
+          'surprised': '😲 Process this new experience with care.'
+        };
+
+        const introEl = document.getElementById('suggestion-intro');
+        if (introEl) {
+          introEl.textContent = introMessages[emotion] || 'Check out these suggestions for you!';
+        }
+
+        // Display suggestions
+        if (data.activities && Array.isArray(data.activities)) {
+          data.activities.forEach((activity, index) => {
+            const suggestionEl = document.createElement('div');
+            suggestionEl.className = 'suggestion-item';
+            suggestionEl.style.animationDelay = `${index * 0.1}s`;
+            suggestionEl.innerHTML = `
+              <div class="suggestion-title">
+                <span>${activity.icon || '🎯'}</span>
+                <span>${activity.name}</span>
+              </div>
+              <div class="suggestion-desc">${activity.description}</div>
+              ${activity.link ? `<a href="${activity.link}" class="suggestion-link">Open Activity →</a>` : ''}
+            `;
+            suggestionsList.appendChild(suggestionEl);
+          });
+        } else {
+          suggestionsList.innerHTML = '<p class="text-gray-600">No specific suggestions for this mood, but remember to reach out to your counselor anytime!</p>';
+        }
+
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        loadingState.style.display = 'none';
+        suggestionsList.innerHTML = '<p class="text-red-600 font-semibold">⚠️ Unable to load suggestions. Please try again.</p>';
+      }
+    }
+
+    async function updateGreetingCardAfterMoodSave(emotion) {
+      try {
+        console.log('🔄 Reloading mood greeting after save...');
+        
+        // Reload the full greeting from API to get updated mood trend
+        await loadMoodGreetingOnDashboard();
+        
+        // Also show emotion-specific confirmation message
+        const goodEmotions = ['happy', 'surprised', 'neutral'];
+        const badEmotions = ['sad', 'angry', 'fearful', 'anxious', 'disgusted'];
+        
+        const emotionMessages = {
+          'happy': '💪 Keep it up! You\'re doing amazing! Your positive energy is inspiring.',
+          'surprised': '✨ That\'s exciting! Embrace this new experience with openness!',
+          'neutral': '🎯 Take a moment to reflect on what might lift your mood today.',
+          'sad': '💙 We\'re here for you. Talk to your counselor or try some activities to feel better.',
+          'angry': '🔥 Your feelings are valid. Talk to your counselor or do activities to channel this energy.',
+          'fearful': '🤝 Remember, you\'re not alone. Talk to your counselor for support.',
+          'anxious': '🌊 Let\'s ease that anxiety. Talk to your counselor or try calming activities.',
+          'disgusted': '💚 Process these feelings with support. Talk to your counselor or do helpful activities.'
+        };
+
+        const moodAlert = document.getElementById('mood-alert');
+        const moodAlertMessage = document.getElementById('mood-alert-message');
+
+        if (moodAlert && moodAlertMessage) {
+          // Update with emotion-specific message
+          moodAlertMessage.innerHTML = emotionMessages[emotion] || 'Your mood has been recorded. Great job!';
+          moodAlert.classList.remove('hidden', 'bg-yellow-50', 'border-yellow-500', 'bg-green-50', 'border-green-500', 'bg-blue-50', 'border-blue-500');
+          
+          // Style based on emotion type
+          if (goodEmotions.includes(emotion)) {
+            moodAlert.classList.add('bg-green-50', 'border-green-500');
+          } else if (badEmotions.includes(emotion)) {
+            moodAlert.classList.add('bg-yellow-50', 'border-yellow-500');
+          }
+          
+          // Scroll to greeting card to show the updated message
+          document.getElementById('mood-greeting-card')?.scrollIntoView({ behavior: 'smooth' });
+          console.log('✅ Greeting card updated with emotion:', emotion);
+        }
+      } catch (error) {
+        console.error('Error updating greeting card:', error);
+      }
+    }
+
+    function showMoodNotification(message, type) {
+      const notif = document.createElement('div');
+      notif.className = `fixed top-6 right-6 p-4 rounded-lg shadow-lg text-white font-semibold z-50 animate-bounce`;
+      notif.style.background = type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+      notif.textContent = message;
+      
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.remove();
+      }, 3000);
     }
 
     // Load mood greeting when page loads
     document.addEventListener('DOMContentLoaded', loadMoodGreetingOnDashboard);
   </script>
+  
+  <!-- Unified Mood Tracker Module for persistent state -->
+  <script src="/js/mood-tracker-unified.js?v=1"></script>
 </body>
 </html>

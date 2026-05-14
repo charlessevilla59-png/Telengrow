@@ -125,12 +125,12 @@
                     {{this.title}}
                   </h2>
                   <span class="text-3xl">
-                    {{#ifEquals this.mood "happy"}}😊{{/ifEquals}}
-                    {{#ifEquals this.mood "sad"}}😢{{/ifEquals}}
-                    {{#ifEquals this.mood "anxious"}}😰{{/ifEquals}}
-                    {{#ifEquals this.mood "calm"}}😌{{/ifEquals}}
+                    {{#ifEquals this.mood "happy"}}�{{/ifEquals}}
+                    {{#ifEquals this.mood "sad"}}�{{/ifEquals}}
+                    {{#ifEquals this.mood "anxious"}}�{{/ifEquals}}
+                    {{#ifEquals this.mood "calm"}}�{{/ifEquals}}
                     {{#ifEquals this.mood "stressed"}}😫{{/ifEquals}}
-                    {{#ifEquals this.mood "neutral"}}😐{{/ifEquals}}
+                    {{#ifEquals this.mood "neutral"}}�{{/ifEquals}}
                   </span>
                 </div>
 
@@ -145,12 +145,12 @@
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-semibold text-purple-700">🤖 AI Analysis:</span>
                     <span class="text-2xl">
-                      {{#ifEquals this.detectedEmotion "happy"}}😊{{/ifEquals}}
-                      {{#ifEquals this.detectedEmotion "sad"}}😢{{/ifEquals}}
-                      {{#ifEquals this.detectedEmotion "anxious"}}😰{{/ifEquals}}
-                      {{#ifEquals this.detectedEmotion "angry"}}😠{{/ifEquals}}
+                      {{#ifEquals this.detectedEmotion "happy"}}�{{/ifEquals}}
+                      {{#ifEquals this.detectedEmotion "sad"}}�{{/ifEquals}}
+                      {{#ifEquals this.detectedEmotion "anxious"}}�{{/ifEquals}}
+                      {{#ifEquals this.detectedEmotion "angry"}}�{{/ifEquals}}
                       {{#ifEquals this.detectedEmotion "calm"}}😌{{/ifEquals}}
-                      {{#ifEquals this.detectedEmotion "neutral"}}😐{{/ifEquals}}
+                      {{#ifEquals this.detectedEmotion "neutral"}}�{{/ifEquals}}
                     </span>
                     <span class="text-xs font-semibold text-gray-700 capitalize">
                       {{this.detectedEmotion}} ({{this.emotionConfidence}}%)
@@ -165,7 +165,7 @@
                     </span>
                     {{else}}
                     <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                      😐 Neutral
+                      � Neutral
                     </span>
                     {{/gte}}
                   </div>

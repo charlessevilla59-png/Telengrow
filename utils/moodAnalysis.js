@@ -121,14 +121,14 @@ export const detectCriticalMoodDeclining = (moods) => {
  */
 export const getMoodInterpretation = (emotion) => {
   const interpretations = {
-    'happy': '😊 You seem happy! Keep up the positive energy!',
-    'surprised': '😲 You seem surprised! That\'s interesting.',
-    'neutral': '😐 You seem calm and neutral. That\'s good!',
-    'fearful': '😨 You seem a bit fearful. Remember, you\'re safe here.',
-    'anxious': '😰 You seem anxious. Would you like to try a relaxation activity?',
-    'disgusted': '🤢 You seem disgusted. Is everything okay?',
-    'angry': '😠 You seem angry. Let\'s talk about it if you need to.',
-    'sad': '😢 You seem sad. Remember, it\'s okay to feel this way. We\'re here for you.'
+    'happy': '😊 You seem happy! Your positive energy is wonderful. Keep sharing that joy with others!',
+    'surprised': '😲 You seem surprised! New experiences can bring excitement and growth to your life.',
+    'neutral': '😐 You seem calm and balanced. This steady state is perfect for reflection and productive activities. You\'re grounded and focused.',
+    'fearful': '😨 You seem a bit fearful. Remember, you\'re safe here. Our counselors are ready to listen and support you through your concerns.',
+    'anxious': '😰 You seem anxious. This is natural, but you\'re not alone. Try our breathing exercises or talk to someone who cares about you.',
+    'disgusted': '🤢 You seem disgusted. Sometimes we need to process these feelings. Would you like to discuss what\'s bothering you?',
+    'angry': '😠 You seem angry. These strong feelings deserve attention. Let\'s channel this energy into something constructive - perhaps journaling or talking it through.',
+    'sad': '😢 You seem sad. It\'s okay to feel this way. Reach out to our counselors, or write about your feelings in your journal. You\'re not alone in this.'
   };
   
   return interpretations[emotion] || '👋 How are you feeling today?';
@@ -177,21 +177,21 @@ export const suggestActivities = (emotion) => {
     'happy': [
       { 
         name: '✍️ Gratitude Journal', 
-        description: 'Capture your joy - Write what made you happy today',
+        description: 'Capture your joy and celebrate what made today special. Document these positive moments so you can revisit them on harder days and remember your strength',
         link: '/journal',
         icon: '✍️',
         color: 'bg-yellow-100 border-yellow-400'
       },
       { 
         name: '💬 Share your Joy', 
-        description: 'Connect with counselor - Spread positivity',
+        description: 'Connect with your counselor and spread positivity. Sharing happiness creates meaningful connections and strengthens your support system',
         link: '/messages',
         icon: '💬',
         color: 'bg-yellow-100 border-yellow-400'
       },
       { 
-        name: '📚 Explore Content', 
-        description: 'Discover inspiring reading materials',
+        name: '📚 Explore Inspiring Content', 
+        description: 'Discover uplifting reading materials that complement your positive mood. Great stories and insights can amplify your happiness',
         link: '/reading',
         icon: '📚',
         color: 'bg-yellow-100 border-yellow-400'
@@ -200,28 +200,28 @@ export const suggestActivities = (emotion) => {
     'sad': [
       { 
         name: '🧘 Breathing Exercises', 
-        description: 'Calm your mind with guided breathing',
+        description: 'Calm your mind with guided breathing techniques. These proven exercises can help ease emotional pain and bring you back to a centered state',
         link: '/games/breathing-bubble',
         icon: '🧘',
         color: 'bg-blue-100 border-blue-400'
       },
       { 
-        name: '📚 Reading Materials', 
-        description: 'Find comfort in inspiring stories',
+        name: '📚 Uplifting Stories', 
+        description: 'Find comfort and hope through inspiring reading materials. Many people have overcome similar challenges - let their stories inspire you',
         link: '/reading',
         icon: '📚',
         color: 'bg-blue-100 border-blue-400'
       },
       { 
         name: '💬 Talk to Counselor', 
-        description: 'Share your feelings - You\'re not alone',
+        description: 'Share your feelings with a trained counselor who genuinely cares. You\'re never alone - professional support can make a real difference',
         link: '/messages',
         icon: '💬',
         color: 'bg-blue-100 border-blue-400'
       },
       { 
-        name: '🎮 Play a Game', 
-        description: 'Lift your mood with fun activities',
+        name: '🎮 Engaging Games', 
+        description: 'Distract yourself with enjoyable activities that lift your mood. Fun and laughter are powerful healing tools',
         link: '/games',
         icon: '🎮',
         color: 'bg-blue-100 border-blue-400'
@@ -229,29 +229,29 @@ export const suggestActivities = (emotion) => {
     ],
     'angry': [
       { 
-        name: '🎾 Stress Ball Game', 
-        description: 'Release energy - Channel your anger positively',
+        name: '🎾 Release Energy', 
+        description: 'Use our stress relief game to release your anger productively. Channel your intense emotions into something constructive and satisfying',
         link: '/games/stress-ball',
         icon: '🎾',
         color: 'bg-red-100 border-red-400'
       },
       { 
-        name: '🧘 Zen Garden', 
-        description: 'Find peace through mindful activity',
+        name: '🧘 Calm Your Mind', 
+        description: 'Regain control through the Zen garden meditation activity. Find peace and perspective to process why you\'re feeling this way',
         link: '/games/zen-garden',
         icon: '🧘',
         color: 'bg-red-100 border-red-400'
       },
       { 
-        name: '🫁 Breathing Exercises', 
-        description: 'Cool down with deep breathing',
+        name: '🫁 Cool Down Breathing', 
+        description: 'Deep breathing techniques can quickly reduce anger and restore emotional balance. Science proves this works - give it a try',
         link: '/games/breathing-bubble',
         icon: '🫁',
         color: 'bg-red-100 border-red-400'
       },
       { 
-        name: '📝 Journal it Out', 
-        description: 'Express your feelings in writing',
+        name: '📝 Journal Your Feelings', 
+        description: 'Express your anger on paper without filter. Writing helps you understand what triggered you and find constructive solutions',
         link: '/journal',
         icon: '📝',
         color: 'bg-red-100 border-red-400'
@@ -259,29 +259,29 @@ export const suggestActivities = (emotion) => {
     ],
     'anxious': [
       { 
-        name: '🫁 Breathing Exercises', 
-        description: 'Ease anxiety with breathing techniques',
+        name: '🫁 Guided Breathing', 
+        description: 'Ease anxiety with proven breathing techniques. This is the fastest way to calm your nervous system and regain control',
         link: '/games/breathing-bubble',
         icon: '🫁',
         color: 'bg-orange-100 border-orange-400'
       },
       { 
-        name: '🧩 Puzzle Therapy', 
-        description: 'Focus your mind on solving puzzles',
+        name: '🧩 Focus & Concentration', 
+        description: 'Ground yourself by solving puzzles. This redirects anxious thoughts and gives your mind something productive to focus on',
         link: '/games/puzzle-therapy',
         icon: '🧩',
         color: 'bg-orange-100 border-orange-400'
       },
       { 
-        name: '✨ Affirmation Cards', 
-        description: 'Boost confidence with positive affirmations',
+        name: '✨ Positive Affirmations', 
+        description: 'Boost your confidence with powerful affirmations. Replace anxious thoughts with positive, empowering messages',
         link: '/games/affirmation-cards',
         icon: '✨',
         color: 'bg-orange-100 border-orange-400'
       },
       { 
-        name: '💬 Connect with Counselor', 
-        description: 'Get professional support',
+        name: '💬 Get Professional Support', 
+        description: 'Connect with a trained counselor who specializes in anxiety. Professional guidance can help you manage these overwhelming feelings',
         link: '/messages',
         icon: '💬',
         color: 'bg-orange-100 border-orange-400'
@@ -289,29 +289,29 @@ export const suggestActivities = (emotion) => {
     ],
     'fearful': [
       { 
-        name: '🫁 Breathing Exercises', 
-        description: 'Ground yourself with breathing techniques',
+        name: '🫁 Grounding Breathing', 
+        description: 'Ground yourself with breathing techniques that anchor you in the present moment. Fear thrives on "what if" - breathing brings you back to "what is"',
         link: '/games/breathing-bubble',
         icon: '🫁',
         color: 'bg-purple-100 border-purple-400'
       },
       { 
         name: '✨ Positive Affirmations', 
-        description: 'Reassure yourself with kind words',
+        description: 'Reassure yourself with kind, empowering words. Positive self-talk counters fearful thoughts and builds your inner strength',
         link: '/games/affirmation-cards',
         icon: '✨',
         color: 'bg-purple-100 border-purple-400'
       },
       { 
-        name: '💬 Connect with Counselor', 
-        description: 'Talk through your fears',
+        name: '💬 Counselor Support', 
+        description: 'Talk through your fears with a compassionate counselor. Naming your fears and getting perspective can significantly reduce them',
         link: '/messages',
         icon: '💬',
         color: 'bg-purple-100 border-purple-400'
       },
       { 
-        name: '📚 Inspiring Stories', 
-        description: 'Find courage through others\' experiences',
+        name: '📚 Courage Stories', 
+        description: 'Read inspiring stories of people who overcame their fears. Learn from their experiences and find courage in their journeys',
         link: '/reading',
         icon: '📚',
         color: 'bg-purple-100 border-purple-400'
@@ -319,29 +319,29 @@ export const suggestActivities = (emotion) => {
     ],
     'disgusted': [
       { 
-        name: '🧼 Self-Care Reminder', 
-        description: 'Practice self-care and hygiene habits',
+        name: '🧼 Self-Care Ritual', 
+        description: 'Refresh yourself with self-care and healthy habits. Taking care of your body can help you process and release these uncomfortable feelings',
         link: '/journal',
         icon: '🧼',
         color: 'bg-green-100 border-green-400'
       },
       { 
-        name: '🌿 Wellness Check', 
-        description: 'Refresh your mind with nature content',
+        name: '🌿 Wellness Resources', 
+        description: 'Explore content about health and well-being. Positive environmental input can shift your emotional state',
         link: '/reading',
         icon: '🌿',
         color: 'bg-green-100 border-green-400'
       },
       { 
-        name: '🫁 Cleansing Breathing', 
-        description: 'Reset with calming exercises',
+        name: '🫁 Reset with Breathing', 
+        description: 'Calm yourself with cleansing breathing exercises. This helps you release negative feelings and start fresh',
         link: '/games/breathing-bubble',
         icon: '🫁',
         color: 'bg-green-100 border-green-400'
       },
       { 
-        name: '💬 Talk it Out', 
-        description: 'Discuss your feelings with someone',
+        name: '💬 Share & Process', 
+        description: 'Talk it out with someone you trust. Processing disgusting feelings with a counselor can help you understand and move past them',
         link: '/messages',
         icon: '💬',
         color: 'bg-green-100 border-green-400'
@@ -350,28 +350,28 @@ export const suggestActivities = (emotion) => {
     'surprised': [
       { 
         name: '✍️ Capture the Moment', 
-        description: 'Write about your surprising experience',
+        description: 'Document your surprising experience in your journal. Capturing these unexpected moments preserves the memory and helps you process what just happened',
         link: '/journal',
         icon: '✍️',
         color: 'bg-pink-100 border-pink-400'
       },
       { 
-        name: '🎮 Fun & Games', 
-        description: 'Keep the excitement going',
+        name: '🎮 Keep the Energy', 
+        description: 'Channel your excitement through engaging games. Excitement is a great fuel for fun and energizing activities',
         link: '/games',
         icon: '🎮',
         color: 'bg-pink-100 border-pink-400'
       },
       { 
-        name: '💬 Share the News', 
-        description: 'Tell others about your surprise',
+        name: '💬 Share Your Surprise', 
+        description: 'Tell your counselor or friends about your amazing surprise! Sharing excitement amplifies the joy and strengthens connections',
         link: '/messages',
         icon: '💬',
         color: 'bg-pink-100 border-pink-400'
       },
       { 
         name: '📚 Explore More', 
-        description: 'Discover new and exciting content',
+        description: 'Discover new and exciting content. Keep feeding that sense of wonder and discovery with fresh perspectives',
         link: '/reading',
         icon: '📚',
         color: 'bg-pink-100 border-pink-400'
@@ -380,30 +380,30 @@ export const suggestActivities = (emotion) => {
     'neutral': [
       { 
         name: '📚 Explore Reading Materials', 
-        description: 'Discover interesting content',
+        description: 'You\'re feeling calm and balanced - a perfect time to explore inspiring stories and insights. Reading can help you discover new perspectives and broaden your understanding',
         link: '/reading',
         icon: '📚',
         color: 'bg-gray-100 border-gray-400'
       },
       { 
-        name: '🎮 Try a Game', 
-        description: 'Engage with fun activities',
+        name: '🎮 Explore Wellness Games', 
+        description: 'Your mood is steady - try light games to maintain your mental clarity and stimulate your mind. Fun activities can help you stay engaged and focused',
         link: '/games',
         icon: '🎮',
         color: 'bg-gray-100 border-gray-400'
       },
       { 
-        name: '✍️ Journal Check-in', 
-        description: 'Reflect on your day',
+        name: '✍️ Reflective Journaling', 
+        description: 'This is an excellent time for deep reflection. Write about your thoughts, goals, and observations about today. Clear thinking leads to meaningful insights',
         link: '/journal',
         icon: '✍️',
         color: 'bg-gray-100 border-gray-400'
       },
       { 
-        name: '🔄 Wellness Check-in', 
-        description: 'Track your mood regularly',
-        link: '/user/mood-tracker',
-        icon: '🔄',
+        name: '🧘 Mindfulness Practice', 
+        description: 'Build on your calm state with mindfulness meditation. Strengthen your emotional awareness and cultivate inner peace for long-term well-being',
+        link: '/games/breathing-bubble',
+        icon: '🧘',
         color: 'bg-gray-100 border-gray-400'
       }
     ]

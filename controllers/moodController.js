@@ -300,6 +300,39 @@ function calculateMoodStats(moods) {
 }
 
 /**
+ * Get mood suggestions based on emotion
+ */
+export const getMoodSuggestions = async (req, res) => {
+  try {
+    const { emotion } = req.body;
+
+    if (!emotion) {
+      return res.status(400).json({ 
+        error: 'Missing emotion', 
+        message: 'Emotion parameter is required' 
+      });
+    }
+
+    // Get suggestions using utility function
+    const suggestions = suggestActivities(emotion);
+
+    res.status(200).json({
+      success: true,
+      emotion: emotion,
+      activities: suggestions,
+      message: `Here are activities suggested for ${emotion} mood`
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting mood suggestions:', error);
+    res.status(500).json({ 
+      error: 'Server error', 
+      message: error.message 
+    });
+  }
+};
+
+/**
  * Check mood trend and notify counselor if declining
  */
 export const checkMoodTrendAndNotify = async (req, res) => {
@@ -399,29 +432,88 @@ export const getMoodDashboardData = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Get latest moods (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // Import JournalEntry model
+    const { JournalEntry } = await import('../models/index.js');
 
-    const recentMoods = await MoodEntry.findAll({
+    // Get the LAST mood entry from DASHBOARD (MoodEntry model)
+    const lastMoodEntry = await MoodEntry.findOne({
       where: {
         userId: userId,
-        createdAt: { [Op.gte]: sevenDaysAgo }
+        detectedEmotion: { [Op.ne]: null }
       },
       order: [['createdAt', 'DESC']],
-      limit: 20
+      attributes: ['id', 'detectedEmotion', 'emotionConfidence', 'createdAt']
     });
 
-    const trendAnalysis = calculateMoodTrend(recentMoods);
+    // Get the LAST journal entry with detected emotion (fallback)
+    const lastJournalEntry = await JournalEntry.findOne({
+      where: {
+        userId: userId,
+        detectedEmotion: { [Op.ne]: null }
+      },
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'title', 'detectedEmotion', 'emotionConfidence', 'emotionScores', 'sentimentAnalysis', 'createdAt']
+    });
+
     const greeting = getGreetingMessage(user);
+
+    // Use the MOST RECENT emotion (prefer MoodEntry from dashboard)
+    let lastEmotion = null;
+    let lastEntryDate = null;
+    let emotionConfidence = 0;
+
+    if (lastMoodEntry && lastJournalEntry) {
+      // Both exist - use the most recent
+      if (new Date(lastMoodEntry.createdAt) > new Date(lastJournalEntry.createdAt)) {
+        lastEmotion = lastMoodEntry.detectedEmotion;
+        lastEntryDate = lastMoodEntry.createdAt;
+        emotionConfidence = lastMoodEntry.emotionConfidence || 0;
+      } else {
+        lastEmotion = lastJournalEntry.detectedEmotion;
+        lastEntryDate = lastJournalEntry.createdAt;
+        emotionConfidence = lastJournalEntry.emotionConfidence || 0;
+      }
+    } else if (lastMoodEntry) {
+      // Only mood entry exists
+      lastEmotion = lastMoodEntry.detectedEmotion;
+      lastEntryDate = lastMoodEntry.createdAt;
+      emotionConfidence = lastMoodEntry.emotionConfidence || 0;
+    } else if (lastJournalEntry) {
+      // Only journal entry exists
+      lastEmotion = lastJournalEntry.detectedEmotion;
+      lastEntryDate = lastJournalEntry.createdAt;
+      emotionConfidence = lastJournalEntry.emotionConfidence || 0;
+    }
+
+    // Prepare emotion data
+    let trendAnalysis = {
+      lastEmotion: lastEmotion,
+      emotionConfidence: emotionConfidence,
+      isPositive: false,
+      isBad: false,
+      lastEntryDate: lastEntryDate
+    };
+
+    // Determine if emotion is positive or negative
+    if (lastEmotion) {
+      const positiveEmotions = ['happy', 'calm', 'surprised', 'neutral'];
+      const badEmotions = ['sad', 'angry', 'anxious', 'fearful', 'disgusted'];
+      
+      if (positiveEmotions.includes(lastEmotion)) {
+        trendAnalysis.isPositive = true;
+      } else if (badEmotions.includes(lastEmotion)) {
+        trendAnalysis.isBad = true;
+      }
+    }
+
+    console.log(`📊 Dashboard mood data for user ${userId}:`, trendAnalysis);
 
     res.status(200).json({
       success: true,
       greeting,
       moodData: {
         trend: trendAnalysis,
-        recentMoods: recentMoods,
-        stats: calculateMoodStats(recentMoods)
+        lastEntry: lastMoodEntry || lastJournalEntry
       }
     });
 

@@ -104,6 +104,24 @@
       margin-bottom: 10px;
     }
 
+    /* Mood button styling */
+    .mood-button {
+      transition: all 0.3s ease;
+      background-color: transparent;
+      border-color: #e5e7eb;
+    }
+
+    .mood-button:hover {
+      transform: scale(1.05);
+    }
+
+    .mood-button.selected {
+      transform: scale(1.1);
+      background-color: #f0fdf4;
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -128,6 +146,65 @@
       max-width: 500px;
       width: 90%;
       animation: fadeInUp 0.4s ease-out;
+    }
+
+    /* Suggestions Container Styles */
+    #suggestions-container {
+      display: none;
+    }
+
+    #suggestions-container.show {
+      display: block;
+    }
+
+    .suggestion-item {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #d1fae5;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      animation: slideInUp 0.3s ease-out;
+    }
+
+    .suggestion-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    }
+
+    .suggestion-title {
+      font-weight: 600;
+      color: #047857;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+    }
+
+    .suggestion-desc {
+      color: #059669;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-link {
+      color: #0891b2;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .suggestion-link:hover {
+      color: #0e7490;
+    }
+
+    #loading-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      color: #059669;
     }
 
     .loading-spinner {
@@ -291,8 +368,26 @@
               >
             </div>
 
+            <!-- Mood Trend Alert -->
+            <div id="mood-alert" class="mb-6 p-4 rounded-lg border-l-4 border-green-500 bg-green-50 hidden animate-fade-in-up">
+              <p id="mood-alert-message" class="text-green-800 font-medium"></p>
+            </div>
+
+            <!-- Suggestions Container -->
+            <div id="suggestions-container" class="mb-6 p-6 rounded-xl bg-white border-2 border-emerald-200 hidden animate-fade-in-up">
+              <h3 class="text-xl font-bold text-gray-900 mb-2">💡 <span id="suggestion-intro">Great choice!</span></h3>
+              <div id="loading-state" class="flex justify-center items-center gap-2">
+                <div class="loading-spinner"></div>
+                <p class="text-gray-600">Loading personalized activities...</p>
+              </div>
+              <div id="suggestions-list" class="space-y-3 mt-4">
+                <!-- Suggestions will be populated here -->
+              </div>
+            </div>
+
             <!-- Submit Button -->
             <button 
+              id="save-mood-btn"
               onclick="saveMoodEntry()"
               class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2 text-lg"
             >
@@ -415,6 +510,8 @@
 
   <!-- Script: Manual Mood Tracker (No Face Recognition) - External File -->
   <script src="/js/mood-tracker-v2.js?v=2"></script>
+  <!-- Script: Unified Mood Tracker Module - Must load AFTER v2 to override functions -->
+  <script src="/js/mood-tracker-unified.js?v=1"></script>
   <script>
     // Sidebar functions
     function openSidebar() {
